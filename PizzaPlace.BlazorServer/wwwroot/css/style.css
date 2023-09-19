@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Lobster&display=swap');
+
+/*
+font-family: 'Lato', sans-serif;
+font-family: 'Lobster', cursive;
+*/
+
+* {
+    font-family: 'Lato', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6{
+    font-family: 'Lobster', cursive;
+}
+
+.nav-icon:hover {
+    background-color: white;
+    color: red !important;
+}
+
+.nav-icon {
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.nav-icon-wrap {
+    margin-left: 10px;
+    display: inline-block;
+}
+
+.nav-icon i {
+    padding: 20px;
+}
+
+.nav-item {
+    margin-left: 15px;
+    color: white;
+}
+
+.nav-link {
+    color: inherit;
+    border-radius: 5px;
+
+}
+
+.nav-link.active {
+    color: red !important;
+    background-color: rgb(216, 216, 216);
+}
+
+.nav-link:focus {
+    color: unset;
+}
+
+.nav-link:hover {
+    background-color: white;
+    color: red !important;
+}
+
+.ml-auto-icon {
+    margin-left: auto;
+    margin-right: 15px;
+}
+
+.navbar-toggler:focus {
+    box-shadow: unset;
+}
+
+.hero-image{
+    height: 600px;
+    background-image: url("/images/pizza.jpg");
+    background-position: left;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+}
+
+.hero-title{
+    position: absolute;
+    left: 50%;
+    top:50%;
+    transform: translate(-50%, -50%);
+    color:white;
+}
+
+.ordering-menu{
+    background-color: white;
+    padding:50px;    
+}
+
+.order-flow-wrapper{
+    height: 150px;
+    width: 50%;
+    background-color: white;
+    position: absolute;
+    bottom:-75px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.shade{
+    position: absolute;
+    top:0;
+    left:0;
+    background-color: rgba(0, 0, 0, 0.7);
+    width: 100%;
+    height: 100%;
+}
+
+.card{
+    height: 500px;
+    cursor: pointer;
+    transition: all .5s;
+}
+
+.card:hover{
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;}
+
+.menu-list{
+    list-style: none;
+    padding: 0;
+}
+
+.menu-item{
+    cursor: pointer;
+    transition: 0.25s all;
+}
+
+.menu-item:hover{
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    transform: scale(1.03);
+    background-color: #9A3B3B;
+    color:white !important;
+}
+
+.animated-collapse {
+    display: block;
+    transition: max-height 0.3s ease-out;
+    overflow: hidden;
+    max-height: 0;
+}
+
+.animated-collapse {
+    transition: max-height 0.3s ease-out;
+    overflow: hidden;
+    max-height: 0;
+}
+
+    .animated-collapse.showing {
+        max-height: 2000px;
+    }
+
+
+@media (max-width: 767.98px) {
+    .nav-item {
+        margin: 0;
+    }
+
+    .nav-link {
+        margin-top: 10px;
+        padding-left: 20px;
+    }
+
+    .hero-image{
+        height: 300px;
+    }
+
+
+
+}
