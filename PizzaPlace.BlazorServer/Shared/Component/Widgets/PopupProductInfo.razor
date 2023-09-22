@@ -1,0 +1,50 @@
+﻿@inject IJSRuntime JSRuntime
+@inject ShoppingCartService ShoppingCartService
+@inject NavMenuService NavMenuService
+
+@if (Show && ProductInfo is not null)
+{
+    <div class="modal-popup p-3" style="max-width:300px;">
+        <div @onclick="HidePopupAsync" style="position:absolute; right:16px; top:16px; cursor:pointer; z-index:1250;"><i class="fa-solid fa-rectangle-xmark fa-2x"></i></div>
+       <div class="position-relative">
+            <img src="/images/pizza_popup.png" class="img-fluid"/>
+            <div class="pizza-overlay"><h4 class="text-center pt-2 text-primary">@ProductInfo.Name</h4></div>
+       </div>
+        <h6 class="text-primary my-0 py-0">Ingridients : </h6>
+        <p class="m-1 pt-1" style="font-size:.8rem; padding-left:10px;">@ProductInfo.Ingridients</p>
+        <div class="float-end" style="margin-right:10px;"><small style="font-size:.7rem;" class="text-decoration-line-through text-secondary">@ProductInfo.Price$</small> <span class="fw-bold">@ProductInfo.DiscountedPrice$</span></div>
+        <button @onclick="AddToCart" style="display:block; width:100%; margin-top:38px;" class="btn btn-outline-primary">Add</button>
+    </div>
+}
+
+<ShadowOverlay OnOverlayClick="HidePopupAsync" Show="Show" />
+
+@code {
+    [Parameter]
+    public bool Show { get; set; }
+
+    [Parameter]
+    public EventCallback OnHideCallback { get; set; }
+
+    [Parameter]
+    public ProductInfo? ProductInfo { get; set; } 
+
+    async Task HidePopupAsync(){
+        Show = false;
+        await OnHideCallback.InvokeAsync();
+    }
+
+    async Task AddToCart()
+    {
+        ProductInfo.Amount = 1;
+        var success = await ShoppingCartService.AddToShoppingCartAsync(ProductInfo);
+
+        if (!NavMenuService.CartShow)
+            await ShoppingCartService.AddToUnseenCartNumber(ProductInfo.Amount);
+
+        if (success)
+            await HidePopupAsync();
+    }
+
+
+}

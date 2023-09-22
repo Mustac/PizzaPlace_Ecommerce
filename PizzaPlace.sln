@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34018.315
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PizzaPlace.BlazorServer", "PizzaPlace.BlazorServer\PizzaPlace.BlazorServer.csproj", "{DB77325D-127D-4B8A-AD04-AF8868349FFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PizzaPlace.BlazorServer", "PizzaPlace.BlazorServer\PizzaPlace.BlazorServer.csproj", "{DB77325D-127D-4B8A-AD04-AF8868349FFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PizzaPlace.Models", "PizzaPlace.Models\PizzaPlace.Models.csproj", "{4AC3910A-A865-4936-9489-AC43B31A732F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{DB77325D-127D-4B8A-AD04-AF8868349FFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB77325D-127D-4B8A-AD04-AF8868349FFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB77325D-127D-4B8A-AD04-AF8868349FFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AC3910A-A865-4936-9489-AC43B31A732F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AC3910A-A865-4936-9489-AC43B31A732F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AC3910A-A865-4936-9489-AC43B31A732F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AC3910A-A865-4936-9489-AC43B31A732F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

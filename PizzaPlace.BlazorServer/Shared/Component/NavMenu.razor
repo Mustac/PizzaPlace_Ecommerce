@@ -1,0 +1,102 @@
+﻿@inject IJSRuntime JS
+@inject ShoppingCartService ShoppingCartService
+@inject NavMenuService NavMenuService
+@* @implements IDisposable *@
+
+<nav class="sticky-top navbar navbar-expand-md bg-danger shadow-sm border-bottom border-white">
+    <div class="container">
+        <a class="navbar-brand text-light" href="#">Pizza Place</a>
+        <div class="d-md-none ml-auto-icon">
+            <div class="nav-icon-wrap">
+                <i class="fa-solid fa-user text-white nav-icon"></i>
+            </div>
+            <div @onclick="ShoppingCartClick" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
+                <i class="fa-solid fa-cart-shopping  nav-icon"></i>
+                <div class="notification text-white fw-bold">
+                    <span class="notification-number">@cartNumberNotification</span>
+                </div>
+            </div>
+        </div>
+        <button class="navbar-toggler bg-white show" @onclick="ToggleMenu" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav" style="margin-left: auto;">
+                <li class="nav-item">
+                    <NavLink Match="NavLinkMatch.All" class="nav-link active" href="/">Home</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink Match="NavLinkMatch.All" class="nav-link" href="/menu">Menu</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink Match="NavLinkMatch.All" class="nav-link" href="/aboutus">About Us</NavLink>
+                </li>
+            </ul>
+        </div>
+        <div class="d-none d-md-block">
+            <div class="nav-icon-wrap ico">
+                <i class="fa-solid fa-user text-white nav-icon"></i>
+            </div>
+            <div @onclick="ShoppingCartClick" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
+                <i class="fa-solid fa-cart-shopping  nav-icon"></i>
+                <div class="notification text-white fw-bold">
+                    <span class="notification-number">@cartNumberNotification</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+@code {
+    public bool navOpen = false;
+    private bool cartActive = false;
+    int cartNumberNotification = 0;
+
+    public event Action<bool>? OnNavToggleClick;
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            OnNavToggleClick += NavMenuService.SetNavState;
+            cartNumberNotification = await ShoppingCartService.GetUnseenCartNumberAsync();
+            ShoppingCartService.OnAddUnseenProductToCart += UpdateUnseenCartProduct;
+            StateHasChanged();
+        }
+    }
+
+    void UpdateUnseenCartProduct(int number )
+    {
+        JS.LogAsync(number.ToString());
+        cartNumberNotification = number;
+        StateHasChanged();
+    }
+
+    private async Task ToggleMenu()
+    {
+        navOpen = !navOpen;
+        OnNavToggleClick?.Invoke(navOpen);
+        await JS.InvokeVoidAsync("toggleNav", navOpen);
+    }
+
+
+    async Task ShoppingCartClick()
+    {
+        cartActive = !cartActive;
+        if(cartActive)
+        {
+            await ShoppingCartService.ResetUnseenCartNumberAsync();
+            cartNumberNotification = await ShoppingCartService.GetUnseenCartNumberAsync();
+        }
+        NavMenuService.CartClick(cartActive);
+
+    }
+
+    public void Dispose()
+    {
+        OnNavToggleClick -= NavMenuService.SetNavState;
+        ShoppingCartService.OnAddUnseenProductToCart += UpdateUnseenCartProduct;
+    }
+
+}

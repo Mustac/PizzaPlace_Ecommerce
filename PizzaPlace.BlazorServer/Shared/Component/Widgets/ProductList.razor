@@ -1,0 +1,47 @@
+﻿<ul class="menu-list">
+    @foreach (var product in Products)
+    {
+        <li @onclick="@(()=>BodyClick(product))" @onmouseenter="@(()=>product.IsHovering = true)" @onmouseleave="@(()=>product.IsHovering = false)" class="border rounded shadow-sm p-3 mt-3 menu-item">
+            <div class="row justify-content-between">
+                <div class="mt-2 m-lg-0 col-12 col-lg-9">
+                    <h5><i class="fa-solid fa-pizza-slice"></i>&nbsp;@product.Name :</h5>
+                    <div>@product.Ingridients </div>
+                </div>
+
+                <div class="mt-2 m-lg-0 col-12 col-lg-2">
+                    <div class="d-flex align-items-center justify-content-end h-100">
+                        <div class="fw-bolder text-decoration-line-through m-0 p-0">@product.Price$</div>
+                        <div style="font-size: 1.2rem;" class="fw-bolder">&nbsp;&nbsp;@product.DiscountedPrice$</div>
+                    </div>
+                </div>
+                
+            </div>
+        </li>
+    }
+</ul>
+
+<PopupProductInfo OnHideCallback="@(()=>showProductPopup = false)" Show="showProductPopup" ProductInfo="selectedProduct"/>
+
+
+@code{
+    bool showProductPopup = false;
+    ProductInfo selectedProduct = new ProductInfo();
+
+    [Parameter]
+    public List<ProductInfo> Products { get; set; } = new List<ProductInfo>();
+
+    [Parameter]
+    public EventCallback<ProductInfo> OnProductBodyClick { get; set; }
+
+    async Task BodyClick(ProductInfo product)
+    {
+        selectedProduct = product;
+        showProductPopup = true;
+    }
+
+   
+
+
+
+
+}

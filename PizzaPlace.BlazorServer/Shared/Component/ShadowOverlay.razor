@@ -1,0 +1,20 @@
+﻿@inject IJSRuntime JSRuntime
+@if (Show)
+{
+    <div @onclick="ShadowOverlayClick" class="shadow-overlay"></div>
+}
+
+@code {
+    [Parameter]
+    public bool Show { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnOverlayClick { get; set; }
+
+    async Task ShadowOverlayClick()
+    {
+        await JSRuntime.LogAsync("Test");
+        await OnOverlayClick.InvokeAsync();
+    }
+
+}

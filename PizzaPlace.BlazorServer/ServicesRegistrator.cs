@@ -1,13 +1,25 @@
-﻿using PizzaPlace.BlazorServer.Services;
-using PizzaPlace.BlazorServer.Shared.NavMenuComponent;
+﻿
+using Blazored.Toast;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
-namespace PizzaPlace.BlazorServer
+namespace PizzaPlace.BlazorServer;
+
+public class ServicesRegistrator
 {
-    public class ServicesRegistrator
+    public static void Register(IServiceCollection services)
     {
-        public static void Register(IServiceCollection services)
-        {
-            services.AddScoped<GlobalService>();
-        }
+        services.AddScoped<NavMenuService>();
+
+        services.AddBlazoredToast();
+
+        services.AddBlazoredLocalStorage();
+
+        services.AddScoped<ShoppingCartService>();
+
+        services.AddScoped<ProductService>();
+
+        services.AddScoped<MyStorageService>();
+
     }
 }
