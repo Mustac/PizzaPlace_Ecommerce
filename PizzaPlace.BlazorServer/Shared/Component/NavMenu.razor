@@ -13,7 +13,7 @@
             <div @onclick="ShoppingCartClick" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
                 <i class="fa-solid fa-cart-shopping  nav-icon"></i>
                 <div class="notification text-white fw-bold">
-                    <span class="notification-number">@cartNumberNotification</span>
+                    <span class="notification-number">@ShoppingCartService.NumberOfItems</span>
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@
             <div @onclick="ShoppingCartClick" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
                 <i class="fa-solid fa-cart-shopping  nav-icon"></i>
                 <div class="notification text-white fw-bold">
-                    <span class="notification-number">@cartNumberNotification</span>
+                    <span class="notification-number">@ShoppingCartService.NumberOfItems</span>
                 </div>
             </div>
         </div>
@@ -60,8 +60,8 @@
         if (firstRender)
         {
             OnNavToggleClick += NavMenuService.SetNavState;
-            cartNumberNotification = await ShoppingCartService.GetUnseenCartNumberAsync();
-            ShoppingCartService.OnAddUnseenProductToCart += UpdateUnseenCartProduct;
+            ShoppingCartService.OnReloadShoppingCart += StateHasChanged;
+            await ShoppingCartService.UpdateShoppingCartAsync();
             StateHasChanged();
         }
     }
@@ -84,11 +84,6 @@
     async Task ShoppingCartClick()
     {
         cartActive = !cartActive;
-        if(cartActive)
-        {
-            await ShoppingCartService.ResetUnseenCartNumberAsync();
-            cartNumberNotification = await ShoppingCartService.GetUnseenCartNumberAsync();
-        }
         NavMenuService.CartClick(cartActive);
 
     }
@@ -96,7 +91,8 @@
     public void Dispose()
     {
         OnNavToggleClick -= NavMenuService.SetNavState;
-        ShoppingCartService.OnAddUnseenProductToCart += UpdateUnseenCartProduct;
+        ShoppingCartService.OnReloadShoppingCart -= StateHasChanged;
+
     }
 
 }

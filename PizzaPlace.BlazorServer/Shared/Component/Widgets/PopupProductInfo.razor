@@ -38,9 +38,7 @@
     {
         ProductInfo.Amount = 1;
         var success = await ShoppingCartService.AddToShoppingCartAsync(ProductInfo);
-
-        if (!NavMenuService.CartShow)
-            await ShoppingCartService.AddToUnseenCartNumber(ProductInfo.Amount);
+        await ShoppingCartService.UpdateShoppingCartAsync();
 
         if (success)
             await HidePopupAsync();
