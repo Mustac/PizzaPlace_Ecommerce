@@ -1,20 +1,38 @@
 ﻿@using Blazored.Toast.Configuration
 @inherits LayoutComponentBase
-
-<PageTitle>PizzaPlace</PageTitle>
-
+@inject NavMenuService NavMenuService
+@inject IJSRuntime JSRuntime
+@implements IDisposable
 
 <ShoppingCartSidebar />
-
-<BlazoredToasts Position="ToastPosition.BottomRight"
-                Timeout="4"
-                IconType="IconType.FontAwesome"
-                SuccessClass="success-toast-override"
-                SuccessIcon="fa fa-thumbs-up"
-                ErrorIcon="fa fa-bug" />
-
 <NavMenu />
-   
+<PageTitle>PizzaPlace</PageTitle>
+
+<div class="page-wrapper @(NavMenuService.CartShow?"active":"")">
+    <BlazoredToasts Position="ToastPosition.BottomRight"
+                    Timeout="4"
+                
+                    IconType="IconType.FontAwesome"
+                    SuccessClass="success-toast-override"
+                    SuccessIcon="fa fa-thumbs-up"
+                    ErrorIcon="fa fa-bug" />
 
 @Body
+
+</div>
+
+@code{
+    protected override void OnInitialized()
+    {
+        NavMenuService.OnShoppingCartClicked += StateHasChanged;
+    }
+
+
+    public void Dispose()
+    {
+        NavMenuService.OnShoppingCartClicked -= StateHasChanged;
+    }
+}
+   
+
  

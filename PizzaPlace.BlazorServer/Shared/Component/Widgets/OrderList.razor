@@ -1,0 +1,91 @@
+﻿@inject ShoppingCartService ShoppingCartService
+@using System.Timers;
+@implements IDisposable
+@inject IJSRuntime JSRuntime
+
+
+<div>
+    @if (ShoppingCartService.Products is not null)
+    {
+        @foreach (var product in ShoppingCartService.Products)
+        {
+            <div class="order-list row">
+                <div class="col-12 d-flex justify-content-between px-0 pb-2 mb-1 border-bottom">
+                    <h6 class="d-inline mb-0"><i class="fa-solid fa-pizza-slice"></i>&nbsp;@product.Name</h6>
+                        <button class="btn-delete"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                <div class="col-12 border-bottom pb-2">
+                    <small><b>Ingridients:</b> @product.Ingridients</small>
+                </div>
+                <div class="col-12 d-flex justify-content-between">
+                    <div>
+                        <button @onclick="@(()=>ModifyAmountAsync(product, false))" class="btn-adjustment">-</button>
+                        <span>@product.Amount</span>
+                        <button @onclick="@(()=>ModifyAmountAsync(product, true))" class="btn-adjustment">+</button>
+
+                    </div>
+                    <div >
+                        <span class="text-decoration-line-through" style="font-size:.7rem;">@product.DiscountedPrice</span>
+                        <span>@product.Price</span>
+                    </div>
+                </div>
+            </div>
+        }
+        <h6>Total : <span class="float-end">@(ShoppingCartService.Products.Select(x => x.Price).Sum())</span></h6>
+    }
+</div>
+@code {
+    Timer timer;
+
+    protected override void OnInitialized()
+    {
+        ShoppingCartService.OnReloadShoppingCart += ReloadComponent;
+        timer = new Timer(1000);
+        timer.Elapsed += SaveChangesAsync;
+    }
+
+    async void SaveChangesAsync(object sender, ElapsedEventArgs e)
+    {
+        await JSRuntime.LogAsync("Saving Products");
+        await ShoppingCartService.SaveShoppingCartAsync();
+        timer.Stop();
+        timer.Enabled = false;
+    }
+
+    void ModifyAmountAsync(ProductInfo product, bool sumup)
+    {
+
+        product.Amount = sumup ? product.Amount + 1 : product.Amount - 1;
+
+        if (product.Amount < 0)
+            product.Amount = 0;
+
+        if(product.Amount == 0)
+
+
+            if (timer.Enabled)
+            {
+                timer.Stop();
+                timer.Enabled = false;
+            }
+
+        timer.Enabled = true;
+        timer.Start();
+    }
+
+    async Task ReloadComponent() =>
+        await InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        ShoppingCartService.OnReloadShoppingCart -= ReloadComponent;
+        timer.Elapsed -= SaveChangesAsync;
+        timer.Dispose();
+    }
+
+
+    /*  public Tuple<float, float> CalculateThePrice()
+       {
+
+    }*/
+}

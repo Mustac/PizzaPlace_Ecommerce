@@ -9,7 +9,7 @@ namespace PizzaPlace.BlazorServer.Services
         private readonly ILocalStorageService _localStorageService;
 
         public event Action OnNavShowChanged;
-        public event Action<bool> OnShoppingCartClicked;
+        public event Action OnShoppingCartClicked;
         public bool NavShow { get; private set; }
         public bool CartShow { get; private set; }
 
@@ -25,10 +25,10 @@ namespace PizzaPlace.BlazorServer.Services
             OnNavShowChanged?.Invoke();
         }
 
-        public void CartClick(bool state)
+        public void SetCartState(bool state)
         {
             CartShow = state;
-            OnShoppingCartClicked?.Invoke(state);
+            OnShoppingCartClicked?.Invoke();
         }
 
 

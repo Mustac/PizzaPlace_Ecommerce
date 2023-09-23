@@ -5,7 +5,7 @@ VisualStudioVersion = 17.7.34018.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PizzaPlace.BlazorServer", "PizzaPlace.BlazorServer\PizzaPlace.BlazorServer.csproj", "{DB77325D-127D-4B8A-AD04-AF8868349FFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PizzaPlace.Models", "PizzaPlace.Models\PizzaPlace.Models.csproj", "{4AC3910A-A865-4936-9489-AC43B31A732F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PizzaPlace.Models", "PizzaPlace.Models\PizzaPlace.Models.csproj", "{4AC3910A-A865-4936-9489-AC43B31A732F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

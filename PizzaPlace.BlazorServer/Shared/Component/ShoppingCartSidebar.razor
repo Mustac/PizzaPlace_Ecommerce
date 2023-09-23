@@ -3,33 +3,18 @@
 @implements IDisposable
 
 
-<div class="shopping-cart p-4 @(state?"active":"")">
+<div class="shopping-cart p-4 @(NavMenuService.CartShow?"active":"")">
     <h5>Order List : </h5>
+    <OrderList/>
 </div>
 
 @code {
-    private bool state;
 
+    protected override void OnInitialized() =>
+        NavMenuService.OnShoppingCartClicked += StateHasChanged;
+
+    public void Dispose() =>
+        NavMenuService.OnShoppingCartClicked -= StateHasChanged;
     
-
-    protected override void OnInitialized()
-    {
-        state = NavMenuService.CartShow;
-
-        NavMenuService.OnShoppingCartClicked += CartClicked;
-        
-    }
-
-    void CartClicked(bool state)
-    {
-        this.state = state;
-        StateHasChanged();
-    }
-
-
-    public void Dispose()
-    {
-        NavMenuService.OnShoppingCartClicked += CartClicked;
-    }
 
 }

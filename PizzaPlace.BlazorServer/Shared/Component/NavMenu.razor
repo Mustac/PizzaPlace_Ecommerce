@@ -1,7 +1,7 @@
 ﻿@inject IJSRuntime JS
 @inject ShoppingCartService ShoppingCartService
 @inject NavMenuService NavMenuService
-@* @implements IDisposable *@
+@implements IDisposable
 
 <nav class="sticky-top navbar navbar-expand-md bg-danger shadow-sm border-bottom border-white">
     <div class="container">
@@ -21,19 +21,20 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav" style="margin-left: auto;">
-                <li class="nav-item">
-                    <NavLink Match="NavLinkMatch.All" class="nav-link active" href="/">Home</NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink Match="NavLinkMatch.All" class="nav-link" href="/menu">Menu</NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink Match="NavLinkMatch.All" class="nav-link" href="/aboutus">About Us</NavLink>
-                </li>
-            </ul>
-        </div>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav" style="margin-left: auto;">
+                    <li class="nav-item">
+                        <NavLink Match="NavLinkMatch.All" class="nav-link mx-1" href="/">Home</NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink Match="NavLinkMatch.All" class="nav-link mx-1" href="/menu">Menu</NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink Match="NavLinkMatch.All" class="nav-link mx-1" href="/aboutus">About Us</NavLink>
+                    </li>
+                </ul>
+            </div>
+
         <div class="d-none d-md-block">
             <div class="nav-icon-wrap ico">
                 <i class="fa-solid fa-user text-white nav-icon"></i>
@@ -53,22 +54,24 @@
     private bool cartActive = false;
     int cartNumberNotification = 0;
 
-    public event Action<bool>? OnNavToggleClick;
+    public event Action<bool>? OnNavButtonClick;
+    public event Action<bool>? OnCartButtonClick;
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            OnNavToggleClick += NavMenuService.SetNavState;
-            ShoppingCartService.OnReloadShoppingCart += StateHasChanged;
-            await ShoppingCartService.UpdateShoppingCartAsync();
+            OnNavButtonClick += NavMenuService.SetNavState;
+            ShoppingCartService.OnReloadShoppingCart += ReloadComponent;
+            await ShoppingCartService.RefreshShoppingCartAsync();
             StateHasChanged();
         }
     }
 
+    async Task ReloadComponent() => await InvokeAsync(StateHasChanged);
+
     void UpdateUnseenCartProduct(int number )
     {
-        JS.LogAsync(number.ToString());
         cartNumberNotification = number;
         StateHasChanged();
     }
@@ -76,22 +79,37 @@
     private async Task ToggleMenu()
     {
         navOpen = !navOpen;
-        OnNavToggleClick?.Invoke(navOpen);
+
+        if (navOpen)
+        {
+            NavMenuService.SetCartState(false);
+            cartActive = NavMenuService.CartShow;
+        }
+
+        OnNavButtonClick?.Invoke(navOpen);
         await JS.InvokeVoidAsync("toggleNav", navOpen);
     }
 
 
-    async Task ShoppingCartClick()
+    async void ShoppingCartClick()
     {
         cartActive = !cartActive;
-        NavMenuService.CartClick(cartActive);
+
+        if (navOpen)
+        {
+            ToggleMenu();
+        }
+
+    NavMenuService.SetCartState(cartActive);
+
+        
 
     }
 
     public void Dispose()
     {
-        OnNavToggleClick -= NavMenuService.SetNavState;
-        ShoppingCartService.OnReloadShoppingCart -= StateHasChanged;
+        OnNavButtonClick -= NavMenuService.SetNavState;
+        ShoppingCartService.OnReloadShoppingCart -= ReloadComponent;
 
     }
 

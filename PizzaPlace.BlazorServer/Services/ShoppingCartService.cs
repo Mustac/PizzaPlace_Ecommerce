@@ -1,5 +1,7 @@
 ﻿using Blazored.Toast.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using PizzaPlace.BlazorServer.Helpers;
 using System.Text.Json;
@@ -10,16 +12,18 @@ namespace PizzaPlace.BlazorServer.Services
     {
         private readonly IToastService _toastService;
         private readonly ILocalStorageService _localStorageService;
+        private readonly IJSRuntime _jSRuntime;
 
         public int NumberOfItems { get; private set; }
         public IList<ProductInfo> Products { get; private set; } = new List<ProductInfo>();
 
-        public event Action OnReloadShoppingCart;
+        public event Func<Task> OnReloadShoppingCart;
 
-        public ShoppingCartService(IToastService toastService, ILocalStorageService localStorageService)
+        public ShoppingCartService(IToastService toastService, ILocalStorageService localStorageService, IJSRuntime jSRuntime)
         {
             _toastService = toastService;
             _localStorageService = localStorageService;
+            _jSRuntime = jSRuntime;
         }
 
         /// <summary>
@@ -71,7 +75,7 @@ namespace PizzaPlace.BlazorServer.Services
 
 
                 await _localStorageService.SetItemAsStringAsync("cart", tempJson);
-                await UpdateShoppingCartAsync();
+                await RefreshShoppingCartAsync();
                 _toastService.ShowSuccess($"{product.Name} has been added to the order");
 
                 return true;
@@ -88,7 +92,7 @@ namespace PizzaPlace.BlazorServer.Services
         /// Update/Refreshes parameters, also call OnReloadShoppingCart
         /// </summary>
         /// <returns></returns>
-        public async Task UpdateShoppingCartAsync()
+        public async Task RefreshShoppingCartAsync()
         {
             try
             {
@@ -98,7 +102,7 @@ namespace PizzaPlace.BlazorServer.Services
 
                 NumberOfItems = Products.Select(x => x.Amount).Sum();
 
-                OnReloadShoppingCart.Invoke();
+                await OnReloadShoppingCart.Invoke();
             }
             catch
             {
@@ -106,6 +110,42 @@ namespace PizzaPlace.BlazorServer.Services
             }
         }
 
+        /// <summary>
+        /// Save new shopping cart
+        /// </summary>
+        /// <param name="products"></param>
+        /// <returns></returns>
+        public async Task SaveShoppingCartAsync()
+        {
+            try
+            {
+                var jsonProducts = JsonConvert.SerializeObject(Products); 
+                
+                await _localStorageService.SetItemAsStringAsync("cart", jsonProducts);
+
+                await _jSRuntime.LogAsync("Saving Shopping Cart");
+
+                await RefreshShoppingCartAsync();
+
+            }
+            catch
+            {
+                await _localStorageService.RemoveItemAsync("cart");
+            }
+        }
+
+        public async Task DeleteShoppingCartAsync() =>
+            await _localStorageService.RemoveItemAsync("cart");
+
+        public async Task DeleteSingleProduct(int productId)
+        {
+            var product = Products.FirstOrDefault(p => p.Id == productId);
+            if (product != null)
+            {
+                Products.Remove(product);
+                await SaveShoppingCartAsync();
+            }
+        }
 
     }
 }
