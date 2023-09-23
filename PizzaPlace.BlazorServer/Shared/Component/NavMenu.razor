@@ -13,7 +13,7 @@
             <div @onclick="ShoppingCartClick" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
                 <i class="fa-solid fa-cart-shopping  nav-icon"></i>
                 <div class="notification text-white fw-bold">
-                    <span class="notification-number">@ShoppingCartService.NumberOfItems</span>
+                    <span class="notification-number">@ShoppingCartService.NumberOfProducts</span>
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@
             <div @onclick="ShoppingCartClick" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
                 <i class="fa-solid fa-cart-shopping  nav-icon"></i>
                 <div class="notification text-white fw-bold">
-                    <span class="notification-number">@ShoppingCartService.NumberOfItems</span>
+                    <span class="notification-number">@ShoppingCartService.NumberOfProducts</span>
                 </div>
             </div>
         </div>

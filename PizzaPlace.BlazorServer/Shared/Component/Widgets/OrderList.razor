@@ -1,18 +1,21 @@
 ﻿@inject ShoppingCartService ShoppingCartService
-@using System.Timers;
 @implements IDisposable
 @inject IJSRuntime JSRuntime
 
 
 <div>
-    @if (ShoppingCartService.Products is not null)
+    @if(ShoppingCartService.Products is null || ShoppingCartService.NumberOfProducts == 0)
+    {
+        <h5>Your cart is empty ...</h5>
+    }
+    else
     {
         @foreach (var product in ShoppingCartService.Products)
         {
-            <div class="order-list row">
+            <div class="order-item row">
                 <div class="col-12 d-flex justify-content-between px-0 pb-2 mb-1 border-bottom">
                     <h6 class="d-inline mb-0"><i class="fa-solid fa-pizza-slice"></i>&nbsp;@product.Name</h6>
-                        <button class="btn-delete"><i class="fa-solid fa-trash"></i></button>
+                    <button @onclick="@(()=>ShoppingCartService.DeleteSingleProduct(product.Id))" class="btn-delete"><i class="fa-solid fa-trash"></i></button>
                 </div>
                 <div class="col-12 border-bottom pb-2">
                     <small><b>Ingridients:</b> @product.Ingridients</small>
@@ -31,61 +34,40 @@
                 </div>
             </div>
         }
-        <h6>Total : <span class="float-end">@(ShoppingCartService.Products.Select(x => x.Price).Sum())</span></h6>
+        <div class="px-2">
+            <div class="mt-3 text-secondary">Order Summary : <span class="float-end">@ShoppingCartService.TotalCartPrice.ToString("#.##") Nok</span></div>
+            <div class="mt-1 text-secondary" >Discounts : <span class="float-end">@ShoppingCartService.TotalDiscounts.ToString("#.##") Nok</span></div>
+            <h5 class="mt-2" >Pay : <span class="float-end">@ShoppingCartService.DiscountedPrice.ToString("#.##") Nok</span></h5>
+        </div>
+        <button class="btn btn-danger float-end mt-2" style="width:100%"><i class="fa-solid fa-credit-card"></i>&nbsp;&nbsp;Order now</button>
     }
 </div>
 @code {
-    Timer timer;
-
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() =>
         ShoppingCartService.OnReloadShoppingCart += ReloadComponent;
-        timer = new Timer(1000);
-        timer.Elapsed += SaveChangesAsync;
-    }
-
-    async void SaveChangesAsync(object sender, ElapsedEventArgs e)
-    {
-        await JSRuntime.LogAsync("Saving Products");
-        await ShoppingCartService.SaveShoppingCartAsync();
-        timer.Stop();
-        timer.Enabled = false;
-    }
-
-    void ModifyAmountAsync(ProductInfo product, bool sumup)
-    {
-
-        product.Amount = sumup ? product.Amount + 1 : product.Amount - 1;
-
-        if (product.Amount < 0)
-            product.Amount = 0;
-
-        if(product.Amount == 0)
-
-
-            if (timer.Enabled)
-            {
-                timer.Stop();
-                timer.Enabled = false;
-            }
-
-        timer.Enabled = true;
-        timer.Start();
-    }
 
     async Task ReloadComponent() =>
         await InvokeAsync(StateHasChanged);
 
-    public void Dispose()
-    {
+    public void Dispose() =>
         ShoppingCartService.OnReloadShoppingCart -= ReloadComponent;
-        timer.Elapsed -= SaveChangesAsync;
-        timer.Dispose();
+
+    async Task ModifyAmountAsync(ProductInfo product, bool sumup)
+    {
+        if (sumup)
+            product.Amount++;
+        else
+            product.Amount--;
+
+        if(product.Amount <= 0)
+        {
+            // delete this product
+            await ShoppingCartService.DeleteSingleProduct(product.Id);
+            return;
+        }
+
+        await ShoppingCartService.SaveShoppingCartAsync();
     }
 
 
-    /*  public Tuple<float, float> CalculateThePrice()
-       {
-
-    }*/
 }

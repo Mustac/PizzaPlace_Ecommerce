@@ -14,8 +14,25 @@ namespace PizzaPlace.BlazorServer.Services
         private readonly ILocalStorageService _localStorageService;
         private readonly IJSRuntime _jSRuntime;
 
-        public int NumberOfItems { get; private set; }
-        public IList<ProductInfo> Products { get; private set; } = new List<ProductInfo>();
+        public int NumberOfProducts { get; private set; }
+        public IList<ProductInfo> Products { get; set; } = new List<ProductInfo>();
+
+        /// <summary>
+        /// Gives the total cart price of the products without discounts
+        /// </summary>
+        public float TotalCartPrice => Products.Select(x => x.Amount * x.Price).Sum();
+
+        /// <summary>
+        /// Gives the discounted price
+        /// </summary>
+        public float DiscountedPrice => Products.Select(x=>x.Amount * x.DiscountedPrice).Sum();
+
+        /// <summary>
+        /// Gives just the amount the price is discounted for
+        /// </summary>
+        public float TotalDiscounts => TotalCartPrice - DiscountedPrice;
+
+      
 
         public event Func<Task> OnReloadShoppingCart;
 
@@ -70,7 +87,7 @@ namespace PizzaPlace.BlazorServer.Services
                     tempJson = JsonConvert.SerializeObject(products);
                 }
 
-                NumberOfItems = products.Select(x => x.Amount).Sum();
+                NumberOfProducts = products.Select(x => x.Amount).Sum();
                 Products = products;
 
 
@@ -100,7 +117,7 @@ namespace PizzaPlace.BlazorServer.Services
 
                 Products = JsonConvert.DeserializeObject<List<ProductInfo>>(jsonProducts);
 
-                NumberOfItems = Products.Select(x => x.Amount).Sum();
+                NumberOfProducts = Products.Select(x => x.Amount).Sum();
 
                 await OnReloadShoppingCart.Invoke();
             }
