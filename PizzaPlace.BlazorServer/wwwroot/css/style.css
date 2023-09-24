@@ -77,10 +77,9 @@ a{
 
 .hero-image{
     height: 800px;
-    background-image: url("/images/pizza.jpg");
     background-position: left;
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: cover !important;
     position: relative;
 }
 
@@ -357,8 +356,8 @@ a{
 
 .footer-copyright-content{
     border-top:1px solid red;
-    padding:20px 0 0 0;
-    margin:0 8px;
+    padding:5px 0 0 0;
+    margin:15px 8px 0 8px;
 }
 
 @media (max-width: 991.98px) {
@@ -367,6 +366,9 @@ a{
     }
 }
 
+.bg-discount {
+    background-color: antiquewhite;
+}
 
 @media (max-width: 767.98px) {
     .nav-item {

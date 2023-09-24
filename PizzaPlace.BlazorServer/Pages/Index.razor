@@ -8,7 +8,7 @@
 
 
 
-<div class="hero-image " @onclick="Print">
+<div class="hero-image " style="background:url('/images/pizza.jpg')">
     <div class="shade"></div>
     <h1 class="hero-title">Every Pizza Tells a Story, Taste Ours.</h1>
     <!--
@@ -22,7 +22,7 @@
 
 <div class="ordering-menu">
     <div class="container ">
-        <h1 class="text-primary">Popular Today :</h1>
+        <h1 class="text-primary" style="padding-left:10px;">Popular Today :</h1>
         <div class="row px-2 py-1 justify-content-center">
             <div class="col-12">
                 <ProductList Products="products" />
@@ -43,7 +43,7 @@
                 </div>
             </div>
 
-            <div class="col-11 col-md-8 col-lg-8 d-flex align-items-center text-white mt-4">
+            <div class="col-11 col-md-10 col-lg-8 d-flex align-items-center text-white mt-4">
                 <div>
                     <h4>Lorem Ipsum</h4>
                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean vitae metus in neque facilisis posuere ac a mi. Nullam orci nisi, iaculis non odio sit amet, volutpat aliquam erat. In nibh justo, sodales at pellentesque non, tempus in lectus. Aenean vel magna dictum, fringilla nisl vel, maximus enim. Nam sodales pulvinar urna, ac sodales dolor feugiat vitae. Phasellus eu ullamcorper libero, ultricies sodales odio. Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
@@ -104,10 +104,10 @@
 @code {
     List<ProductInfo> products = new List<ProductInfo>
     {
-    new ProductInfo{Id = 1, Name = "Meat Lover's Magic", Ingridients = "Tomato sauce, Mozzarella cheese, Pepperoni, Italian sausage, Bacon, Ham, Ground beef.", Price=16.99f, DiscountedPrice=13.99f},
-    new ProductInfo{Id = 2, Name = "Veggie Delight", Ingridients = "Tomato sauce, Mozzarella cheese, Green peppers, Onions, Mushrooms, Black olives, Tomatoes.", Price=14.99f, DiscountedPrice=11.99f},
-    new ProductInfo{Id = 3, Name = "Margherita Classic", Ingridients = "Tomato sauce, Fresh mozzarella, Fresh basil leaves, Tomatoes.", Price=13.99f, DiscountedPrice=10.99f},
-    new ProductInfo{Id = 4, Name = "Hawaiian Paradise", Ingridients = "Tomato sauce, Mozzarella cheese, Ham, Pineapple.", Price=15.99f, DiscountedPrice=12.99f}
+    new ProductInfo{Id = 1, Name = "Meat Lover's Magic", Ingredients = "Tomato sauce, Mozzarella cheese, Pepperoni, Italian sausage, Bacon, Ham, Ground beef.", Price=16.99f, DiscountedPrice=13.99f},
+    new ProductInfo{Id = 2, Name = "Veggie Delight", Ingredients = "Tomato sauce, Mozzarella cheese, Green peppers, Onions, Mushrooms, Black olives, Tomatoes.", Price=14.99f, DiscountedPrice=11.99f},
+    new ProductInfo{Id = 3, Name = "Margherita Classic", Ingredients = "Tomato sauce, Fresh mozzarella, Fresh basil leaves, Tomatoes.", Price=13.99f, DiscountedPrice=10.99f},
+    new ProductInfo{Id = 4, Name = "Hawaiian Paradise", Ingredients = "Tomato sauce, Mozzarella cheese, Ham, Pineapple.", Price=15.99f, DiscountedPrice=12.99f}
     };
 
     Timer timer;

@@ -1,0 +1,50 @@
+﻿@page "/menu"
+
+<div class="hero-image " style="background:url('images/pizza_menu.jpg'); background-size:cover; height:200px; background-position:center;">
+    <div class="shade"></div>
+    <!--
+    <div class="order-flow-wrapper shadow rounded p-3">
+        <h3>Speciality of the day : </h3>
+        <h6>Mushroom Manor Delight</h6>
+        <p>Ingridients : <b>mushroom</b>, <b>cherry tomato</b>, <b>champignon</b></p>
+    </div>
+    -->
+</div>
+
+
+<div class="container py-4 ">
+    <h2 class="text-danger">30% off Pizzas : </h2>
+    <div class="row px-5">
+        <ProductList Products="popularProducts" />
+    </div>
+    <h2 class="text-danger">MENU : </h2>
+    <div class="row px-5">
+    <ProductList Products="products"/>
+    </div>
+</div>
+
+@code {
+    List<ProductInfo> popularProducts = new List<ProductInfo>
+    {
+    new ProductInfo{Id = 1, Name = "Meat Lover's Magic", Ingredients = "Tomato sauce, Mozzarella cheese, Pepperoni, Italian sausage, Bacon, Ham, Ground beef.", Price=16.99f, DiscountedPrice=13.99f},
+    new ProductInfo{Id = 2, Name = "Veggie Delight", Ingredients = "Tomato sauce, Mozzarella cheese, Green peppers, Onions, Mushrooms, Black olives, Tomatoes.", Price=14.99f, DiscountedPrice=11.99f},
+    new ProductInfo{Id = 3, Name = "Margherita Classic", Ingredients = "Tomato sauce, Fresh mozzarella, Fresh basil leaves, Tomatoes.", Price=13.99f, DiscountedPrice=10.99f},
+    new ProductInfo{Id = 4, Name = "Hawaiian Paradise", Ingredients = "Tomato sauce, Mozzarella cheese, Ham, Pineapple.", Price=15.99f, DiscountedPrice=12.99f},
+
+    };
+
+    List<ProductInfo> products = new List<ProductInfo>
+    {
+        new ProductInfo{Id = 5, Name = "Spicy Pepperoni", Ingredients = "Tomato sauce, Mozzarella cheese, Spicy pepperoni, Red chili flakes.", Price=17.99f, DiscountedPrice=0f},
+    new ProductInfo{Id = 6, Name = "BBQ Chicken Feast", Ingredients = "Barbecue sauce, Mozzarella cheese, Grilled chicken, Red onions, Cilantro.", Price=18.99f, DiscountedPrice=0f},
+    new ProductInfo{Id = 7, Name = "Mushroom Madness", Ingredients = "Tomato sauce, Mozzarella cheese, Various mushrooms, Black olives, Green peppers.", Price=16.99f, DiscountedPrice=0f},
+    new ProductInfo{Id = 8, Name = "Cheese Extravaganza", Ingredients = "Tomato sauce, Mozzarella, Cheddar, Parmesan, Gorgonzola.", Price=15.99f, DiscountedPrice=0f},
+    new ProductInfo{Id = 9, Name = "Sweet & Spicy Hawaiian", Ingredients = "Tomato sauce, Mozzarella cheese, Ham, Pineapple, Jalapeños.", Price=17.49f, DiscountedPrice=0f},
+    new ProductInfo{Id = 10, Name = "Vegan Delight", Ingredients = "Tomato sauce, Vegan cheese, Green peppers, Onions, Black olives, Mushrooms.", Price=19.99f, DiscountedPrice=0f},
+    new ProductInfo{Id = 11, Name = "Buffalo Chicken", Ingredients = "Buffalo sauce, Mozzarella cheese, Grilled chicken, Red onions.", Price=18.49f, DiscountedPrice=0f},
+    new ProductInfo{Id = 12, Name = "Garlic Seafood Supreme", Ingredients = "White sauce, Mozzarella cheese, Shrimp, Crab, Garlic.", Price=22.99f, DiscountedPrice=0f},
+    new ProductInfo{Id = 13, Name = "Classic Margherita", Ingredients = "Tomato sauce, Fresh mozzarella, Tomatoes, Basil.", Price=14.99f, DiscountedPrice=0f},
+    new ProductInfo{Id = 14, Name = "The Carnivore", Ingredients = "Tomato sauce, Mozzarella cheese, Pepperoni, Sausage, Bacon, Ham.", Price=20.99f, DiscountedPrice=0f}
+
+    };
+}

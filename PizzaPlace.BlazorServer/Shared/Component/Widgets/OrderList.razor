@@ -18,7 +18,7 @@
                     <button @onclick="@(()=>ShoppingCartService.DeleteSingleProduct(product.Id))" class="btn-delete"><i class="fa-solid fa-trash"></i></button>
                 </div>
                 <div class="col-12 border-bottom pb-2">
-                    <small><b>Ingridients:</b> @product.Ingridients</small>
+                    <small><b>Ingridients:</b> @product.Ingredients</small>
                 </div>
                 <div class="col-12 d-flex justify-content-between">
                     <div>
@@ -28,7 +28,10 @@
 
                     </div>
                     <div>
-                        <span class="text-decoration-line-through" style="font-size:.7rem;">@product.DiscountedPrice</span>
+                        @if(product.DiscountedPrice > 0)
+                        {
+                            <span class="text-decoration-line-through" style="font-size:.7rem;">@product.DiscountedPrice</span>
+                        }
                         <span>@product.Price</span>
                     </div>
                 </div>
@@ -37,7 +40,7 @@
         <div class="px-2">
             <div class="mt-3 text-secondary">Order Summary : <span class="float-end">@ShoppingCartService.TotalCartPrice.ToString("#.##") Nok</span></div>
             <div class="mt-1 text-secondary">Discounts : <span class="float-end">@ShoppingCartService.TotalDiscounts.ToString("#.##") Nok</span></div>
-            <h5 class="mt-2">Pay : <span class="float-end">@ShoppingCartService.DiscountedPrice.ToString("#.##") Nok</span></h5>
+            <h5 class="mt-2">Pay : <span class="float-end">@ShoppingCartService.TotalPriceWithDiscounts.ToString("#.##") Nok</span></h5>
         </div>
         <div class="py-1">
             <button class="btn btn-danger mt-2 d-block w-100"><i class="fa-solid fa-credit-card"></i>&nbsp;&nbsp;Order now</button>

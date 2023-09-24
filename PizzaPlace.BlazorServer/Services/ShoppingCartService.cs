@@ -25,12 +25,13 @@ namespace PizzaPlace.BlazorServer.Services
         /// <summary>
         /// Gives the discounted price
         /// </summary>
-        public float DiscountedPrice => Products.Select(x=>x.Amount * x.DiscountedPrice).Sum();
+        public float TotalPriceWithDiscounts => 
+            Products.Where(x=>x.DiscountedPrice > 0).Select(x=>x.DiscountedPrice * x.Amount).Sum() + Products.Where(x=>x.DiscountedPrice == 0).Select(x=>x.Price * x.Amount).Sum();
 
         /// <summary>
         /// Gives just the amount the price is discounted for
         /// </summary>
-        public float TotalDiscounts => TotalCartPrice - DiscountedPrice;
+        public float TotalDiscounts => TotalCartPrice - TotalPriceWithDiscounts;
 
       
 
