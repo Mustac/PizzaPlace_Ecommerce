@@ -13,6 +13,11 @@ h1, h2, h3, h4, h5, h6{
     font-family: 'Lobster', cursive;
 }
 
+a{
+    all:unset;
+    cursor:pointer;
+}
+
 /*.nav-icon:hover {
     background-color: white;
     color: red !important;
@@ -71,7 +76,7 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .hero-image{
-    height: 600px;
+    height: 800px;
     background-image: url("/images/pizza.jpg");
     background-position: left;
     background-repeat: no-repeat;
@@ -89,7 +94,15 @@ h1, h2, h3, h4, h5, h6{
 
 .ordering-menu{
     background-color: white;
-    padding:50px;    
+    padding:25px 0;    
+}
+
+.fa-star{
+    color:orange;
+}
+
+.feedback{
+    height:300px;
 }
 
 .order-flow-wrapper{
@@ -216,7 +229,6 @@ h1, h2, h3, h4, h5, h6{
     border-radius: 5px;
     margin: 10px 0;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    cursor:pointer;
     transition:0.2s all;
 }
 
@@ -249,21 +261,114 @@ h1, h2, h3, h4, h5, h6{
     background-color:unset;
     font-weight:bolder;
     padding:0 10px;
+    transition:all 0.3s;
+    cursor:pointer;
 }
 
-.page-wrapper.active {
-    margin-right: 0px !important;
+.stripe-red {
+    height:250px;
+   position:absolute;
+   z-index:-1;
+   width:100%;
+   top:50%;
+   transform:translateY(-50%);
 }
 
+.frame {
+    background-color: white;
+    position:relative;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
 
-@media(min-width:600px) {
+    .frame div {
+        position: absolute;
+        border:10px solid white;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+    }
+
+    .frame img {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+
+    .btn-adjustment:hover{
+        transform:scale(1.3);
+    }
+
     .page-wrapper.active {
-        margin-right: 350px !important;
+        margin-right: 0px !important;
+    }
+
+
+.carousel-item{
+    height:200px;
+}
+
+.footer {
+    background-color: #272829;
+    color:white;
+}
+
+.footer-icons{
+    list-style:none;
+    padding:7px 0;
+}
+
+.footer-icons li{
+    display:inline-block;
+    margin:0 10px;
+    padding:1px 5px;
+    border-radius:5px;
+    border: 3px solid white;
+    transition:0.25s all;
+    cursor:pointer;
+}
+
+    .footer-icons li:hover {
+        transform:scale(1.2);
+    }
+
+    .footer-icons li:first-child{
+        display: inline-block;
+        margin: 0 10px 0 0;
+        padding: 1px 5px;
+        border-radius: 5px;
+        border: 3px solid white;
+    }
+
+.footer-ul {
+    list-style:none;
+    padding:0;
+}
+
+.footer-title{
+    border-bottom:1px solid red;
+    padding:5px 0;
+    width:150px;
+    display:inline-block;
+    margin:0;
+}
+
+.footer-copyright-content{
+    border-top:1px solid red;
+    padding:20px 0 0 0;
+    margin:0 8px;
+}
+
+@media (max-width: 991.98px) {
+    .stripe-red {
+        height: 350px;
     }
 }
 
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
     .nav-item {
         margin: 0;
     }
@@ -273,7 +378,7 @@ h1, h2, h3, h4, h5, h6{
         padding-left: 20px;
     }
 
-    .hero-image{
+    .hero-image {
         height: 300px;
     }
 
@@ -284,24 +389,31 @@ h1, h2, h3, h4, h5, h6{
         z-index: 1999 !important;
     }
 
-    .blazored-toast{
-        width:100vw !important;
-        margin:0 !important;
+    .blazored-toast {
+        width: 100vw !important;
+        margin: 0 !important;
     }
 
-
+    .stripe-red {
+        top:20%;
+        height: 150px;
+        transform:unset;
+    }
 }
 
-@media (min-width: 600px) {
+@media (min-width: 767.98px) {
+
+    .page-wrapper.active {
+        margin-right: 350px !important;
+    }
+
     .nav-item {
         margin: 0;
     }
 
 
 
-    .hero-image {
-        height: 300px;
-    }
+  
 
 
     .page-wrapper .blazored-toast {

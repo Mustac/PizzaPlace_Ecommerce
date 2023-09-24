@@ -3,7 +3,7 @@
 @implements IDisposable
 
 
-<div class="shopping-cart p-4 @(NavMenuService.CartShow?"active":"")">
+<div class="shopping-cart p-4 @(NavMenuService.CartShow?"active":"")" style="overflow:auto;">
     <h5>Order List : </h5>
     <OrderList/>
 </div>

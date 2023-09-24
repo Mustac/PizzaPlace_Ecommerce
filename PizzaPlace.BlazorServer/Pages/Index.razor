@@ -1,5 +1,5 @@
 ﻿@page "/"
-
+@using System.Timers
 @inject NavMenuService GlobalService
 @inject IJSRuntime JSRuntime
 @implements IDisposable
@@ -25,27 +25,115 @@
         <h1 class="text-primary">Popular Today :</h1>
         <div class="row px-2 py-1 justify-content-center">
             <div class="col-12">
-                <ProductList Products="products"/>
+                <ProductList Products="products" />
             </div>
         </div>
     </div>
 </div>
 
 
-@code{
+<div class="position-relative  bg-primary py-4">
+    @* <div class="stripe-red bg-danger"></div> *@
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-11 col-md-10 col-lg-4">
+                <div class="frame">
+                    <div></div>
+                    <img src="/images/pizzachef.png" class="img-fluid" alt="pizzachef.png" />
+                </div>
+            </div>
+
+            <div class="col-11 col-md-8 col-lg-8 d-flex align-items-center text-white mt-4">
+                <div>
+                    <h4>Lorem Ipsum</h4>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean vitae metus in neque facilisis posuere ac a mi. Nullam orci nisi, iaculis non odio sit amet, volutpat aliquam erat. In nibh justo, sodales at pellentesque non, tempus in lectus. Aenean vel magna dictum, fringilla nisl vel, maximus enim. Nam sodales pulvinar urna, ac sodales dolor feugiat vitae. Phasellus eu ullamcorper libero, ultricies sodales odio. Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="feedback">
+    <div class="container d-flex align-items-center justify-content-center" style="height:300px;">
+        <div id="feedback-carousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active text-center">
+                    <div class="pb-3">
+                        <i class="fa-solid fa-star p-1"></i>
+                        <i class="fa-solid fa-star p-1"></i>
+                        <i class="fa-solid fa-star p-1"></i>
+                        <i class="fa-solid fa-star p-1"></i>
+                        <i class="fa-solid fa-star p-1"></i>
+                    </div>
+                    <h4 class="mt-2">Marijan Mustac</h4>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean vitae metus in neque facilisis posuere ac a mi.</p>
+                </div>
+                <div class="carousel-item text-center">
+                    <div class="pb-3">
+                        <i class="fa-solid fa-star p-1"></i>
+                        <i class="fa-solid fa-star p-1"></i>
+                        <i class="fa-solid fa-star p-1"></i>
+                        <i class="fa-regular fa-star p-1"></i>
+                        <i class="fa-regular fa-star p-1"></i>
+                    </div>
+                    <h4 class="mt-2">Martina Mustac</h4>
+                    <p>In scelerisque suscipit ex at interdum. Ut suscipit porttitor enim, et varius purus hendrerit ac. Vivamus in est urna. Morbi dapibus quis leo eget ultricies. Sed vitae efficitur tortor. Aenean maximus nulla ac tempor posuere. Curabitur eu sapien augue. Fusce porttitor enim a nisi tristique luctus.</p>
+                </div>
+                <div class="carousel-item text-center">
+                    <div class="pb-3">
+                        <i class="fa-solid fa-star p-1"></i>
+                        <i class="fa-solid fa-star p-1"></i>
+                        <i class="fa-solid fa-star p-1"></i>
+                        <i class="fa-solid fa-star p-1"></i>
+                        <i class="fa-regular fa-star p-1"></i>
+                    </div>
+                    <h4 class="mt-2">Zoran Simic</h4>
+                    <p>Vivamus at gravida erat. Vivamus scelerisque ex vel volutpat consectetur. Quisque dapibus molestie ipsum, et congue orci vulputate eu. Duis est dolor, feugiat in mollis id, cursus a lacus. Fusce suscipit, augue vitae euismod posuere, elit est cursus magna, nec lobortis est urna ac lacus. Nunc sagittis imperdiet mollis. Vestibulum nec congue libero. Donec sed lacus neque. In faucibus imperdiet aliquam.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+@code {
     List<ProductInfo> products = new List<ProductInfo>
-{
+    {
     new ProductInfo{Id = 1, Name = "Meat Lover's Magic", Ingridients = "Tomato sauce, Mozzarella cheese, Pepperoni, Italian sausage, Bacon, Ham, Ground beef.", Price=16.99f, DiscountedPrice=13.99f},
     new ProductInfo{Id = 2, Name = "Veggie Delight", Ingridients = "Tomato sauce, Mozzarella cheese, Green peppers, Onions, Mushrooms, Black olives, Tomatoes.", Price=14.99f, DiscountedPrice=11.99f},
     new ProductInfo{Id = 3, Name = "Margherita Classic", Ingridients = "Tomato sauce, Fresh mozzarella, Fresh basil leaves, Tomatoes.", Price=13.99f, DiscountedPrice=10.99f},
     new ProductInfo{Id = 4, Name = "Hawaiian Paradise", Ingridients = "Tomato sauce, Mozzarella cheese, Ham, Pineapple.", Price=15.99f, DiscountedPrice=12.99f}
-};
+    };
+
+    Timer timer;
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeCarousel");
+            await InvokeAsync(StateHasChanged);
+            timer = new Timer(4000);
+            timer.Enabled = true;
+            timer.Start();
+            timer.Elapsed += NextSlideCarousel;
+        }
+
+
+    }
 
 
     protected override void OnInitialized()
     {
         GlobalService.OnNavShowChanged += StateHasChanged;
     }
+
+    void NextSlideCarousel(object sender, ElapsedEventArgs e) => JSRuntime.InvokeVoidAsync("caruselNext");
 
     void Print()
     {
@@ -55,8 +143,8 @@
     public void Dispose()
     {
         GlobalService.OnNavShowChanged -= StateHasChanged;
+        timer.Stop();
+        timer.Elapsed -= NextSlideCarousel;
     }
-
-
 }
 
