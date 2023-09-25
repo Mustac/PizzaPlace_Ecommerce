@@ -11,8 +11,20 @@
             <div class="pizza-overlay"><h4 class="text-center pt-2 text-primary">@ProductInfo.Name</h4></div>
        </div>
         <h6 class="text-primary my-0 py-0">Ingridients : </h6>
-        <p class="m-1 pt-1" style="font-size:.8rem; padding-left:10px;">@ProductInfo.Ingridients</p>
-        <div class="float-end" style="margin-right:10px;"><small style="font-size:.7rem;" class="text-decoration-line-through text-secondary">@ProductInfo.Price$</small> <span class="fw-bold">@ProductInfo.DiscountedPrice$</span></div>
+        <p class="m-1 pt-1" style="font-size:.8rem; padding-left:10px;">@ProductInfo.Ingredients</p>
+        
+            <div class="float-end" style="margin-right:10px;">
+            @if (ProductInfo.DiscountedPrice > 0)
+            {
+                <small style="font-size:.7rem;" class="text-decoration-line-through text-secondary">@ProductInfo.Price$</small>
+                <span class="fw-bold">@ProductInfo.DiscountedPrice$</span>
+            }
+            else
+            {
+                <span class="fw-bold">@ProductInfo.Price$</span>
+            }
+        </div>
+       
         <button @onclick="AddToCart" style="display:block; width:100%; margin-top:38px;" class="btn btn-outline-primary">Add</button>
     </div>
 }
