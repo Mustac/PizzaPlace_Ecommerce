@@ -1,17 +1,30 @@
-﻿@inject IJSRuntime JS
+﻿@inject IJSRuntime JSRuntime
 @inject ShoppingCartService ShoppingCartService
 @inject NavMenuService NavMenuService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 @implements IDisposable
 
 <nav class="sticky-top navbar navbar-expand-md bg-danger shadow-sm border-bottom border-white">
     <div class="container">
         <a class="navbar-brand text-light" href="#"><h4 class="m-0 p-0">Pizza Place</h4></a>
-        <div class="d-md-none ml-auto-icon">
-            <div class="nav-icon-wrap">
-                <i class="fa-solid fa-user text-white nav-icon"></i>
-            </div>
+        <div class="d-flex align-items-center d-md-none ml-auto-icon">
+            @if (!authState.User.Identity.IsAuthenticated)
+            {
+                <div @onclick="NavigateToLogin" class="nav-icon-wrap ico">
+                    <i class="fa-solid fa-user text-white nav-icon"></i>
+                </div>
+            }
+            else
+            {
+                <div class="nav-icon-wrap ico">
+                    <NavLink @onclick="ToggleUserBtn" Match="NavLinkMatch.All" class="nav-link text-white mt-0 p-0" href="/account">
+                        <i class="fa-solid fa-user-check nav-icon"></i>
+                    </NavLink>
+                </div>
+            }
             <div @onclick="ShoppingCartClick" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
-                <i class="fa-solid fa-cart-shopping  nav-icon"></i>
+                <i class="fa-solid fa-cart-shopping nav-icon"></i>
                 <div class="notification text-white fw-bold">
                     <span class="notification-number">@ShoppingCartService.NumberOfProducts</span>
                 </div>
@@ -21,24 +34,35 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav" style="margin-left: auto;">
-                    <li class="nav-item">
-                        <NavLink Match="NavLinkMatch.All" class="nav-link mx-1" href="/">Home</NavLink>
-                    </li>
-                    <li class="nav-item">
-                        <NavLink Match="NavLinkMatch.All" class="nav-link mx-1" href="/menu">Menu</NavLink>
-                    </li>
-                    <li class="nav-item">
-                        <NavLink Match="NavLinkMatch.All" class="nav-link mx-1" href="/aboutus">About Us</NavLink>
-                    </li>
-                </ul>
-            </div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav" style="margin-left: auto;">
+                <li class="nav-item">
+                    <NavLink @onclick="ToggleMenu" Match="NavLinkMatch.All" class="nav-link mx-1" href="/">Home</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink @onclick="ToggleMenu" Match="NavLinkMatch.All" class="nav-link mx-1" href="/menu">Menu</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink @onclick="ToggleMenu" Match="NavLinkMatch.All" class="nav-link mx-1" href="/aboutus">About Us</NavLink>
+                </li>
+            </ul>
+        </div>
 
         <div class="d-none d-md-block">
-            <div class="nav-icon-wrap ico">
-                <i class="fa-solid fa-user text-white nav-icon"></i>
-            </div>
+            @if (!authState.User.Identity.IsAuthenticated)
+            {
+                <div @onclick="NavigateToLogin" class="nav-icon-wrap ico">
+                    <i class="fa-solid fa-user text-white nav-icon"></i>
+                </div>
+            }
+            else
+            {
+                <div class="nav-icon-wrap ico">
+                    <NavLink @onclick="ToggleMenu" Match="NavLinkMatch.All" class="nav-link text-white" href="/account">
+                        <i class="fa-solid fa-user-check " style="padding:12px;"></i>
+                    </NavLink>
+                </div>
+            }
             <div @onclick="ShoppingCartClick" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
                 <i class="fa-solid fa-cart-shopping  nav-icon"></i>
                 <div class="notification text-white fw-bold">
@@ -52,10 +76,20 @@
 @code {
     public bool navOpen = false;
     private bool cartActive = false;
+    private bool userBtnActive = false;
     int cartNumberNotification = 0;
 
     public event Action<bool>? OnNavButtonClick;
     public event Action<bool>? OnCartButtonClick;
+
+    AuthenticationState authState;
+
+    protected async override Task OnInitializedAsync()
+    {
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    }
+
+    void NavigateToLogin() => NavigationManager.NavigateTo("identity/account/login", forceLoad: true);
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -70,14 +104,24 @@
 
     async Task ReloadComponent() => await InvokeAsync(StateHasChanged);
 
-    void UpdateUnseenCartProduct(int number )
+    async Task ToggleUserBtn()
+    {
+        if (navOpen)
+            await ToggleMenu();
+    }
+
+    void UpdateUnseenCartProduct(int number)
     {
         cartNumberNotification = number;
         StateHasChanged();
     }
 
-    private async Task ToggleMenu()
+    public async Task ToggleMenu()
     {
+        if(!await IsMenuToggable())
+            return;
+
+
         navOpen = !navOpen;
 
         if (navOpen)
@@ -87,7 +131,7 @@
         }
 
         OnNavButtonClick?.Invoke(navOpen);
-        await JS.InvokeVoidAsync("toggleNav", navOpen);
+        await JSRuntime.InvokeVoidAsync("toggleNav", navOpen);
     }
 
 
@@ -97,14 +141,17 @@
 
         if (navOpen)
         {
-            ToggleMenu();
+            await ToggleMenu();
         }
 
-    NavMenuService.SetCartState(cartActive);
-
-        
-
+        NavMenuService.SetCartState(cartActive);
     }
+
+    public async Task<bool> IsMenuToggable() =>
+         await JSRuntime.InvokeAsync<bool>("isMenuToggable");
+
+
+
 
     public void Dispose()
     {

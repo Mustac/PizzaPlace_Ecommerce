@@ -110,7 +110,7 @@
     new ProductInfo{Id = 4, Name = "Hawaiian Paradise", Ingredients = "Tomato sauce, Mozzarella cheese, Ham, Pineapple.", Price=15.99f, DiscountedPrice=12.99f}
     };
 
-    Timer timer;
+    Timer timer = new Timer(4000);
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -118,7 +118,6 @@
         {
             await JSRuntime.InvokeVoidAsync("initializeCarousel");
             await InvokeAsync(StateHasChanged);
-            timer = new Timer(4000);
             timer.Enabled = true;
             timer.Start();
             timer.Elapsed += NextSlideCarousel;

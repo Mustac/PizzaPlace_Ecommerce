@@ -360,6 +360,20 @@ a{
     margin:15px 8px 0 8px;
 }
 
+.user-info tr td {
+    font-size: 1.5rem;
+    padding: 10px 10px;
+}
+
+    .user-info tr td:first-child {
+        font-weight: bolder !important;
+        font-size: 1.5rem;
+    }
+
+.user-info tr {
+    border-top: 1px solid gray;
+}
+
 @media (max-width: 991.98px) {
     .stripe-red {
         height: 350px;
@@ -401,6 +415,16 @@ a{
         height: 150px;
         transform:unset;
     }
+
+    .user-info tr td {
+        font-size: 1rem;
+        padding: 10px 10px;
+    }
+
+        .user-info tr td:first-child {
+            font-weight: bolder !important;
+            font-size: 1rem;
+        }
 }
 
 @media (min-width: 767.98px) {

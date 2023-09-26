@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PizzaPlace.BlazorServer.Data;
@@ -11,9 +12,11 @@ using PizzaPlace.BlazorServer.Data;
 namespace PizzaPlace.BlazorServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230926083212_seed-roles")]
+    partial class seedroles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,27 +53,21 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0a18af76-8333-4d3f-89be-a1b6e1630c4e",
+                            Id = "9eb3ad7f-f363-4b54-9667-bfe3bfacaa9d",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
-                            Id = "e4f72d5f-edf2-4825-8fc0-ba00a310b32e",
+                            Id = "602ea918-0940-464b-941c-eb5214ef258d",
                             Name = "Chef",
                             NormalizedName = "CHEF"
                         },
                         new
                         {
-                            Id = "195c6e53-5a36-4602-bdf3-13e6085b6ec9",
+                            Id = "82302099-151b-4af3-99c2-a53bac98358c",
                             Name = "Delivery",
                             NormalizedName = "DELIVERY"
-                        },
-                        new
-                        {
-                            Id = "99ef4292-185d-456e-b69c-3f25e2aee812",
-                            Name = "Customer",
-                            NormalizedName = "CUSTOMER"
                         });
                 });
 

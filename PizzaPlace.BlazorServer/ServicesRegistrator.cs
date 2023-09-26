@@ -16,7 +16,7 @@ public class ServicesRegistrator
         services.AddDbContext<DataContext>(options =>
         options.UseNpgsql(config.GetConnectionString("DefaultConnection")));
 
-        services.AddDefaultIdentity<IdentityUser>(o =>
+        services.AddIdentity<IdentityUser, IdentityRole>(o =>
         {
             o.SignIn.RequireConfirmedEmail = false;
             o.SignIn.RequireConfirmedPhoneNumber = false;
@@ -27,7 +27,8 @@ public class ServicesRegistrator
             o.Password.RequiredLength = 4;
             o.Password.RequireUppercase = false;
         })
-            .AddEntityFrameworkStores<DataContext>();
+            .AddEntityFrameworkStores<DataContext>()
+            .AddDefaultTokenProviders();
 
 
         services.AddScoped<NavMenuService>();

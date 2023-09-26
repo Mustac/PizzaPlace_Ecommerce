@@ -30,3 +30,7 @@ function initializeCarousel() {
 function caruselNext() {
     carousel.next();
 }
+
+async function isMenuToggable() {
+    return window.innerWidth < 767.98;
+}

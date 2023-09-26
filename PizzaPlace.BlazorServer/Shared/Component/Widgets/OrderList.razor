@@ -38,9 +38,9 @@
             </div>
         }
         <div class="px-2">
-            <div class="mt-3 text-secondary">Order Summary : <span class="float-end">@ShoppingCartService.TotalCartPrice.ToString("#.##") Nok</span></div>
-            <div class="mt-1 text-secondary">Discounts : <span class="float-end">@ShoppingCartService.TotalDiscounts.ToString("#.##") Nok</span></div>
-            <h5 class="mt-2">Pay : <span class="float-end">@ShoppingCartService.TotalPriceWithDiscounts.ToString("#.##") Nok</span></h5>
+            <div class="mt-3 text-secondary">Order Summary : <span class="float-end">@ShoppingCartService.TotalCartPrice.ToString("#.##") $</span></div>
+            <div class="mt-1 text-secondary">Discounts : <span class="float-end">@(ShoppingCartService.TotalDiscounts == 0?0:ShoppingCartService.TotalDiscounts.ToString("#.##")) $</span></div>
+            <h5 class="mt-2">Pay : <span class="float-end">@ShoppingCartService.TotalPriceWithDiscounts.ToString("#.##") $</span></h5>
         </div>
         <div class="py-1">
             <button class="btn btn-danger mt-2 d-block w-100"><i class="fa-solid fa-credit-card"></i>&nbsp;&nbsp;Order now</button>
