@@ -1,4 +1,9 @@
 ﻿@page "/account"
+@using System.Security.Claims;
+
+<AuthorizeView>
+    <Authorized>
+
 
 <div class="container mb-5">
     <div class="row mt-5  justify-content-center">
@@ -10,7 +15,7 @@
         <div class="col-12 col-md-3">
             <img src="/images/blank-profile-picture.png" class="img-fluid border-1 border border-secondary p-2 rounded shadow" alt="blank-profile-picture.png" />
         </div>
-        <div class="col-12 col-md-5 mt-5 mt-md-0" >
+        <div class="col-12 col-md-6 mt-5 mt-md-0" >
             <table class="user-info w-100">
                 <tr>
                     <td>Name : </td>
@@ -33,6 +38,10 @@
                     <td>Address :</td>
                     <td>Hjeramoen 46A, 2072 Dal </td>
                 </tr>
+                <tr>
+                    <td>Position :</td>
+                            <td>@context.User?.FindFirst(ClaimTypes.Role).Value</td>
+                </tr>
             </table>
 
         </div>
@@ -49,6 +58,10 @@
         
     </div>
 </div>
+
+
+    </Authorized>
+</AuthorizeView>
 
 @code {
 

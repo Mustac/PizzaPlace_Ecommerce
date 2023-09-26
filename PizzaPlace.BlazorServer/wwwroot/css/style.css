@@ -361,13 +361,13 @@ a{
 }
 
 .user-info tr td {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     padding: 10px 10px;
 }
 
     .user-info tr td:first-child {
         font-weight: bolder !important;
-        font-size: 1.5rem;
+        font-size: 1rem;
     }
 
 .user-info tr {
