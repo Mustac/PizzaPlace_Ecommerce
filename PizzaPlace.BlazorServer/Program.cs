@@ -1,8 +1,9 @@
 global using PizzaPlace.BlazorServer;
 global using PizzaPlace.BlazorServer.Data;
 global using PizzaPlace.BlazorServer.Services;
-global using PizzaPlace.Models;
 global using Blazored.LocalStorage;
+global using PizzaPlace.BlazorServer.Models;
+
 
 
 using Microsoft.AspNetCore.Components;

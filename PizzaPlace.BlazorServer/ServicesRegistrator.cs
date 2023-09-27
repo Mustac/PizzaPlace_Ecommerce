@@ -16,7 +16,7 @@ public class ServicesRegistrator
         services.AddDbContext<DataContext>(options =>
         options.UseNpgsql(config.GetConnectionString("DefaultConnection")));
 
-        services.AddIdentity<IdentityUser, IdentityRole>(o =>
+        services.AddIdentity<ApplicationUser, IdentityRole>(o =>
         {
             o.SignIn.RequireConfirmedEmail = false;
             o.SignIn.RequireConfirmedPhoneNumber = false;

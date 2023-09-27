@@ -27,11 +27,11 @@ namespace PizzaPlace.BlazorServer.Areas.Identity.Pages.Account
             Fail
         }
 
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public LoginModel(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -107,7 +107,7 @@ namespace PizzaPlace.BlazorServer.Areas.Identity.Pages.Account
 
                 if(user is null)
                 {
-                    user = new IdentityUser { Email = Input.Email, UserName = Input.Email };
+                    user = new ApplicationUser { Email = Input.Email, UserName = Input.Email };
                     var response = await _userManager.CreateAsync(user);
 
                     IdentityResult result = new IdentityResult();
