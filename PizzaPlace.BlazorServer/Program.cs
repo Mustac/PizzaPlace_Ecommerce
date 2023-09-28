@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using PizzaPlace.BlazorServer.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 

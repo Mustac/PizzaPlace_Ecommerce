@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using PizzaPlace.BlazorServer.Helpers;
 using System.Reflection.Emit;
 
 namespace PizzaPlace.BlazorServer.Data
@@ -22,10 +23,21 @@ namespace PizzaPlace.BlazorServer.Data
             base.OnModelCreating(builder);
 
             builder.Entity<ApplicationUser>()
-       .HasMany(u => u.Orders)  // Indicate that ApplicationUser has many Orders
-       .WithOne()               // Each Order has one ApplicationUser
-       .HasForeignKey(o => o.UserId) // Foreign key in Order table
-       .IsRequired();           // Make the foreign key required
+            .HasMany(u => u.Orders)
+            .WithOne(o => o.User)
+            .HasForeignKey(o => o.UserId)
+            .IsRequired();
+
+            builder.Entity<ApplicationUser>()
+                .HasMany(u => u.ChefOrders)
+                .WithOne(o => o.Chef)
+                .HasForeignKey(o => o.ChefId);
+
+            builder.Entity<ApplicationUser>()
+                .HasMany(u => u.DeliveryOrders)
+                .WithOne(o => o.Delivery)
+                .HasForeignKey(o => o.DeliveryId);
+
 
             // Configuring the relationships between the entities
             builder.Entity<ProductIngredient>()
@@ -54,15 +66,7 @@ namespace PizzaPlace.BlazorServer.Data
                 .WithMany(p => p.OrderProducts)
                 .HasForeignKey(op => op.ProductId);
 
-            builder.Entity<IdentityRole>()
-                .HasData(
-                new IdentityRole { Id = Guid.NewGuid().ToString(), Name = "Manager", NormalizedName = "MANAGER" },
-                new IdentityRole { Id = Guid.NewGuid().ToString(), Name = "Chef", NormalizedName = "CHEF" },
-                new IdentityRole { Id = Guid.NewGuid().ToString(), Name = "Delivery", NormalizedName = "DELIVERY" },
-                new IdentityRole { Id = Guid.NewGuid().ToString(), Name = "Customer", NormalizedName = "CUSTOMER" }
-                );
+            
         }
-
-
     }
 }

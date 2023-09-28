@@ -21,17 +21,10 @@ namespace PizzaPlace.BlazorServer.Areas.Identity.Pages.Account
             _signInManager = signInManager;
         }
 
-        public async Task<IActionResult> OnGet(string returnUrl = null)
+        public async Task<IActionResult> OnGet()
         {
             await _signInManager.SignOutAsync();
-            if (returnUrl != null)
-            {
-                return LocalRedirect(returnUrl);
-            }
-            else
-            {
-                return RedirectToPage();
-            }
+            return Redirect("/");
         }
     }
 }

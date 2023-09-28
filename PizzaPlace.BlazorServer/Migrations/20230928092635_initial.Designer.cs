@@ -12,8 +12,8 @@ using PizzaPlace.BlazorServer.Data;
 namespace PizzaPlace.BlazorServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230927194749_test")]
-    partial class test
+    [Migration("20230928092635_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,32 +49,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "746b37e9-750b-417c-8fb6-bcca1510300c",
-                            Name = "Manager",
-                            NormalizedName = "MANAGER"
-                        },
-                        new
-                        {
-                            Id = "63f83220-7a8f-4d92-8c5d-aacfa5b66b7b",
-                            Name = "Chef",
-                            NormalizedName = "CHEF"
-                        },
-                        new
-                        {
-                            Id = "0cf6631c-dd64-40e9-bebe-a39ace47e3e9",
-                            Name = "Delivery",
-                            NormalizedName = "DELIVERY"
-                        },
-                        new
-                        {
-                            Id = "55663d3b-ccdf-4dec-b849-f75a88623f40",
-                            Name = "Customer",
-                            NormalizedName = "CUSTOMER"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -183,7 +157,7 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.ApplicationUser", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -192,19 +166,15 @@ namespace PizzaPlace.BlazorServer.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("AddressCity")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("AddressState")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("AddressStreet")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("AddressZip")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -263,7 +233,7 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.Discount", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Discount", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -275,7 +245,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -283,7 +252,7 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.ToTable("Discounts");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.Feedback", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Feedback", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -292,7 +261,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("OrderId")
@@ -308,7 +276,7 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.ToTable("Feedbacks");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.Ingredient", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Ingredient", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -317,7 +285,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -325,7 +292,7 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.ToTable("Ingredients");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.Order", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -334,15 +301,15 @@ namespace PizzaPlace.BlazorServer.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ChefId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("DeliveryId")
-                        .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<float>("DiscountedPrice")
+                        .HasColumnType("real");
+
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("TimeCompleted")
@@ -361,10 +328,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId1")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ChefId");
@@ -373,12 +336,10 @@ namespace PizzaPlace.BlazorServer.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("UserId1");
-
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.OrderProduct", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.OrderProduct", b =>
                 {
                     b.Property<int>("OrderId")
                         .HasColumnType("integer");
@@ -399,7 +360,7 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.ToTable("OrderProducts");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.Product", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -407,11 +368,10 @@ namespace PizzaPlace.BlazorServer.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("DiscountId")
+                    b.Property<int>("DiscountId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<float>("Price")
@@ -424,7 +384,7 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.ProductIngredient", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.ProductIngredient", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
@@ -450,7 +410,7 @@ namespace PizzaPlace.BlazorServer.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("PizzaPlace.Models.ApplicationUser", null)
+                    b.HasOne("PizzaPlace.BlazorServer.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -459,7 +419,7 @@ namespace PizzaPlace.BlazorServer.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("PizzaPlace.Models.ApplicationUser", null)
+                    b.HasOne("PizzaPlace.BlazorServer.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -474,7 +434,7 @@ namespace PizzaPlace.BlazorServer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PizzaPlace.Models.ApplicationUser", null)
+                    b.HasOne("PizzaPlace.BlazorServer.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -483,16 +443,16 @@ namespace PizzaPlace.BlazorServer.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("PizzaPlace.Models.ApplicationUser", null)
+                    b.HasOne("PizzaPlace.BlazorServer.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.Feedback", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Feedback", b =>
                 {
-                    b.HasOne("PizzaPlace.Models.Order", "Order")
+                    b.HasOne("PizzaPlace.BlazorServer.Models.Order", "Order")
                         .WithMany()
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -501,29 +461,19 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.Order", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Order", b =>
                 {
-                    b.HasOne("PizzaPlace.Models.ApplicationUser", "Chef")
-                        .WithMany()
-                        .HasForeignKey("ChefId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("PizzaPlace.BlazorServer.Models.ApplicationUser", "Chef")
+                        .WithMany("ChefOrders")
+                        .HasForeignKey("ChefId");
 
-                    b.HasOne("PizzaPlace.Models.ApplicationUser", "Delivery")
-                        .WithMany()
-                        .HasForeignKey("DeliveryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("PizzaPlace.BlazorServer.Models.ApplicationUser", "Delivery")
+                        .WithMany("DeliveryOrders")
+                        .HasForeignKey("DeliveryId");
 
-                    b.HasOne("PizzaPlace.Models.ApplicationUser", null)
+                    b.HasOne("PizzaPlace.BlazorServer.Models.ApplicationUser", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PizzaPlace.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -534,15 +484,15 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.OrderProduct", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.OrderProduct", b =>
                 {
-                    b.HasOne("PizzaPlace.Models.Order", "Order")
+                    b.HasOne("PizzaPlace.BlazorServer.Models.Order", "Order")
                         .WithMany("OrderProducts")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PizzaPlace.Models.Product", "Product")
+                    b.HasOne("PizzaPlace.BlazorServer.Models.Product", "Product")
                         .WithMany("OrderProducts")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -553,24 +503,26 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.Product", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Product", b =>
                 {
-                    b.HasOne("PizzaPlace.Models.Discount", "Discount")
+                    b.HasOne("PizzaPlace.BlazorServer.Models.Discount", "Discount")
                         .WithMany("Products")
-                        .HasForeignKey("DiscountId");
+                        .HasForeignKey("DiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Discount");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.ProductIngredient", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.ProductIngredient", b =>
                 {
-                    b.HasOne("PizzaPlace.Models.Ingredient", "Ingredient")
+                    b.HasOne("PizzaPlace.BlazorServer.Models.Ingredient", "Ingredient")
                         .WithMany("ProductIngredients")
                         .HasForeignKey("IngredientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PizzaPlace.Models.Product", "Product")
+                    b.HasOne("PizzaPlace.BlazorServer.Models.Product", "Product")
                         .WithMany("ProductIngredients")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -581,27 +533,31 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.ApplicationUser", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("ChefOrders");
+
+                    b.Navigation("DeliveryOrders");
+
                     b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.Discount", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Discount", b =>
                 {
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.Ingredient", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Ingredient", b =>
                 {
                     b.Navigation("ProductIngredients");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.Order", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Order", b =>
                 {
                     b.Navigation("OrderProducts");
                 });
 
-            modelBuilder.Entity("PizzaPlace.Models.Product", b =>
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Product", b =>
                 {
                     b.Navigation("OrderProducts");
 

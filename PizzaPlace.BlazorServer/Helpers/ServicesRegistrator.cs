@@ -7,11 +7,11 @@ using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace PizzaPlace.BlazorServer;
+namespace PizzaPlace.BlazorServer.Helpers;
 
 public class ServicesRegistrator
 {
-    public static void Register(IServiceCollection services, IConfiguration config)
+    public static async Task Register(IServiceCollection services, IConfiguration config)
     {
         services.AddDbContext<DataContext>(options =>
         options.UseNpgsql(config.GetConnectionString("DefaultConnection")));
@@ -42,6 +42,11 @@ public class ServicesRegistrator
         services.AddScoped<ProductService>();
 
         services.AddScoped<MyStorageService>();
+
+        var userManager = services.BuildServiceProvider().GetRequiredService(typeof(UserManager<ApplicationUser>)) as UserManager<ApplicationUser>;
+        var roleManager = services.BuildServiceProvider().GetRequiredService(typeof(RoleManager<IdentityRole>)) as RoleManager<IdentityRole>;
+
+        await DataSeeder.SeedAsync(userManager, roleManager);
 
     }
 }
