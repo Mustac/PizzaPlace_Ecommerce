@@ -112,6 +112,7 @@
             OnNavButtonClick += NavMenuService.SetNavState;
             ShoppingCartService.OnReloadShoppingCart += ReloadComponent;
             await ShoppingCartService.RefreshShoppingCartAsync();
+            await JSRuntime.InvokeVoidAsync("initializeNav");
             StateHasChanged();
         }
     }

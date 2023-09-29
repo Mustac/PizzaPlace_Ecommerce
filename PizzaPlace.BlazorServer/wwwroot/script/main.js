@@ -1,12 +1,8 @@
 var bsNav;
 
 function toggleNav(state) {
-
-    if (bsNav === undefined)
-        bsNav = new bootstrap.Collapse(document.getElementById("navbarNav"));
-
-    if (state)
-    {
+    console.log("toggleNav");
+    if (state) {
         bsNav.show();
         return;
     }
@@ -16,6 +12,13 @@ function toggleNav(state) {
 
 var myCarousel;
 var carousel;
+
+function initializeNav() {
+    bsNav = new bootstrap.Collapse(document.getElementById("navbarNav"), {
+        toggle: false 
+    });
+    
+}
 
 function initializeCarousel() {
     myCarousel = document.getElementById("feedback-carousel");
