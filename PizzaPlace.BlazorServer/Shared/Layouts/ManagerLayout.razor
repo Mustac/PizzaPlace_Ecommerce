@@ -4,8 +4,17 @@
 
 <TopBar/>
 <PageTitle>Managment</PageTitle>
-<LeftSidebar/>
+<LeftSidebar OnHover="SidebarHover" />
+<div class="body-wrap-frame @(sidebarMouseHovering?"active":"")">
+    <div class="body-wrap">
+<h1>@sidebarMouseHovering</h1>
+         @Body
+    </div>
+</div>
 
 @code {
+    bool sidebarMouseHovering = false;
 
+    void SidebarHover(bool state) => 
+        sidebarMouseHovering = state;
 }

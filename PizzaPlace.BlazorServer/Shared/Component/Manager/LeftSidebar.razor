@@ -1,31 +1,39 @@
-﻿<div class="left-sidebar bg-dark" style="padding-top:61px;">
+﻿<div class="left-sidebar bg-dark" @onmouseenter="@(()=>SidebarHover(true))" @onmouseleave="@(()=>SidebarHover(false))" style="padding-top:61px;">
     <div class="sidebar-nav">
         <ul class="sidebar-nav-items">
             <li>
-                <NavLink class="sidebar-nav-item">Dashboard</NavLink>
+                <NavLink href="/manager/" Match="NavLinkMatch.All" ActiveClass="active" class="sidebar-nav-item"><i class="fa-solid fa-chart-line"></i><span class="item-menu">Dashboard</span></NavLink>
             </li>
             <li>
-                <Collapsable Title="Personel">
-                    <Items>
-                        <div>Chefs</div>
-                        <div>Delivery</div>
-                    </Items>
-                </Collapsable>
-               @*  <!-- The button for toggling the collapse -->
-                <button class="sidebar-nav-item btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#personelMenu" aria-expanded="false" aria-controls="personelMenu">
-                    Personel
-                </button>
-                <!-- The collapsible content -->
-                <div class="collapse" id="personelMenu">
-                    <div class="sidebar-nav-item">
-                        <div>Chefs</div>
-                        <div>Delivery</div>
-                    </div>
-                </div> *@
+                <NavLink href="/manager/report" Match="NavLinkMatch.All" ActiveClass="active" class="sidebar-nav-item"><i class="fa-solid fa-note-sticky"></i><span class="item-menu">Report</span></NavLink>
             </li>
             <li>
-                <NavLink class="sidebar-nav-item">Orders</NavLink>
+                <NavLink href="/manager/discounts" Match="NavLinkMatch.All" ActiveClass="active" class="sidebar-nav-item"><i class="fa-solid fa-percent"></i><span class="item-menu">Discounts</span></NavLink>
+            </li>
+            <li>
+                <NavLink href="/manager/products" Match="NavLinkMatch.All" ActiveClass="active" class="sidebar-nav-item"><i class="fa-solid fa-pizza-slice"></i><span class="item-menu">Products</span></NavLink>
+            </li>
+            <li>
+                <NavLink href="/manager/ingredients" Match="NavLinkMatch.All" ActiveClass="active" class="sidebar-nav-item"><i class="fa-solid fa-mortar-pestle"></i><span class="item-menu">Ingredients</span></NavLink>
+            </li>
+            <li>
+                <NavLink href="/manager/employees" Match="NavLinkMatch.All" ActiveClass="active" class="sidebar-nav-item"><i class="fa-solid fa-people-arrows"></i><span class="item-menu">Employees</span></NavLink>
+            </li>
+            <li>
+                <NavLink href="/manager/orders" Match="NavLinkMatch.All" ActiveClass="active" class="sidebar-nav-item"><i class="fa-solid fa-box-open"></i><span class="item-menu">Orders</span></NavLink>
             </li>
         </ul>
     </div>
 </div>
+
+@code{
+    const string activeClass = "active";
+
+    [Parameter]
+    public EventCallback<bool> OnHover { get; set; }
+
+    void SidebarHover(bool state) => OnHover.InvokeAsync(state);
+
+
+}
+
