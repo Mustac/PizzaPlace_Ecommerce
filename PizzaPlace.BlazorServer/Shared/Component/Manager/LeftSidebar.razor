@@ -1,0 +1,31 @@
+﻿<div class="left-sidebar bg-dark" style="padding-top:61px;">
+    <div class="sidebar-nav">
+        <ul class="sidebar-nav-items">
+            <li>
+                <NavLink class="sidebar-nav-item">Dashboard</NavLink>
+            </li>
+            <li>
+                <Collapsable Title="Personel">
+                    <Items>
+                        <div>Chefs</div>
+                        <div>Delivery</div>
+                    </Items>
+                </Collapsable>
+               @*  <!-- The button for toggling the collapse -->
+                <button class="sidebar-nav-item btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#personelMenu" aria-expanded="false" aria-controls="personelMenu">
+                    Personel
+                </button>
+                <!-- The collapsible content -->
+                <div class="collapse" id="personelMenu">
+                    <div class="sidebar-nav-item">
+                        <div>Chefs</div>
+                        <div>Delivery</div>
+                    </div>
+                </div> *@
+            </li>
+            <li>
+                <NavLink class="sidebar-nav-item">Orders</NavLink>
+            </li>
+        </ul>
+    </div>
+</div>

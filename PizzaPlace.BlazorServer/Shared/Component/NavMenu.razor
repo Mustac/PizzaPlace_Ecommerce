@@ -1,35 +1,39 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@using System.Security.Claims;
+@inject IJSRuntime JSRuntime
 @inject ShoppingCartService ShoppingCartService
 @inject NavMenuService NavMenuService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
-<nav class="sticky-top navbar navbar-expand-md bg-danger shadow-sm border-bottom border-white">
+<nav class="sticky-top navbar navbar-expand-md @NavBarClass shadow-sm border-bottom border-white">
     <div class="container">
-        <a class="navbar-brand text-light" href="#"><h4 class="m-0 p-0">Pizza Place</h4></a>
-        <div class="d-flex align-items-center d-md-none ml-auto-icon">
-            @if (!authState.User.Identity.IsAuthenticated)
-            {
-                <div @onclick="NavigateToLogin" class="nav-icon-wrap ico">
-                    <i class="fa-solid fa-user text-white nav-icon"></i>
-                </div>
-            }
-            else
-            {
-                <div class="nav-icon-wrap ico">
-                    <NavLink @onclick="ToggleUserBtn" Match="NavLinkMatch.All" class="nav-link text-white mt-0 p-0" href="/account">
-                        <i class="fa-solid fa-user-check nav-icon"></i>
-                    </NavLink>
-                </div>
-            }
-            <div @onclick="ShoppingCartClick" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
-                <i class="fa-solid fa-cart-shopping nav-icon"></i>
-                <div class="notification text-white fw-bold">
-                    <span class="notification-number">@ShoppingCartService.NumberOfProducts</span>
+        <a class="navbar-brand text-light" href="#"><h4 class="m-0 p-0">@NavBarLogoText</h4></a>
+        @if(AccessFrom == Page.CustomerPage)
+        {
+            <div class="d-flex align-items-center d-md-none ml-auto-icon">
+                @if (!authState.User.Identity.IsAuthenticated)
+                {
+                    <div @onclick="NavigateToLogin" class="nav-icon-wrap ico">
+                        <i class="fa-solid fa-user text-white nav-icon"></i>
+                    </div>
+                }
+                else
+                {
+                    <div class="nav-icon-wrap ico">
+                        <NavLink @onclick="ToggleUserBtn" Match="NavLinkMatch.All" class="nav-link text-white mt-0 p-0" href="/account">
+                            <i class="fa-solid fa-user-check nav-icon"></i>
+                        </NavLink>
+                    </div>
+                }
+                <div @onclick="ShoppingCartClick" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
+                    <i class="fa-solid fa-cart-shopping nav-icon"></i>
+                    <div class="notification text-white fw-bold">
+                        <span class="notification-number">@ShoppingCartService.NumberOfProducts</span>
+                    </div>
                 </div>
             </div>
-        </div>
+        }
         <button class="navbar-toggler bg-white show" @onclick="ToggleMenu" type="button">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -48,6 +52,8 @@
             </ul>
         </div>
 
+            @if(AccessFrom == Page.CustomerPage)
+        {
         <div class="d-none d-md-block">
             @if (!authState.User.Identity.IsAuthenticated)
             {
@@ -58,35 +64,43 @@
             else
             {
                 <div class="nav-icon-wrap ico">
-                    <NavLink @onclick="ToggleMenu" Match="NavLinkMatch.All" class="nav-link text-white" href="/account">
+                    <NavLink @onclick="ToggleMenu" Match="NavLinkMatch.All" class="nav-link text-white" data-toggle="tooltip" title="Account" href="/account">
                         <i class="fa-solid fa-user-check " style="padding:12px;"></i>
                     </NavLink>
                 </div>
             }
-            <div @onclick="ShoppingCartClick" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
+            <div @onclick="ShoppingCartClick" data-toggle="tooltip" title="Cart" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
                 <i class="fa-solid fa-cart-shopping  nav-icon"></i>
                 <div class="notification text-white fw-bold">
                     <span class="notification-number">@ShoppingCartService.NumberOfProducts</span>
                 </div>
             </div>
         </div>
+        }
     </div>
 </nav>
 
 @code {
-    public bool navOpen = false;
+    [Parameter]
+    public Page AccessFrom { get; set; } = Page.CustomerPage;
+
+    string NavBarClass = "bg-danger";
+    string NavBarLogoText = "Pizza Place";
+
+    private bool navOpen = false;
     private bool cartActive = false;
     private bool userBtnActive = false;
     int cartNumberNotification = 0;
 
-    public event Action<bool>? OnNavButtonClick;
-    public event Action<bool>? OnCartButtonClick;
+    public event Action<bool> OnNavButtonClick;
+    public event Action<bool> OnCartButtonClick;
 
-    AuthenticationState authState;
+    public AuthenticationState authState;
 
     protected async override Task OnInitializedAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        SetNavBarClasses();
     }
 
     void NavigateToLogin() => NavigationManager.NavigateTo("identity/account/login", forceLoad: true);
@@ -118,7 +132,7 @@
 
     public async Task ToggleMenu()
     {
-        if(!await IsMenuToggable())
+        if (!await IsMenuToggable())
             return;
 
 
@@ -151,13 +165,22 @@
          await JSRuntime.InvokeAsync<bool>("isMenuToggable");
 
 
+    void SetNavBarClasses()
+    {
+        if (AccessFrom == Page.ManagerPage)
+        {
+            NavBarClass = "bg-dark";
+           // NavBarLogoText = "Manager Page";
+            NavBarLogoText = "";
+        }
+
+    }
 
 
     public void Dispose()
     {
         OnNavButtonClick -= NavMenuService.SetNavState;
         ShoppingCartService.OnReloadShoppingCart -= ReloadComponent;
-
     }
 
 }

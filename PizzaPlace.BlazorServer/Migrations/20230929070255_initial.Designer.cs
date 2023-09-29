@@ -12,7 +12,7 @@ using PizzaPlace.BlazorServer.Data;
 namespace PizzaPlace.BlazorServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230928092635_initial")]
+    [Migration("20230929070255_initial")]
     partial class initial
     {
         /// <inheritdoc />

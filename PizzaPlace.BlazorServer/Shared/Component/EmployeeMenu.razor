@@ -2,20 +2,23 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @if(userClaims is not null)
 {
-    <div class="employee-menu">
-        @if (userClaims.IsInRole(Role.Manager))
-        {
-            <a class="btn btn-primary" data-toggle="tooltip" title="Manager panel"><i class="fa-solid fa-screwdriver-wrench"></i></a>
-        }
-        @if(userClaims.IsInRole(Role.Manager) || userClaims.IsInRole(Role.Chef))
-        {
-            <a class="btn btn-primary" data-toggle="tooltip" title="Chef panel"><i class="fa-solid fa-utensils"></i></a>
-        }
-        @if(userClaims.IsInRole(Role.Manager) || userClaims.IsInRole(Role.Delivery))
-        {
-            <a class="btn btn-primary" data-toggle="tooltip" title="Delivery panel"><i class="fa-solid fa-truck"></i></a>
-        }
-    </div>
+    @if (!userClaims.IsInRole(Role.Customer))
+    {
+        <div class="employee-menu">
+            @if (userClaims.IsInRole(Role.Manager))
+            {
+                <a class="btn btn-primary" href="/manager" data-toggle="tooltip" title="Manager panel"><i class="fa-solid fa-screwdriver-wrench"></i></a>
+            }
+            @if(userClaims.IsInRole(Role.Manager) || userClaims.IsInRole(Role.Chef))
+            {
+                <a class="btn btn-primary" data-toggle="tooltip" title="Chef panel"><i class="fa-solid fa-utensils"></i></a>
+            }
+            @if(userClaims.IsInRole(Role.Manager) || userClaims.IsInRole(Role.Delivery))
+            {
+                <a class="btn btn-primary" data-toggle="tooltip" title="Delivery panel"><i class="fa-solid fa-truck"></i></a>
+            }
+        </div>
+    }
 }
 
 @code {

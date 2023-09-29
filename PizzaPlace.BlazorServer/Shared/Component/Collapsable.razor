@@ -1,0 +1,25 @@
+﻿<div>
+    <div @onclick="Toggle" style="cursor: pointer;">
+        <h5>@Title</h5>
+    </div>
+    <div class="@collapseClass">
+        @Items
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public RenderFragment Items { get; set; }
+
+    private string collapseClass = "collapsed";
+    private bool isExpanded;
+
+    private void Toggle()
+    {
+        isExpanded = !isExpanded;
+        collapseClass = isExpanded ? "expanded" : "collapsed";
+    }
+}
