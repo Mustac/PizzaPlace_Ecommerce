@@ -1,7 +1,31 @@
 ﻿@page "/manager/products"
 @layout ManagerLayout
 
-<h1>Products</h1>
+<div class="container mt-2 mb-5">
+    <div class="row">
+            <h1 class="text-white text-center">Products</h1>
+        @for(int i = 0; i < 30; i++)
+        {
+            <div class="col-sm-12 col-md-6">
+                <ul class="list-products">
+                    <li class="py-3 px-4" data-toggle="tooltip" data-html="true" title="Click to edit">
+                        <div class="d-flex justify-content-between ">
+                            <div><i class="fa-solid fa-pizza-slice"></i>&nbsp;&nbsp;<h6 class="d-inline">Meat Lover's Magic :</h6></div>
+                            <div>
+                                <span class="price-cut text-secondary">12.99$</span>
+                                <span class="fw-bold">9.99$</span>
+                            </div>
+                        </div>
+                        <hr class="my-2"/>
+                        <div>
+                            <p><b>Ingredients :</b> <small>Tomato sauce, Mozzarella cheese, Pepperoni, Italian sausage, Bacon, Ham, Ground beef.</small></p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        }
+    </div>
+</div>
 @code {
 
 }
