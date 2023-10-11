@@ -15,9 +15,9 @@ var carousel;
 
 function initializeNav() {
     bsNav = new bootstrap.Collapse(document.getElementById("navbarNav"), {
-        toggle: false 
+        toggle: false
     });
-    
+
 }
 
 function initializeCarousel() {
@@ -37,3 +37,4 @@ function caruselNext() {
 async function isMenuToggable() {
     return window.innerWidth < 767.98;
 }
+

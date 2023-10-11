@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PizzaPlace.BlazorServer.Data;
@@ -11,9 +12,11 @@ using PizzaPlace.BlazorServer.Data;
 namespace PizzaPlace.BlazorServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231006090258_deletedDiscountTable")]
+    partial class deletedDiscountTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -259,6 +262,23 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.ToTable("Feedbacks");
                 });
 
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Ingredient", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ingredients");
+                });
+
             modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -341,10 +361,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.Property<float>("DiscountedPrice")
                         .HasColumnType("real");
 
-                    b.Property<string>("Ingredients")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -355,6 +371,21 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.ProductIngredient", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IngredientId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ProductId", "IngredientId");
+
+                    b.HasIndex("IngredientId");
+
+                    b.ToTable("ProductIngredients");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -465,6 +496,25 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.ProductIngredient", b =>
+                {
+                    b.HasOne("PizzaPlace.BlazorServer.Models.Ingredient", "Ingredient")
+                        .WithMany("ProductIngredients")
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PizzaPlace.BlazorServer.Models.Product", "Product")
+                        .WithMany("ProductIngredients")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ingredient");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("PizzaPlace.BlazorServer.Models.ApplicationUser", b =>
                 {
                     b.Navigation("ChefOrders");
@@ -472,6 +522,11 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.Navigation("DeliveryOrders");
 
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Ingredient", b =>
+                {
+                    b.Navigation("ProductIngredients");
                 });
 
             modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Order", b =>
@@ -482,6 +537,8 @@ namespace PizzaPlace.BlazorServer.Migrations
             modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Product", b =>
                 {
                     b.Navigation("OrderProducts");
+
+                    b.Navigation("ProductIngredients");
                 });
 #pragma warning restore 612, 618
         }

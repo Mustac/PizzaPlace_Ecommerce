@@ -1,31 +1,132 @@
 ﻿@page "/manager/products"
 @layout ManagerLayout
+@inject ProductService ProductService
+@inject IJSRuntime JSRuntime
 
-<div class="container mt-2 mb-5">
-    <div class="row">
-            <h1 class="text-white text-center">Products</h1>
-        @for(int i = 0; i < 30; i++)
-        {
-            <div class="col-sm-12 col-md-6">
-                <ul class="list-products">
-                    <li class="py-3 px-4" data-toggle="tooltip" data-html="true" title="Click to edit">
-                        <div class="d-flex justify-content-between ">
-                            <div><i class="fa-solid fa-pizza-slice"></i>&nbsp;&nbsp;<h6 class="d-inline">Meat Lover's Magic :</h6></div>
-                            <div>
-                                <span class="price-cut text-secondary">12.99$</span>
-                                <span class="fw-bold">9.99$</span>
-                            </div>
-                        </div>
-                        <hr class="my-2"/>
-                        <div>
-                            <p><b>Ingredients :</b> <small>Tomato sauce, Mozzarella cheese, Pepperoni, Italian sausage, Bacon, Ham, Ground beef.</small></p>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        }
+<div class="container">
+    <div class="d-flex justify-content-between"
+    <h1>Menu : </h1>
+    <div>
+        <button class="btn btn-primary btn-sm mt-3" @onclick="RegisterProduct">Register new product</button>
     </div>
+    </div>
+    <table >
+        <thead class="text-dark">
+            <tr>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Discounted Price</th>
+                <th>Ingredients</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        @if(products is not null)
+        {
+            @foreach(var product in products)
+            {
+                @if(product.DiscountedPrice == 0)
+                {
+                    <tr>
+                        <td>@product.Name</td>
+                        <td>@product.Price$</td>
+                        <td>
+                            <div>
+                                No discount
+                        </div>
+                        </td>
+                        <td>@product.Ingredients</td>
+                      
+                        <td>
+
+                                <button class="btn btn-sm text-white" style="background-color:green" @onclick="@(()=>EditProduct(product))">Edit</button>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <tr class="bg-yellow fw-bold">
+                        <td>@product.Name</td>
+                        <td>@product.Price$</td>
+                        <td>@product.DiscountedPrice.ToString("#.##")$</td>
+                        <td>@product.Ingredients</td>
+                       
+                        <td>
+
+                            <button class="btn btn-sm text-white" style="background-color:green" @onclick="@(()=>EditProduct(product))">Edit</button>
+                        </td>
+                    </tr>
+                }
+        }
+        }
+            <!-- More rows as needed -->
+        </tbody>
+    </table>
 </div>
+    
+
+<ProductRegistrationModal @ref="_productRegistrationModal" Product="productDTO" OnProductCreated="OnProductCreated" />
+
 @code {
+    IEnumerable<Product> products;
+    private Product selectedProduct = new Product();
+
+    private ProductDTO productDTO
+    {
+        get
+        {
+            return new ProductDTO
+                {
+                    Id = selectedProduct.Id,
+                    Name = selectedProduct.Name,
+                    DiscountedPrice = selectedProduct.DiscountedPrice,
+                    Ingredients = selectedProduct.Ingredients,
+                    Price = selectedProduct.Price
+                };
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var temp = await ProductService.GetProductsAsync();
+        products = await GetProductsAsync();
+    }
+
+    ProductRegistrationModal _productRegistrationModal;
+    ProductRegistrationModal _productEditModal;
+
+
+    async Task OnProductCreated(Product product)
+    {
+        selectedProduct = product;
+        products = await GetProductsAsync();
+    }
+
+    /// <summary>
+    /// Called when we want to register a new product
+    /// </summary>
+    void RegisterProduct() => EditProduct(new Product());
+
+
+    /// <summary>
+    /// Called when we want to edit an existing product
+    /// </summary>
+    void EditProduct(Product product)
+    {
+        selectedProduct = product;
+        _productRegistrationModal.Show();
+    }
+
+    void SelectProduct(Product product) => selectedProduct = product;
+
+    async Task<IEnumerable<Product>> GetProductsAsync()
+    {
+        var temp = await ProductService.GetProductsAsync();
+        return temp.OrderBy(p => p.DiscountedPrice == 0)
+        .ThenBy(x => x.Name)
+        .ToList();
+    }
+
 
 }
+

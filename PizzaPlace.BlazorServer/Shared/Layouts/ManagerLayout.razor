@@ -4,6 +4,14 @@
 
 <TopBar/>
 <PageTitle>Managment</PageTitle>
+
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="4"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug" />
+
 <LeftSidebar OnHover="SidebarHover" />
 <div class="body-wrap-frame @(sidebarMouseHovering?"active":"")">
     <div class="body-wrap">

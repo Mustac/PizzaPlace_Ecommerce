@@ -1,0 +1,142 @@
+﻿@inject ProductService ProductService
+@inject IToastService ToastService
+
+@if (show)
+{
+    <div class="product-registration-modal">
+
+        <div class="d-flex justify-content-between align-items-end mb-2">
+
+            <h5 class="my-0 p-0">@(Product.Id == 0 ? "New Product" : "Edit Product")</h5>
+
+            <div @onclick=Hide class="btn btn-secondary text-white btn-sm"><i class="fa-solid fa-x"></i></div>
+        </div>
+        <hr />
+        @if (Product.Id != 0)
+        {
+            <div class="mt-3 d-inline-block py-1 px-2 rounded bg-info">
+                <input id="input-checkbox" class="form-check-input border-dark" type="checkbox" @bind-value="enableEdit">
+                <label for="input-checkbox">Enable edit</label>
+            </div>
+        }
+
+        @if (Product.Id == 0 || (Product.Id != 0 && enableEdit))
+        {
+            <EditForm Model="Product" OnValidSubmit="RegisterNewPizza">
+                <DataAnnotationsValidator />
+                <label for="input-name" class="mt-2">Name :</label>
+                <InputText id="input-name" class="form-control my-1" @bind-Value="Product.Name"></InputText>
+                <ValidationMessage class="validation-error" For="(()=>Product.Name)"></ValidationMessage>
+
+                <label for="input-ingredients" class="mt-2">Ingredients :</label>
+                <InputTextArea id="input-ingredients" class="form-control my-1" @bind-Value="Product.Ingredients"></InputTextArea>
+                <ValidationMessage class="validation-error" For="(()=>Product.Ingredients)"></ValidationMessage>
+
+                <div class="mt-3 ">
+                    <div class="d-flex my-1 align-items-center  ml-auto" style="width:150px;">
+                        <div style="margin:0 10px 0 0">
+                            <label class="d-inline-block text-nowrap" for="input-price">Price : </label>
+                        </div>
+                        <InputNumber id="input-price" class="form-control" @bind-Value="Product.Price"></InputNumber>
+                        <p style="margin-left:10px;">$</p>
+                    </div>
+                    <ValidationMessage class="validation-error text-end" For="(()=>Product.Price)"></ValidationMessage>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-between">
+                    <button @onclick="Hide" type="button" class="btn btn-secondary text-white w-100 mx-1">Close</button>
+                    <button type="submit" class="btn btn-primary w-100 mx-1">Register</button>
+                </div>
+            </EditForm>
+
+        }
+
+        @*
+
+    <EditForm Model="Product" OnValidSubmit="RegisterNewPizza">
+    <DataAnnotationsValidator />
+    <label for="input-name" class="mt-2">Name :</label>
+    <InputText disabled="@(!enableEdit)" id="input-name" class="form-control my-1" @bind-Value="Product.Name"></InputText>
+    <ValidationMessage class="validation-error" For="(()=>Product.Name)"></ValidationMessage>
+
+    <label for="input-ingredients" class="mt-2">Ingredients :</label>
+    <InputTextArea disabled="@(!enableEdit)" id="input-ingredients" class="form-control my-1" @bind-Value="Product.Ingredients"></InputTextArea>
+    <ValidationMessage class="validation-error" For="(()=>Product.Ingredients)"></ValidationMessage>
+
+    <div class="mt-3 ">
+    <div class="d-flex my-1 align-items-center  ml-auto" style="width:150px;">
+    <div style="margin:0 10px 0 0">
+    <label class="d-inline-block text-nowrap" for="input-price">Price : </label>
+    </div>
+    <InputNumber disabled="@(!enableEdit)" id="input-price" class="form-control" @bind-Value="Product.Price"></InputNumber>
+    <p style="margin-left:10px;">$</p>
+    </div>
+    <ValidationMessage class="validation-error text-end" For="(()=>Product.Price)"></ValidationMessage>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between">
+    <button @onclick="Hide" type="button" class="btn btn-secondary text-white w-100 mx-1">Close</button>
+    <button type="submit" class="btn btn-primary w-100 mx-1 @(!enableEdit?"disabled":"")">Register</button>
+    </div>
+    </EditForm>
+    *@
+
+    </div>
+
+    <ShadowOverlay Show="true" />
+}
+
+
+@code {
+    [Parameter]
+    public ProductDTO? Product { get; set; } = new ProductDTO();
+
+    private bool show;
+
+    private bool enableEdit = false;
+
+    /// <summary>
+    /// Giving back the info if the product is created or not
+    /// </summary>
+    [Parameter]
+    public EventCallback<Product> OnProductCreated { get; set; }
+
+    [Parameter]
+    public EventCallback OnHide { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+
+    async Task RegisterNewPizza()
+    {
+        var product = await ProductService.NewProductAsync(Product);
+
+        if (product is not null)
+        {
+            ToastService.ShowSuccess($"{Product.Name} is registrated");
+            Hide();
+            await OnProductCreated.InvokeAsync(product);
+        }
+        else
+            ToastService.ShowError($"Something went wrong");
+
+        await OnProductCreated.InvokeAsync(product);
+
+
+    }
+
+    async Task ComponentStateChange() =>
+        await OnHide.InvokeAsync();
+
+    public void Show()
+    {
+        show = true;
+        Product = new ProductDTO();
+    }
+    public void Hide() => show = false;
+
+
+}

@@ -11,12 +11,9 @@ namespace PizzaPlace.BlazorServer.Data
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
         public DbSet<Product> Products { get; set; }
-        public DbSet<Ingredient> Ingredients { get; set; }
-        public DbSet<ProductIngredient> ProductIngredients { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderProduct> OrderProducts { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
-        public DbSet<Discount> Discounts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -38,20 +35,6 @@ namespace PizzaPlace.BlazorServer.Data
                 .WithOne(o => o.Delivery)
                 .HasForeignKey(o => o.DeliveryId);
 
-
-            // Configuring the relationships between the entities
-            builder.Entity<ProductIngredient>()
-                .HasKey(pi => new { pi.ProductId, pi.IngredientId });
-
-            builder.Entity<ProductIngredient>()
-                .HasOne(pi => pi.Product)
-                .WithMany(p => p.ProductIngredients)
-                .HasForeignKey(pi => pi.ProductId);
-
-            builder.Entity<ProductIngredient>()
-                .HasOne(pi => pi.Ingredient)
-                .WithMany(i => i.ProductIngredients)
-                .HasForeignKey(pi => pi.IngredientId);
 
             builder.Entity<OrderProduct>()
                 .HasKey(op => new { op.OrderId, op.ProductId });

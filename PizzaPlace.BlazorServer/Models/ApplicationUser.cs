@@ -4,10 +4,10 @@ namespace PizzaPlace.BlazorServer.Models;
 
 public class ApplicationUser : IdentityUser
 {
-    public string AddressStreet { get; set; }
-    public string AddressCity { get; set; }
-    public string AddressState { get; set; }
-    public string AddressZip { get; set; }
+    public string AddressStreet { get; set; } = string.Empty;
+    public string AddressCity { get; set; } = string.Empty;
+    public string AddressState { get; set; } = string.Empty;
+    public string AddressZip { get; set; } = string.Empty;
     public ICollection<Order> Orders { get; set; }
     public ICollection<Order> ChefOrders { get; set; }
     public ICollection<Order> DeliveryOrders { get; set; }
