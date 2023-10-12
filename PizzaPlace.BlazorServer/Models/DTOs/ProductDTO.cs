@@ -22,6 +22,7 @@ namespace PizzaPlace.BlazorServer.Models.DTOs
         [FloatRange(minimum:0, maximum:999, ErrorMessage = "The price must be between 0 and 999")]
         [LessThan("Price", ErrorMessage = "Discounted Price must be less than the regular Price")]
         public float? DiscountedPrice { get; set; }
+        public bool IsActive { get; set; }
 
     }
 }

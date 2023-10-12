@@ -8,22 +8,22 @@
 <div class="container" style="min-width:1200px">
     <div class="d-flex justify-content-between">
         <div class="d-flex">
-            <div class="btn-option-select bg-primary p-2">
-                <h3 class="p-2 px-5 mb-0 bg-primary text-white">Products</h3>
+            <div @onclick="@(()=>_pageState = PageState.Products)" class="btn-option-select @(_pageState == PageState.Products?"bg-primary":"bg-soft-gray") p-2">
+                <h3 class="p-2 px-5 mb-0 text-white">Products</h3>
             </div>
-            <div class="p-2 btn-option-select border bg-soft-gray align-self-">
+            <div @onclick="@(()=>_pageState = PageState.Archived)" class="p-2 btn-option-select  @(_pageState == PageState.Archived?"bg-primary":"bg-soft-gray") align-self-">
                 <h3 class="p-1 text-white ml-2 mb-0">Archived</h3>
             </div>
         </div>
         <div class="align-self-end mb-2">
-             <button class="btn btn-primary btn-sm" @onclick="RegisterProduct">Register new product</button>
+            <button class="btn btn-primary btn-sm" @onclick="RegisterProduct">Register new product</button>
         </div>
     </div>
     <div class="product-table bg-primary p-2">
 
-        <table>
-            <thead class="text-dark">
-                <tr>
+        <table class="bg-white ">
+            <thead>
+                <tr id="table-header">
                     <th>Product Name</th>
                     <th>Price</th>
                     <th>Discounted Price</th>
@@ -32,40 +32,48 @@
                 </tr>
             </thead>
             <tbody>
-            @if(products is not null)
-            {
-                @foreach(var product in products)
+                @if (products is not null)
                 {
-            
-                            <tr class="@(product.DiscountedPrice == 0?"":"bg-yellow fw-bold") @(product.Id == selectedProduct.Id?activeSelectedClass:"")">
-                                <td><i class="fa-solid fa-pizza-slice"></i>&nbsp; @product.Name</td>
+                    @foreach (var product in products)
+                    {
+
+                        <tr class="@(product.DiscountedPrice == 0?"":"bg-yellow fw-bold") @(product.Id == selectedProduct.Id?activeSelectedClass:"")">
+                            <td><i class="fa-solid fa-pizza-slice"></i>&nbsp; @product.Name</td>
                             <td>@product.Price$</td>
                             <td>
-                                    @(product.DiscountedPrice == 0 ? "N/D" : product.DiscountedPrice.ToString("#.##"))
+                                @(product.DiscountedPrice == 0 ? "N/D" : product.DiscountedPrice.ToString("#.##"))
                             </td>
                             <td>@product.Ingredients</td>
-                      
+                           
+
                             <td>
 
-                                    <button class="btn btn-sm text-white" style="background-color:green" @onclick="@(()=>EditProduct(product))">Edit</button>
+                                <button class="btn btn-sm text-white" style="background-color:green" @onclick="@(()=>EditProduct(product))">Edit</button>
                                 <button class="btn btn-sm btn-danger" @onclick="@(()=>DeleteProductAsync(product.Id))">Archive</button>
                             </td>
                         </tr>
-             
-            }
-            }
+
+                    }
+                }
                 <!-- More rows as needed -->
             </tbody>
         </table>
     </div>
 </div>
-    
 
-<ProductRegistrationModal @ref="_productRegistrationModal" Product="productDTO"/>
+
+<ProductRegistrationModal @ref="_productRegistrationModal" Product="productDTO" />
 
 @code {
     IEnumerable<Product> products;
     private Product selectedProduct = new Product();
+
+    PageState _pageState = PageState.Products;
+
+    enum PageState{
+        Products,
+        Archived
+    }
 
     string activeSelectedClass = "border border-2 border-dark";
 
@@ -82,7 +90,7 @@
                     DiscountedPrice = selectedProduct.DiscountedPrice,
                     Ingredients = selectedProduct.Ingredients,
                     Price = selectedProduct.Price
-                }:
+                } :
                 new ProductDTO();
         }
     }
