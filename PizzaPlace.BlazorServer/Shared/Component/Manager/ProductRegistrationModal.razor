@@ -128,15 +128,6 @@
     private bool enableEdit = false;
     private bool enablePromo = false;
 
-    /// <summary>
-    /// Giving back the info if the product is created or not
-    /// </summary>
-    [Parameter]
-    public EventCallback<Product> OnProductCreated { get; set; }
-
-    [Parameter]
-    public EventCallback OnProductUpdated { get; set; }
-
     [Parameter]
     public EventCallback OnHide { get; set; }
 
@@ -176,7 +167,6 @@
         {
             ToastService.ShowSuccess($"{Product.Name} is registrated");
             Hide();
-            await OnProductCreated.InvokeAsync(product);
         }
         else
             ToastService.ShowError($"Something went wrong");
@@ -193,7 +183,6 @@
         if (state == State.Success)
         {
             ToastService.ShowSuccess("Success");
-            await OnProductUpdated.InvokeAsync(_product);
         }
         else if (state == State.Fail)
             ToastService.ShowError("Something went wrong");
@@ -215,9 +204,6 @@
         show = false;
     }
 
-    async Task OnDelete(int Id)
-    {
-        
-    }
+   
 
 }

@@ -161,6 +161,7 @@ th {
 td {
     border: 1px solid #ddd;
     padding: 8px;
+    background-color:white;
 }
 
     /* Set the width of each column by percentage */
@@ -177,13 +178,18 @@ td {
     }
 
     th:nth-child(4), td:nth-child(4) {
-        width: 65%;
     }
     th:nth-child(5), td:nth-child(5) {
-        width: 50px;
+        width: 130px !important;
     }
 
+.bg-gray{
+    background-color:gray;
+}
 
+.bg-soft-gray {
+    background-color: rgb(60, 60, 60);
+}
 
 .ingredients {
     font-size: 0.8rem;
@@ -194,8 +200,27 @@ td {
     border-color:black !important;
 }
 
-@media (min-width: 991.98px) {
-    .body-wrap-frame.active {
+.product-table{
+    border-radius:0 5px 5px 5px;
+    min-width:1150px;
+}
+
+.btn-option-select {
+    border-radius: 5px 5px 0 0;
+    cursor: pointer;
+    border-bottom: 0;
+    transition:0.5s all;
+    width:200px;
+    text-align:center
+}
+
+    .btn-option-select:hover {
+        background-color:rgb(208, 137, 137);
+    }
+
+
+    @media (min-width: 991.98px) {
+        .body-wrap-frame.active {
         padding-left: 200px;
     }
 

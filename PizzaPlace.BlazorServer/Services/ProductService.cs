@@ -8,6 +8,11 @@ namespace PizzaPlace.BlazorServer.Services
     {
         private readonly DataContext _context;
 
+        /// <summary>
+        /// Triggers whenever table product is updated
+        /// </summary>
+        public event Func<Task>? OnProductAction;
+
         public ProductService(DataContext context)
         {
             _context = context;
@@ -22,7 +27,11 @@ namespace PizzaPlace.BlazorServer.Services
             var success = await _context.SaveChangesAsync() > 0;
 
             if (success)
+            {
+                if (OnProductAction != null)
+                    await OnProductAction.Invoke();
                 return prod.Entity;
+            }
 
             return null;
         }
@@ -41,9 +50,16 @@ namespace PizzaPlace.BlazorServer.Services
 
             _context.Update(product);
 
-            return await _context.SaveChangesAsync() > 0 ? State.Success : State.Fail;
+            var success = await _context.SaveChangesAsync() > 0;
 
+            if (success)
+            {
+                if (OnProductAction != null)
+                    await OnProductAction.Invoke();
+                return State.Success;
+            }
 
+            return State.Fail;
         }
 
         public async Task<IEnumerable<Product>> GetProductsAsync()
@@ -59,7 +75,15 @@ namespace PizzaPlace.BlazorServer.Services
 
             _context.Products.Update(product);
 
-            return await _context.SaveChangesAsync() > 0;
+            var success = await _context.SaveChangesAsync() > 0;
+
+            if (success)
+            {
+                if (OnProductAction != null)
+                    await OnProductAction.Invoke();
+            }
+
+            return success;
         }
 
     }
