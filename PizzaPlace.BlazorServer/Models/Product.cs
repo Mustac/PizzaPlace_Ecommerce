@@ -15,5 +15,6 @@ public class Product
     public float Price { get; set; }
     public float DiscountedPrice { get; set; }
     public string Ingredients { get; set; }
+    public bool IsDeleted { get; set; }
     public virtual ICollection<OrderProduct> OrderProducts { get; set; }
 }

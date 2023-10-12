@@ -27,8 +27,8 @@
             {
                 @if(product.DiscountedPrice == 0)
                 {
-                    <tr>
-                        <td>@product.Name</td>
+                        <tr class=" @(product.Id == selectedProduct.Id?activeSelectedClass:"")">
+                            <td><i class="fa-solid fa-pizza-slice"></i>&nbsp; @product.Name</td>
                         <td>@product.Price$</td>
                         <td>
                             <div>
@@ -45,8 +45,8 @@
                 }
                 else
                 {
-                    <tr class="bg-yellow fw-bold">
-                        <td>@product.Name</td>
+                        <tr class="bg-yellow fw-bold @(product.Id == selectedProduct.Id?activeSelectedClass:"")">
+                            <td><i class="fa-solid fa-pizza-slice"></i>&nbsp; @product.Name</td>
                         <td>@product.Price$</td>
                         <td>@product.DiscountedPrice.ToString("#.##")$</td>
                         <td>@product.Ingredients</td>
@@ -65,24 +65,29 @@
 </div>
     
 
-<ProductRegistrationModal @ref="_productRegistrationModal" Product="productDTO" OnProductCreated="OnProductCreated" />
+<ProductRegistrationModal @ref="_productRegistrationModal" Product="productDTO" OnProductCreated="ProductCreated" OnProductUpdated="RefreshProducts" />
 
 @code {
     IEnumerable<Product> products;
     private Product selectedProduct = new Product();
 
+    string activeSelectedClass = "border border-2 border-dark";
+
     private ProductDTO productDTO
     {
         get
         {
-            return new ProductDTO
+            return
+            selectedProduct is not null ?
+            new ProductDTO
                 {
                     Id = selectedProduct.Id,
                     Name = selectedProduct.Name,
                     DiscountedPrice = selectedProduct.DiscountedPrice,
                     Ingredients = selectedProduct.Ingredients,
                     Price = selectedProduct.Price
-                };
+                }:
+                new ProductDTO();
         }
     }
 
@@ -95,13 +100,17 @@
     ProductRegistrationModal _productRegistrationModal;
     ProductRegistrationModal _productEditModal;
 
-
-    async Task OnProductCreated(Product product)
+    async Task ProductCreated(Product product)
     {
         selectedProduct = product;
-        products = await GetProductsAsync();
+        await RefreshProducts();
+        StateHasChanged();
     }
 
+    async Task RefreshProducts() =>
+        products = await GetProductsAsync();
+    
+        
     /// <summary>
     /// Called when we want to register a new product
     /// </summary>
@@ -126,6 +135,8 @@
         .ThenBy(x => x.Name)
         .ToList();
     }
+
+
 
 
 }

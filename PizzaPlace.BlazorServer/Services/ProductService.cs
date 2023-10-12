@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PizzaPlace.BlazorServer.Helpers;
 using PizzaPlace.BlazorServer.Models.DTOs;
 
 namespace PizzaPlace.BlazorServer.Services
@@ -26,8 +27,40 @@ namespace PizzaPlace.BlazorServer.Services
             return null;
         }
 
+        public async Task<string> UpdateProductAsync(ProductDTO productDto)
+        {
+            var product = await _context.Products.FindAsync(productDto.Id);
+
+            if (product is null)
+                return State.NotFound;
+
+            product.Name = productDto.Name;
+            product.Price = productDto.Price;
+            product.DiscountedPrice = productDto.DiscountedPrice.HasValue? productDto.DiscountedPrice.Value:0;
+            product.Ingredients = productDto.Ingredients;
+
+            _context.Update(product);
+
+            return await _context.SaveChangesAsync() > 0 ? State.Success : State.Fail;
+
+
+        }
+
         public async Task<IEnumerable<Product>> GetProductsAsync()
-            => await _context.Products.ToListAsync();
+            => await _context.Products.Where(x=>!x.IsDeleted).ToListAsync();
+
+        public async Task<bool> SoftDeleteAsync(int Id)
+        {
+            var product = await _context.Products.FindAsync(Id);
+
+            if (product is null) return false;
+
+            product.IsDeleted = true;
+
+            _context.Products.Update(product);
+
+            return await _context.SaveChangesAsync() > 0;
+        }
 
     }
 }
