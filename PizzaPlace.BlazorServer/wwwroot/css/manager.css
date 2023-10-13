@@ -169,6 +169,11 @@ td {
     padding: 8px;
 }
 
+tr:hover{
+    background-color:dimgray !important;
+    color:white !important;
+}
+
     /* Set the width of each column by percentage */
     th:nth-child(1), td:nth-child(1) {
         width: 20%;
@@ -185,7 +190,7 @@ td {
     th:nth-child(4), td:nth-child(4) {
     }
     th:nth-child(5), td:nth-child(5) {
-        width: 130px !important;
+        width: 150px !important;
     }
 
 .bg-gray{

@@ -8,10 +8,10 @@
 <div class="container" style="min-width:1200px">
     <div class="d-flex justify-content-between">
         <div class="d-flex">
-            <div @onclick="@(()=>_pageState = PageState.Products)" class="btn-option-select @(_pageState == PageState.Products?"bg-primary":"bg-soft-gray") p-2">
+            <div @onclick="@(()=>TabClicked(TabState.Products))" class="btn-option-select @(_tabState == TabState.Products?"bg-primary":"bg-soft-gray") p-2">
                 <h3 class="p-2 px-5 mb-0 text-white">Products</h3>
             </div>
-            <div @onclick="@(()=>_pageState = PageState.Archived)" class="p-2 btn-option-select  @(_pageState == PageState.Archived?"bg-primary":"bg-soft-gray") align-self-">
+            <div @onclick="@(()=>TabClicked(TabState.Archived))" class="p-2 btn-option-select  @(_tabState == TabState.Archived?"bg-primary":"bg-soft-gray") align-self-">
                 <h3 class="p-1 text-white ml-2 mb-0">Archived</h3>
             </div>
         </div>
@@ -37,7 +37,7 @@
                     @foreach (var product in products)
                     {
 
-                        <tr class="@(product.DiscountedPrice == 0?"":"bg-yellow fw-bold") @(product.Id == selectedProduct.Id?activeSelectedClass:"")">
+                        <tr class="@(product.DiscountedPrice != 0 && _tabState == TabState.Products?"bg-yellow fw-bold":"") @(_tabState == TabState.Archived?"text-secondary":"") @(product.Id == selectedProduct.Id?activeSelectedClass:"")">
                             <td><i class="fa-solid fa-pizza-slice"></i>&nbsp; @product.Name</td>
                             <td>@product.Price$</td>
                             <td>
@@ -45,12 +45,21 @@
                             </td>
                             <td>@product.Ingredients</td>
                            
-
-                            <td>
-
-                                <button class="btn btn-sm text-white" style="background-color:green" @onclick="@(()=>EditProduct(product))">Edit</button>
-                                <button class="btn btn-sm btn-danger" @onclick="@(()=>DeleteProductAsync(product.Id))">Archive</button>
-                            </td>
+                            @if(_tabState == TabState.Products)
+                            {
+                                <td class="text-center">
+                                        <button class="btn btn-sm text-white" style="background-color:green" @onclick="@(()=>EditProduct(product))">Edit</button>
+                                        <button class="btn btn-sm btn-danger" @onclick="@(()=>SoftDeleteProductAsync(product))">Archive</button>
+                                </td>
+                            }
+                            
+                            @if(_tabState == TabState.Archived)
+                            {
+                                <td class="text-center">
+                                    <button class="btn btn-sm text-white" style="background-color:green" @onclick="@(()=>RestoreProduct(product))">Restore</button>
+                                    <button class="btn btn-sm btn-danger" @onclick="@(()=>HardDeleteProductAsync(product))">Delete</button>
+                                </td>
+                            }
                         </tr>
 
                     }
@@ -68,9 +77,9 @@
     IEnumerable<Product> products;
     private Product selectedProduct = new Product();
 
-    PageState _pageState = PageState.Products;
+    TabState _tabState = TabState.Products;
 
-    enum PageState{
+    enum TabState{
         Products,
         Archived
     }
@@ -98,7 +107,7 @@
     protected override async Task OnInitializedAsync()
     {
         var temp = await ProductService.GetProductsAsync();
-        products = await GetProductsAsync();
+        await RefreshProducts();
         ProductService.OnProductAction += RefreshProducts;
     }
 
@@ -114,7 +123,12 @@
 
     async Task RefreshProducts()
     {
-        products = await GetProductsAsync();
+        if(_tabState == TabState.Products)
+            products =  await ProductService.GetProductsAsync();
+
+        if(_tabState == TabState.Archived)
+            products = await ProductService.GetArchivedProductsAsync();
+
         await InvokeAsync(StateHasChanged);
     }
 
@@ -136,25 +150,44 @@
 
     void SelectProduct(Product product) => selectedProduct = product;
 
-    async Task<IEnumerable<Product>> GetProductsAsync()
+    async Task SoftDeleteProductAsync(Product product)
     {
-        var temp = await ProductService.GetProductsAsync();
-        return temp.OrderBy(p => p.DiscountedPrice == 0)
-        .ThenBy(x => x.Name)
-        .ToList();
-    }
-
-    async Task DeleteProductAsync(int Id)
-    {
-        bool success = await ProductService.SoftDeleteAsync(Id);
+        bool success = await ProductService.SoftDeleteAsync(product.Id);
 
         if (success)
         {
-            ToastService.ShowSuccess($"Product deleted");
+            ToastService.ShowSuccess($"{product.Name} archived");
             return;
         }
 
         ToastService.ShowError($"Something went wrong");
+    }
+
+    async Task TabClicked(TabState state)
+    {
+        _tabState = state;
+
+        if(state == TabState.Products)
+            products = await ProductService.GetProductsAsync();
+
+        if (state == TabState.Archived)
+            products = await ProductService.GetArchivedProductsAsync();
+    }
+
+    async Task RestoreProduct(Product product)
+    {
+        var success = await ProductService.RestoreProduct(product.Id);
+
+        if (success == State.Success)
+            ToastService.ShowSuccess($"{product.Name} restored");
+    }
+
+    async Task HardDeleteProductAsync(Product product)
+    {
+        var success = await ProductService.HardDeleteAsync(product.Id);
+
+        if (success)
+            ToastService.ShowSuccess($"{product.Name} hard deleted");
     }
 
     public void Dispose()

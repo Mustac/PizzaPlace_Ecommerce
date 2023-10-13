@@ -63,7 +63,35 @@ namespace PizzaPlace.BlazorServer.Services
         }
 
         public async Task<IEnumerable<Product>> GetProductsAsync()
-            => await _context.Products.Where(x=>!x.IsDeleted).ToListAsync();
+            => await _context.Products.Where(x=>!x.IsDeleted).OrderBy(x=>x.DiscountedPrice == 0).ToListAsync();
+
+        public async Task<IEnumerable<Product>> GetArchivedProductsAsync()
+            => await _context.Products.Where(x => x.IsDeleted).OrderBy(x => x.DiscountedPrice == 0).ToListAsync();
+
+        public async Task<string> RestoreProduct(int Id)
+        {
+            var product = await _context.Products.FindAsync(Id);
+
+            if (product == null)
+                return State.Fail;
+
+            product.IsDeleted = false;
+
+            _context.Update(product);
+
+            bool success = await _context.SaveChangesAsync() > 0;
+
+            if(success)
+            {
+                if (OnProductAction != null)
+                    await OnProductAction.Invoke();
+
+                return State.Success;
+            }
+
+            return State.Fail;
+
+        }
 
         public async Task<bool> SoftDeleteAsync(int Id)
         {
@@ -74,6 +102,25 @@ namespace PizzaPlace.BlazorServer.Services
             product.IsDeleted = true;
 
             _context.Products.Update(product);
+
+            var success = await _context.SaveChangesAsync() > 0;
+
+            if (success)
+            {
+                if (OnProductAction != null)
+                    await OnProductAction.Invoke();
+            }
+
+            return success;
+        }
+
+        public async Task<bool> HardDeleteAsync(int Id)
+        {
+            var product = await _context.Products.FindAsync(Id);
+
+            if (product is null) return false;
+
+            _context.Products.Remove(product);
 
             var success = await _context.SaveChangesAsync() > 0;
 
