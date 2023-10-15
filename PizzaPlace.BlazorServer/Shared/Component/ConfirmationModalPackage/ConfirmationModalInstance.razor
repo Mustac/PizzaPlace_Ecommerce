@@ -1,0 +1,54 @@
+﻿@implements IDisposable
+
+@if (show)
+{
+    <div class="position-absolute-center confirmation-modal">
+        <div class="confirmation-modal-body">
+            <p>@text</p>
+        </div>
+        <div class="d-flex p-3">
+            <button @onclick="Cancel" class="btn btn-danger d-block w-100" style="margin-right:5px;">Cancel</button>
+            <button @onclick="Accept" class="btn btn-outline-danger d-block w-100" style="margin-left:5px;">Accept</button>
+        </div>
+    </div>
+}
+
+<ShadowOverlay Show="show" OnOverlayClick="Hide" />
+
+@code {
+    private string text = string.Empty;
+    private bool show;
+    private TaskCompletionSource<bool> _taskCompletionSource;
+
+    protected override void OnInitialized() =>
+        ConfirmationModal.OnShowModal += HandleShowModal;
+
+    public void Dispose() =>
+        ConfirmationModal.OnShowModal -= HandleShowModal;
+
+    private async Task<bool> HandleShowModal(string message)
+    {
+        text = message;
+        show = true;
+        _taskCompletionSource = new TaskCompletionSource<bool>(); // Initialize TCS here
+        StateHasChanged();
+        return await _taskCompletionSource.Task;
+    }
+
+    private void Cancel()
+    {
+        show = false;
+        _taskCompletionSource.SetResult(false);
+    }
+
+    private void Accept()
+    {
+        show = false;
+        _taskCompletionSource.SetResult(true);
+    }
+
+    private void Hide()
+    {
+        show = false;
+    }
+}

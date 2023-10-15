@@ -154,6 +154,7 @@
 table {
     min-width: 1100px; /* Minimum width of the table */
     border-collapse: collapse;
+    width:100%;
 }
 
 /* Style table headers (optional) */

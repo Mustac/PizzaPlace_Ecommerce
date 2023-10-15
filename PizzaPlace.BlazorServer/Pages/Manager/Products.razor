@@ -15,9 +15,12 @@
                 <h3 class="p-1 text-white ml-2 mb-0">Archived</h3>
             </div>
         </div>
-        <div class="align-self-end mb-2">
-            <button class="btn btn-primary btn-sm" @onclick="RegisterProduct">Register new product</button>
-        </div>
+        @if(_tabState == TabState.Products)
+        {
+            <div class="align-self-end mb-2">
+                <button class="btn btn-primary btn-sm" @onclick="RegisterProduct">Register new product</button>
+            </div>
+        }
     </div>
     <div class="product-table bg-primary p-2">
 
@@ -69,7 +72,6 @@
         </table>
     </div>
 </div>
-
 
 <ProductRegistrationModal @ref="_productRegistrationModal" Product="productDTO" />
 
@@ -184,6 +186,11 @@
 
     async Task HardDeleteProductAsync(Product product)
     {
+        var confirmation = await ConfirmationModal.ShowAsync($"Are you sure you want to delete {product.Name}?");
+
+        if (!confirmation)
+            return;
+
         var success = await ProductService.HardDeleteAsync(product.Id);
 
         if (success)

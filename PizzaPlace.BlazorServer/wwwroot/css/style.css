@@ -42,11 +42,29 @@ a{
     cursor:pointer;
 }
 
+.position-absolute-center{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%, -50%);
+}
+
+.confirmation-modal{
+    min-width:300px;
+    background-color:white;
+    top:30%;
+    z-index:4;
+    border-radius:5px;
+}
+
+.confirmation-modal-body{
+    padding:20px;
+    text-align:center;
+}
 /*.nav-icon:hover {
     background-color: white;
     color: red !important;
 }*/
-
 .nav-icon {
     cursor: pointer;
     border-radius: 5px;
