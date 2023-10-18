@@ -3,6 +3,8 @@
 @inject ProductService ProductService
 @inject IJSRuntime JSRuntime
 @inject IToastService ToastService
+@inject ConfirmationModal ConfirmationModal
+@inject GlobalEventService GlobalEventService
 @implements IDisposable
 
 <div class="container" style="min-width:1200px">
@@ -76,7 +78,7 @@
 <ProductRegistrationModal @ref="_productRegistrationModal" Product="productDTO" />
 
 @code {
-    IEnumerable<Product> products;
+    IEnumerable<ProductDTO> products;
     private Product selectedProduct = new Product();
 
     TabState _tabState = TabState.Products;
@@ -88,29 +90,12 @@
 
     string activeSelectedClass = "border border-2 border-dark";
 
-    private ProductDTO productDTO
-    {
-        get
-        {
-            return
-            selectedProduct is not null ?
-            new ProductDTO
-                {
-                    Id = selectedProduct.Id,
-                    Name = selectedProduct.Name,
-                    DiscountedPrice = selectedProduct.DiscountedPrice,
-                    Ingredients = selectedProduct.Ingredients,
-                    Price = selectedProduct.Price
-                } :
-                new ProductDTO();
-        }
-    }
 
     protected override async Task OnInitializedAsync()
     {
         var temp = await ProductService.GetProductsAsync();
         await RefreshProducts();
-        ProductService.OnProductAction += RefreshProducts;
+        GlobalEventService.OnProductChange += RefreshProducts;
     }
 
     ProductRegistrationModal _productRegistrationModal;
@@ -125,11 +110,15 @@
 
     async Task RefreshProducts()
     {
-        if(_tabState == TabState.Products)
-            products =  await ProductService.GetProductsAsync();
+        OperationResponse<IEnumerable<ProductDTO>> operationResponse = null;
 
-        if(_tabState == TabState.Archived)
-            products = await ProductService.GetArchivedProductsAsync();
+        if(_tabState == TabState.Products)
+            operationResponse = await ProductService.GetProductsAsync();
+        else if(_tabState == TabState.Archived)
+            operationResponse = await ProductService.GetProductsAsync(ProductService.ProductRange.Archived);
+
+        if (operationResponse is not null && operationResponse.Result == OperationResult.Ok)
+            products = operationResponse.Data;
 
         await InvokeAsync(StateHasChanged);
     }
@@ -169,11 +158,9 @@
     {
         _tabState = state;
 
-        if(state == TabState.Products)
-            products = await ProductService.GetProductsAsync();
+        await RefreshProducts();
 
-        if (state == TabState.Archived)
-            products = await ProductService.GetArchivedProductsAsync();
+        StateHasChanged();
     }
 
     async Task RestoreProduct(Product product)
@@ -199,7 +186,7 @@
 
     public void Dispose()
     {
-        ProductService.OnProductAction -= RefreshProducts;
+        GlobalEventService.OnProductChange -= RefreshProducts;
     }
 
 

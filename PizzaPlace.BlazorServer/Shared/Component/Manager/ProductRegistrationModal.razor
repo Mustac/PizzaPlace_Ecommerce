@@ -180,7 +180,7 @@
 
         string state = await ProductService.UpdateProductAsync(_product);
 
-        if (state == State.Success)
+        if (state == OperationResponse.Ok)
         {
             ToastService.ShowSuccess("Success");
         }

@@ -2,6 +2,8 @@
 @using System.Timers
 @inject NavMenuService GlobalService
 @inject IJSRuntime JSRuntime
+@inject ProductService ProductService
+@inject GlobalEventService GlobalEventService
 @implements IDisposable
 
 <PageTitle>Index</PageTitle>
@@ -102,13 +104,7 @@
 
 
 @code {
-    List<ProductInfo> products = new List<ProductInfo>
-    {
-    new ProductInfo{Id = 1, Name = "Meat Lover's Magic",  Ingredients = "Tomato sauce, Mozzarella cheese, Pepperoni, Italian sausage, Bacon, Ham, Ground beef.", Price=16.99f, DiscountedPrice=13.99f},
-    new ProductInfo{Id = 2, Name = "Veggie Delight", Ingredients = "Tomato sauce, Mozzarella cheese, Green peppers, Onions, Mushrooms, Black olives, Tomatoes.", Price=14.99f, DiscountedPrice=11.99f},
-    new ProductInfo{Id = 3, Name = "Margherita Classic", Ingredients = "Tomato sauce, Fresh mozzarella, Fresh basil leaves, Tomatoes.", Price=13.99f, DiscountedPrice=10.99f},
-    new ProductInfo{Id = 4, Name = "Hawaiian Paradise", Ingredients = "Tomato sauce, Mozzarella cheese, Ham, Pineapple.", Price=15.99f, DiscountedPrice=12.99f}
-    };
+    List<ProductInfo> products = new List<ProductInfo>();
 
     Timer timer = new Timer(4000);
 
@@ -121,22 +117,43 @@
             timer.Enabled = true;
             timer.Start();
             timer.Elapsed += NextSlideCarousel;
+            await ReloadProducts();
+            await InvokeAsync(StateHasChanged);
         }
 
 
     }
 
-
-    protected override void OnInitialized()
+    protected async override Task OnInitializedAsync()
     {
         GlobalService.OnNavShowChanged += StateHasChanged;
+        GlobalEventService.OnProductChange += ReloadProducts;
     }
+
 
     void NextSlideCarousel(object sender, ElapsedEventArgs e) => JSRuntime.InvokeVoidAsync("caruselNext");
 
     void Print()
     {
         JSRuntime.InvokeVoidAsync("console.log", GlobalService.NavShow);
+    }
+
+    async Task ReloadProducts()
+    {
+        products = new List<ProductInfo>();
+        var temp = await ProductService.GetProductsAsync();
+        products = temp.Where(x => x.DiscountedPrice > 0).Select(x => new ProductInfo
+            {
+                DiscountedPrice = x.DiscountedPrice,
+                Id = x.Id,
+                Name = x.Name,
+                Price = x.Price,
+                Ingredients = x.Ingredients
+             }).ToList();
+
+        await InvokeAsync(StateHasChanged);
+        await JSRuntime.LogAsync(products.Count.ToString());
+
     }
 
     public void Dispose()

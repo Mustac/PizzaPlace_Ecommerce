@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Hosting;
 
 namespace PizzaPlace.BlazorServer.Helpers;
 
@@ -28,8 +29,9 @@ public class ServicesRegistrator
             o.Password.RequireUppercase = false;
         })
             .AddEntityFrameworkStores<DataContext>()
-            .AddDefaultTokenProviders();
+        .AddDefaultTokenProviders();
 
+        services.AddAutoMapper(typeof(Program));
 
         services.AddScoped<NavMenuService>();
 
@@ -42,6 +44,8 @@ public class ServicesRegistrator
         services.AddScoped<ProductService>();
 
         services.AddScoped<MyStorageService>();
+
+        services.AddSingleton<GlobalEventService>();
 
         var userManager = services.BuildServiceProvider().GetRequiredService(typeof(UserManager<ApplicationUser>)) as UserManager<ApplicationUser>;
         var roleManager = services.BuildServiceProvider().GetRequiredService(typeof(RoleManager<IdentityRole>)) as RoleManager<IdentityRole>;

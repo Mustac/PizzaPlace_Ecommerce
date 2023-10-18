@@ -1,137 +1,187 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using PizzaPlace.BlazorServer.Helpers;
 using PizzaPlace.BlazorServer.Models.DTOs;
+using PizzaPlace.BlazorServer.Models.DTOs.Products;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PizzaPlace.BlazorServer.Services
 {
+    /// <summary>
+    /// Provides services related to product management.
+    /// </summary>
     public class ProductService
     {
         private readonly DataContext _context;
+        private readonly GlobalEventService _globalEventService;
+        private readonly IMapper _mapper;
 
-        /// <summary>
-        /// Triggers whenever table product is updated
-        /// </summary>
-        public event Func<Task>? OnProductAction;
-
-        public ProductService(DataContext context)
+        public ProductService(DataContext context, GlobalEventService globalEventService, IMapper mapper)
         {
             _context = context;
+            _globalEventService = globalEventService;
+            _mapper = mapper;
         }
 
-        public async Task<Product> NewProductAsync(ProductDTO productDto)
+        public enum ProductRange
+        {
+            All,
+            Active,
+            Archived,
+        }
+
+        /// <summary>
+        /// Asynchronously creates a new product in the database.
+        /// </summary>
+        /// <param name="productDto">The data transfer object containing product details.</param>
+        /// <returns>The created product entity or null if the creation fails.</returns>
+        public async Task<OperationResponse> NewProductAsync(ProductDTO productDto)
         {
             Product product = new Product(productDto.Name, productDto.Price, productDto.Ingredients);
 
-            var prod = await _context.Products.AddAsync(product);
+            _context.Products.Add(product);
+
+            var successSave = await _context.SaveChangesAsync() > 0;
+
+            if (successSave)
+            {
+                if(_globalEventService.OnProductChange is not null) await _globalEventService.OnProductChange.Invoke();
+                return OperationResponse.Ok();
+            }
+
+            return OperationResponse.Fail();
+        }
+
+        /// <summary>
+        /// Asynchronously updates a product in the database.
+        /// </summary>
+        /// <param name="productDto">The data transfer object containing updated product details.</param>
+        /// <returns>An <see cref="OperationResponse"/> indicating the result of the update operation.</returns>
+        public async Task<OperationResponse> UpdateProductAsync(ProductDTO productDto)
+        {
+            var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productDto.Id);
+
+            if (product is null) return OperationResponse.NotFound();
+
+            product = _mapper.Map<Product>(productDto);
 
             var success = await _context.SaveChangesAsync() > 0;
 
             if (success)
             {
-                if (OnProductAction != null)
-                    await OnProductAction.Invoke();
-                return prod.Entity;
+                if (_globalEventService.OnProductChange is not null)
+                    await _globalEventService.OnProductChange.Invoke();
             }
 
-            return null;
+            return OperationResponse.Fail();
         }
 
-        public async Task<string> UpdateProductAsync(ProductDTO productDto)
+
+        /// <summary>
+        /// Asynchronously retrieves a collection of products based on a specified criteria.
+        /// </summary>
+        /// <param name="productRange">The range or category of products to retrieve.</param>
+        /// <returns>A collection of products that match the specified criteria.</returns>
+        public async Task<OperationResponse<IEnumerable<ProductDTO>>> GetAsync(ProductRange productRange = ProductRange.All)
         {
-            var product = await _context.Products.FindAsync(productDto.Id);
+            IEnumerable<Product> products = new List<Product>();
 
-            if (product is null)
-                return State.NotFound;
+            if (productRange == ProductRange.All)
+                products = await _context.Products.OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
+            else if (productRange == ProductRange.Active)
+                products = await _context.Products.Where(x => !x.IsArchived).OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
+            else if (productRange == ProductRange.Archived)
+                products = await _context.Products.Where(x => x.IsArchived).OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
 
-            product.Name = productDto.Name;
-            product.Price = productDto.Price;
-            product.DiscountedPrice = productDto.DiscountedPrice.HasValue? productDto.DiscountedPrice.Value:0;
-            product.Ingredients = productDto.Ingredients;
+            var dto = _mapper.Map<IEnumerable<ProductDTO>>(products);
 
-            _context.Update(product);
+            var response = OperationResponse<IEnumerable<ProductDTO>>.CreateResponse(dto);
 
-            var success = await _context.SaveChangesAsync() > 0;
-
-            if (success)
-            {
-                if (OnProductAction != null)
-                    await OnProductAction.Invoke();
-                return State.Success;
-            }
-
-            return State.Fail;
+            return response;
         }
 
-        public async Task<IEnumerable<Product>> GetProductsAsync()
-            => await _context.Products.Where(x=>!x.IsDeleted).OrderBy(x=>x.DiscountedPrice == 0).ToListAsync();
 
-        public async Task<IEnumerable<Product>> GetArchivedProductsAsync()
-            => await _context.Products.Where(x => x.IsDeleted).OrderBy(x => x.DiscountedPrice == 0).ToListAsync();
-
-        public async Task<string> RestoreProduct(int Id)
+        /// <summary>
+        /// Asynchronously restores a previously archived product.
+        /// </summary>
+        /// <param name="Id">The unique identifier of the product to be restored.</param>
+        /// <returns>An <see cref="OperationResponse"/> indicating the result of the restoration.</returns>
+        public async Task<OperationResponse> RestoreArchivedAsync(int Id)
         {
-            var product = await _context.Products.FindAsync(Id);
+            var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == Id);
 
             if (product == null)
-                return State.Fail;
+                return OperationResponse.NotFound();
 
-            product.IsDeleted = false;
-
-            _context.Update(product);
+            product.IsArchived = false;
 
             bool success = await _context.SaveChangesAsync() > 0;
 
-            if(success)
+            if (success)
             {
-                if (OnProductAction != null)
-                    await OnProductAction.Invoke();
+                if (_globalEventService.OnProductChange is not null)
+                    await _globalEventService.OnProductChange.Invoke();
 
-                return State.Success;
+                return OperationResponse.Ok();
             }
 
-            return State.Fail;
-
+            return OperationResponse.Fail();
         }
 
-        public async Task<bool> SoftDeleteAsync(int Id)
+
+        /// <summary>
+        /// Asynchronously archives a product.
+        /// </summary>
+        /// <param name="Id">The unique identifier of the product to be archived.</param>
+        /// <returns>An <see cref="OperationResponse"/> indicating the result of the archiving process.</returns>
+        public async Task<OperationResponse> ArchiveAsync(int Id)
         {
-            var product = await _context.Products.FindAsync(Id);
+            var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == Id);
 
-            if (product is null) return false;
+            if (product == null)
+                return OperationResponse.NotFound();
 
-            product.IsDeleted = true;
+            product.IsArchived = true;
 
-            _context.Products.Update(product);
-
-            var success = await _context.SaveChangesAsync() > 0;
+            bool success = await _context.SaveChangesAsync() > 0;
 
             if (success)
             {
-                if (OnProductAction != null)
-                    await OnProductAction.Invoke();
+                if (_globalEventService.OnProductChange is not null)
+                    await _globalEventService.OnProductChange.Invoke();
+                return OperationResponse.Ok();
             }
 
-            return success;
+            return OperationResponse.Fail();
         }
 
-        public async Task<bool> HardDeleteAsync(int Id)
-        {
-            var product = await _context.Products.FindAsync(Id);
 
-            if (product is null) return false;
+        /// <summary>
+        /// Asynchronously deletes a product from the database permanently.
+        /// </summary>
+        /// <param name="Id">The unique identifier of the product to be deleted.</param>
+        /// <returns>An <see cref="OperationResponse"/> indicating the result of the deletion process.</returns>
+        public async Task<OperationResponse> HardDeleteAsync(int Id)
+        {
+            var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == Id);
+
+            if (product == null)
+                return OperationResponse.NotFound();
 
             _context.Products.Remove(product);
 
-            var success = await _context.SaveChangesAsync() > 0;
+            bool success = await _context.SaveChangesAsync() > 0;
 
             if (success)
             {
-                if (OnProductAction != null)
-                    await OnProductAction.Invoke();
+                if (_globalEventService.OnProductChange is not null)
+                    await _globalEventService.OnProductChange.Invoke();
+                return OperationResponse.Ok();
             }
 
-            return success;
+            return OperationResponse.Fail();
         }
-
     }
 }

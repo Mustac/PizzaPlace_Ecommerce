@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PizzaPlace.BlazorServer.Helpers;
+using PizzaPlace.BlazorServer.Shared.Component.ConfirmationModalPackage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 ServicesRegistrator.Register(builder.Services, builder.Configuration);
+builder.Services.AddScoped<ConfirmationModal>();
 
 var app = builder.Build();
 
