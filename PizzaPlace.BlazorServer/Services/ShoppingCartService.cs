@@ -35,8 +35,11 @@ namespace PizzaPlace.BlazorServer.Services
         /// Gets the total price with discounts applied.
         /// </summary>
         public float TotalPriceWithDiscounts =>
-            Products.Where(x => x.DiscountedPrice > 0).Sum(x => x.DiscountedPrice * x.Amount) +
-            Products.Where(x => x.DiscountedPrice == 0).Sum(x => x.Price * x.Amount);
+            Products.Where(x => x.DiscountedPrice > 0)
+                    .Sum(x => x.DiscountedPrice * x.Amount) +
+            Products.Where(x => x.DiscountedPrice == 0)
+                   .Sum(x => x.Price * x.Amount);
+
 
         /// <summary>
         /// Computes the total amount discounted for the cart.

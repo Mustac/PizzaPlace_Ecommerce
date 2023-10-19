@@ -17,6 +17,17 @@ namespace PizzaPlace.BlazorServer.Services;
 /// </summary>
 public class ProductService : BaseService
 {
+
+    /// <summary>
+    /// The ProductService provides methods for managing product-related operations in the system, such as 
+    /// creating, updating, deleting, and retrieving products from the database. It supports operations like:
+    /// - Creating a new product in the database.
+    /// - Updating existing product details.
+    /// - Retrieving a collection of products based on specified criteria like discounted or archived.
+    /// - Archiving a product, making it inaccessible for normal operations.
+    /// - Restoring an archived product, making it available again for normal operations.
+    /// - Permanently deleting a product from the database.
+    /// </summary>
     public ProductService(DataContext context, GlobalEventService globalEventService, IMapper mapper, IToastService toastService)
         : base(context, globalEventService, mapper, toastService)
     {
@@ -28,7 +39,7 @@ public class ProductService : BaseService
     /// </summary>
     /// <param name="productDto">The data transfer object containing product details.</param>
     /// <returns>The created product entity or null if the creation fails.</returns>
-    public async Task<OperationResponse> NewProductAsync(ProductInputDTO productDto)
+    public async Task<OperationResponse> CreateProductAsync(ProductDTO productDto)
         => await ProcessRequestAsync(async () =>
         {
             Product product = new Product(productDto.Name, productDto.Price, productDto.Ingredients);
@@ -52,7 +63,7 @@ public class ProductService : BaseService
     /// </summary>
     /// <param name="productDto">The data transfer object containing updated product details.</param>
     /// <returns>An <see cref="OperationResponse"/> indicating the result of the update operation.</returns>
-    public async Task<OperationResponse> UpdateProductAsync(ProductInputDTO productDto)
+    public async Task<OperationResponse> UpdateProductAsync(ProductDTO productDto)
      => await ProcessRequestAsync(async () =>
      {
          var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == productDto.Id);

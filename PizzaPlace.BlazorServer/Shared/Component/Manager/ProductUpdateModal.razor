@@ -1,0 +1,146 @@
+﻿@inject ProductService ProductService
+@inject IToastService ToastService
+@inject IMapper Mapper
+@inject IJSRuntime JsRuntime
+
+@if (_product is not null && show)
+{
+    <div class="product-registration-modal">
+
+        <div class="d-flex justify-content-between align-items-end mb-2">
+
+            <h5 class="my-0 p-0">New Product</h5>
+
+            <div @onclick=Hide class="btn btn-secondary text-white btn-sm"><i class="fa-solid fa-x"></i></div>
+        </div>
+        <hr />
+
+        <EditForm Model="_product" OnValidSubmit="UpdateProductValidSubmit">
+            <DataAnnotationsValidator />
+            <div class="mt-3 py-1 px-2 rounded bg-info">
+                <div>
+                    <input id="input-checkbox" class="form-check-input border-dark" type="checkbox" @bind-value="enableEdit">
+                    <label for="input-checkbox">Enable edit</label>
+                </div>
+                @if (enableEdit)
+                {
+                    <label for="input-name" class="mt-2">Name :</label>
+                    <InputText id="input-name" class="form-control my-1" @bind-Value="_product.Name"></InputText>
+                    <ValidationMessage class="validation-error" For="(()=>_product.Name)"></ValidationMessage>
+
+                    <label for="input-ingredients" class="mt-2">Ingredients :</label>
+                    <InputTextArea id="input-ingredients" class="form-control my-1" @bind-Value="_product.Ingredients"></InputTextArea>
+                    <ValidationMessage class="validation-error" For="(()=>_product.Ingredients)"></ValidationMessage>
+
+                    <div class="mt-3 ">
+                        <div class="d-flex my-1 align-items-center  ml-auto" style="width:150px;">
+                            <div style="margin:0 10px 0 0">
+                                <label class="d-inline-block text-nowrap" for="input-price">Price : </label>
+                            </div>
+                            <InputNumber id="input-price" class="form-control" @bind-Value="_product.Price"></InputNumber>
+                            <p style="margin-left:10px;">$</p>
+                        </div>
+                        <ValidationMessage class="validation-error text-end" For="(()=>_product.Price)"></ValidationMessage>
+                    </div>
+                }
+            </div>
+
+            <div class="mt-2 py-1 px-2 rounded bg-info">
+                <div>
+                    <input id="input-checkbox-promo" class="form-check-input border-dark" type="checkbox" checked="@enablePromo" @onchange="OnPromoChanged">
+                    <label for="input-checkbox-promo">Enable promo</label>
+                </div>
+                @if (enablePromo)
+                {
+                    <div class="d-flex">
+                        <div style="width:50%; padding-right:5px;">
+                            <div class="mb-1">
+                                Current price :
+                            </div>
+                            <div class="border border-dark border-3 rounded " style="background-color:lightgray; padding:6px;">
+                                @_product.Price$
+                            </div>
+                        </div>
+                        <div style="width:50%; padding-left:5px;">
+                            <label for="input-discount">Discounted Price :</label>
+                            <InputNumber id="input-discount" class="form-control my-1" @bind-Value="_product.DiscountedPrice"></InputNumber>
+                            <ValidationMessage class="validation-error" For="(()=>_product.DiscountedPrice)"></ValidationMessage>
+                        </div>
+                    </div>
+
+                }
+            </div>
+
+
+            <div class="mt-4 d-flex justify-content-between">
+                <button @onclick="Hide" type="button" class="btn btn-secondary text-white w-100 mx-1">Close</button>
+                <button type="submit" class="btn btn-primary w-100 mx-1">Update</button>
+            </div>
+        </EditForm>
+
+
+    </div>
+
+    <ShadowOverlay Show="true" />
+}
+
+
+@code {
+    private ProductInputDTO _product { get; set; } = new ProductInputDTO();
+
+    private bool show;
+
+    private bool enableEdit = false;
+    private bool enablePromo = false;
+
+    [Parameter]
+    public EventCallback OnHide { get; set; }
+
+    [Parameter]
+    public EventCallback OnStateChange { get; set; }
+
+
+    private void OnPromoChanged(ChangeEventArgs e)
+    {
+        enablePromo = (bool)e.Value;
+
+        if (!enablePromo)
+        {
+            _product.DiscountedPrice = 0;
+        }
+    }
+
+
+    async Task UpdateProductValidSubmit()
+    {
+        ProductDTO product = Mapper.Map<ProductDTO>(_product);
+
+        if (!enablePromo)
+            product.DiscountedPrice = 0;
+
+        await ProductService.UpdateProductAsync(product);
+
+        Hide();
+    }
+
+    public async Task Show(ProductDTO product)
+    {
+        await JsRuntime.LogAsync("Show triggered, product name : " + product?.Name);
+        _product = Mapper.Map<ProductInputDTO>(product);
+
+        enablePromo = _product.DiscountedPrice > 0;
+        show = true;
+        await JsRuntime.LogAsync("Set show to true : " + show.ToString());
+        enableEdit = false;
+        StateHasChanged();
+        await OnStateChange.InvokeAsync();
+
+    }
+
+    public void Hide()
+    {
+        OnHide.InvokeAsync();
+        show = false;
+        _product = new ProductInputDTO();
+    }
+}

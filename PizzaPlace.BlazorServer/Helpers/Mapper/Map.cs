@@ -8,6 +8,7 @@ namespace PizzaPlace.BlazorServer.Helpers.Mapper
         public Map()
         {
             CreateMap<ProductDTO, Product>().ReverseMap();
+            CreateMap<ProductDTO, ProductInputDTO>().ReverseMap();
         }
     }
 }

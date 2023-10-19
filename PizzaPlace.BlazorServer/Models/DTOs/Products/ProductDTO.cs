@@ -1,13 +1,35 @@
-﻿namespace PizzaPlace.BlazorServer.Models.DTOs.Products
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PizzaPlace.BlazorServer.Models.DTOs.Products;
+
+public class ProductDTO
 {
-    public class ProductDTO
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Ingredients { get; set; } = string.Empty;
-        public float Price { get; set; }
-        public float DiscountedPrice { get; set; }
-        public bool IsHovering { get; set; }
-        public int Amount { get; set; }
-    }
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Ingredients { get; set; } = string.Empty;
+    public float Price { get; set; }
+    public float DiscountedPrice { get; set; }
+    public bool IsHovering { get; set; }
+    public int Amount { get; set; }
+}
+
+public class ProductInputDTO
+{
+    public int Id { get; set; }
+
+    [Required]
+    [StringLength(maximumLength: 30, MinimumLength = 2)]
+    public string Name { get; set; } = string.Empty;
+
+    [Required]
+    [FloatRange(minimum: 0, maximum: 999, ErrorMessage = "The price must be between 0 and 999")]
+    public float Price { get; set; }
+
+    [Required]
+    [StringLength(maximumLength: 300, MinimumLength = 3)]
+    public string Ingredients { get; set; } = string.Empty;
+
+    [FloatRange(minimum: 0, maximum: 999, ErrorMessage = "The price must be between 0 and 999")]
+    [LessThan("Price", ErrorMessage = "Discounted Price must be less than the regular Price")]
+    public float? DiscountedPrice { get; set; }
 }
