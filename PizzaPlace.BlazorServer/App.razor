@@ -1,4 +1,5 @@
-﻿<CascadingAuthenticationState>
+﻿@using Blazored.Toast.Configuration;
+<CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
             <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
@@ -11,5 +12,11 @@
             </LayoutView>
         </NotFound>
     </Router>
+    <BlazoredToasts Position="ToastPosition.BottomRight"
+                    Timeout="4"
+                    IconType="IconType.FontAwesome"
+                    SuccessClass="success-toast-override"
+                    SuccessIcon="fa fa-thumbs-up"
+                    ErrorIcon="fa fa-bug" />
     <ConfirmationModalInstance/>
 </CascadingAuthenticationState>

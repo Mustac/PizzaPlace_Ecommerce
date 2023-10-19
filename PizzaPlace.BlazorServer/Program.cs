@@ -12,12 +12,14 @@ global using System.Collections.Generic;
 global using System.Linq;
 global using System.Threading.Tasks;
 global using PizzaPlace.BlazorServer.Shared.Component.ConfirmationModalPackage;
+using PizzaPlace.BlazorServer.Services.BaseServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
+BaseService.ConnString = builder.Configuration.GetConnectionString("DefaultConnection");
 ServicesRegistrator.Register(builder.Services, builder.Configuration);
 builder.Services.AddScoped<ConfirmationModal>();
 

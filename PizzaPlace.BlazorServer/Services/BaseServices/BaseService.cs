@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Blazored.Toast.Services;
+using Microsoft.EntityFrameworkCore;
 using PizzaPlace.BlazorServer.Helpers;
 
 namespace PizzaPlace.BlazorServer.Services.BaseServices
@@ -9,18 +10,41 @@ namespace PizzaPlace.BlazorServer.Services.BaseServices
     /// </summary>
     public class BaseService
     {
-        protected readonly DataContext _context;
         protected readonly GlobalEventService _globalEventService;
         protected readonly IMapper _mapper;
         protected readonly IToastService _toastService;
 
-        public BaseService(DataContext dataContext, GlobalEventService globalEventService, IMapper mapper, IToastService toastService)
+        private static string connString = string.Empty;
+        public static string ConnString
         {
-            _context = dataContext;
+            get
+            {
+                return connString;
+            }
+            set
+            {
+                if (string.IsNullOrEmpty(connString))
+                    connString = value;
+            }
+        }
+
+        public BaseService(GlobalEventService globalEventService, IMapper mapper, IToastService toastService)
+        {
+            
             _globalEventService = globalEventService;
             _mapper = mapper;
             _toastService = toastService;
         }
+
+        protected DataContext CreateDataContext()
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
+            optionsBuilder.UseNpgsql(ConnString);
+
+            return new DataContext(optionsBuilder.Options);
+        }
+
+
 
 
         /// <summary>
@@ -36,26 +60,29 @@ namespace PizzaPlace.BlazorServer.Services.BaseServices
         /// If the provided function succeeds, additional toast notifications might be shown based on the result and 
         /// the notifications parameter.
         /// </remarks>
-        protected async Task<OperationResponse> ProcessRequestAsync(Func<Task<OperationResponse>> func, bool notifications = false)
+        protected async Task<OperationResponse> ProcessRequestAsync(Func<DataContext, Task<OperationResponse>> func, bool notifications = false)
         {
             try
             {
-                var response = await func.Invoke();
-
-                if(notifications)
+                using (var context = CreateDataContext())
                 {
-                    if(response.Result == OperationResult.Ok)
-                        _toastService.ShowSuccess(response.Message);
+                    var response = await func.Invoke(context);
 
-                    if(response.Result == OperationResult.NotFound)
-                        _toastService.ShowInfo(response.Message);
+                    if (notifications)
+                    {
+                        if (response.Result == OperationResult.Ok)
+                            _toastService.ShowSuccess(response.Message);
+
+                        if (response.Result == OperationResult.NotFound)
+                            _toastService.ShowInfo(response.Message);
+                    }
+
+                    return response;
                 }
-
-                return response;
-
             }
-            catch
+            catch (Exception ex)
             {
+                throw ex;
                 _toastService.ShowError("Critical error, please try again later");
                 return OperationResponse.Fail();
             }
@@ -76,26 +103,31 @@ namespace PizzaPlace.BlazorServer.Services.BaseServices
         /// If the provided function succeeds, additional toast notifications might be shown based on the result and 
         /// the notifications parameter.
         /// </remarks>
-        protected async Task<OperationResponse<T>> ProcessRequestAsync<T>(Func<Task<OperationResponse<T>>> func, bool notifications = false)
+        protected async Task<OperationResponse<T>> ProcessRequestAsync<T>(Func<DataContext, Task<OperationResponse<T>>> func, bool notifications = false)
         {
             try
             {
-                var response = await func.Invoke();
-
-                if (notifications)
+                using (var context = CreateDataContext())
                 {
-                    if (response.Result == OperationResult.Ok)
-                        _toastService.ShowSuccess(response.Message);
 
-                    if (response.Result == OperationResult.NotFound)
-                        _toastService.ShowInfo(response.Message);
+                    var response = await func.Invoke(context);
+
+                    if (notifications)
+                    {
+                        if (response.Result == OperationResult.Ok)
+                            _toastService.ShowSuccess(response.Message);
+
+                        if (response.Result == OperationResult.NotFound)
+                            _toastService.ShowInfo(response.Message);
+                    }
+
+                    return response;
                 }
 
-                return response;
-
             }
-            catch
+            catch (Exception ex)
             {
+                throw ex;
                 _toastService.ShowError("Critical error, please try again later");
                 return OperationResponse<T>.Fail();
             }
