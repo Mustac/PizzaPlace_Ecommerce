@@ -39,7 +39,7 @@
     public EventCallback OnHideCallback { get; set; }
 
     [Parameter]
-    public ProductInfo? ProductInfo { get; set; } 
+    public ProductDTO ProductInfo { get; set; } = new ProductDTO();
 
     async Task HidePopupAsync(){
         Show = false;

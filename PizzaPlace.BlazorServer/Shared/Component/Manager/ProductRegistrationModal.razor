@@ -1,6 +1,5 @@
 ﻿@using System.Reflection;
 @inject ProductService ProductService
-@inject IToastService ToastService
 @inject IJSRuntime JsRuntime
 
 @if (show)
@@ -119,9 +118,9 @@
 
 @code {
     [Parameter]
-    public ProductDTO? Product { get; set; } = new ProductDTO();
+    public ProductInputDTO? Product { get; set; } = new ProductInputDTO();
 
-    private ProductDTO _product = new ProductDTO();
+    private ProductInputDTO _product = new ProductInputDTO();
 
     private bool show;
 
@@ -136,10 +135,10 @@
         if (Product is not null)
         {
             enablePromo = Product.DiscountedPrice > 0;
-            _product = new ProductDTO
+            _product = new ProductInputDTO
             {
                 Id = Product.Id,
-                DiscountedPrice = Product.DiscountedPrice,
+                DiscountedPrice = Product.DiscountedPrice ?? 0,
                 Ingredients = Product.Ingredients,
                 Name = Product.Name,
                 Price = Product.Price
@@ -158,36 +157,16 @@
     }
 
 
-    async Task NewProductValidSubmit()
-    {
+    async Task NewProductValidSubmit() =>
+         await ProductService.NewProductAsync(Product);
 
-        var product = await ProductService.NewProductAsync(Product);
-
-        if (product is not null)
-        {
-            ToastService.ShowSuccess($"{Product.Name} is registrated");
-            Hide();
-        }
-        else
-            ToastService.ShowError($"Something went wrong");
-
-    }
 
     async Task UpdateProductValidSubmit()
     {
         if (!enablePromo)
             _product.DiscountedPrice = 0;
 
-        string state = await ProductService.UpdateProductAsync(_product);
-
-        if (state == OperationResponse.Ok)
-        {
-            ToastService.ShowSuccess("Success");
-        }
-        else if (state == State.Fail)
-            ToastService.ShowError("Something went wrong");
-        else if (state == State.NotFound)
-            ToastService.ShowWarning("Product could not be found, try refreshing the page");
+        await ProductService.UpdateProductAsync(_product);
 
         Hide();
     }
@@ -196,7 +175,7 @@
     {
         show = true;
         enableEdit = false;
-        Product = new ProductDTO();
+        Product = new ProductInputDTO();
     }
 
     public void Hide()

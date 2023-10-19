@@ -1,10 +1,11 @@
 ﻿using Blazored.Toast.Services;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using PizzaPlace.BlazorServer.Helpers;
+using System.Linq;
 using System.Text.Json;
+using Microsoft.JSInterop;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PizzaPlace.BlazorServer.Services
 {
@@ -13,30 +14,6 @@ namespace PizzaPlace.BlazorServer.Services
         private readonly IToastService _toastService;
         private readonly ILocalStorageService _localStorageService;
         private readonly IJSRuntime _jSRuntime;
-
-        public int NumberOfProducts { get; private set; }
-        public IList<ProductInfo> Products { get; set; } = new List<ProductInfo>();
-
-        /// <summary>
-        /// Gives the total cart price of the products without discounts
-        /// </summary>
-        public float TotalCartPrice => Products.Select(x => x.Amount * x.Price).Sum();
-
-        /// <summary>
-        /// Gives the discounted price
-        /// </summary>
-        public float TotalPriceWithDiscounts => 
-            Products.Where(x=>x.DiscountedPrice > 0).Select(x=>x.DiscountedPrice * x.Amount).Sum() + Products.Where(x=>x.DiscountedPrice == 0).Select(x=>x.Price * x.Amount).Sum();
-
-        /// <summary>
-        /// Gives just the amount the price is discounted for
-        /// </summary>
-        public float TotalDiscounts => TotalCartPrice - TotalPriceWithDiscounts;
-
-      
-
-        public event Func<Task> OnReloadShoppingCart;
-
         public ShoppingCartService(IToastService toastService, ILocalStorageService localStorageService, IJSRuntime jSRuntime)
         {
             _toastService = toastService;
@@ -44,53 +21,60 @@ namespace PizzaPlace.BlazorServer.Services
             _jSRuntime = jSRuntime;
         }
 
+
+        public event Func<Task> OnShoppingCartChange;
+        public IList<ProductDTO> Products { get; set; } = new List<ProductDTO>();
+        public int NumberOfProducts { get; private set; }
+
         /// <summary>
-        /// Add productinfo to current products, sum it up if same product, save it and call UpdateShoppingCartAsync that will also trigger OnReloadShoppingCart
+        /// Gets the total cart price of the products without discounts.
         /// </summary>
-        /// <param name="product"></param>
-        /// <returns></returns>
-        public async Task<bool> AddToShoppingCartAsync(ProductInfo product)
+        public float TotalCartPrice => Products.Sum(x => x.Amount * x.Price);
+
+        /// <summary>
+        /// Gets the total price with discounts applied.
+        /// </summary>
+        public float TotalPriceWithDiscounts =>
+            Products.Where(x => x.DiscountedPrice > 0).Sum(x => x.DiscountedPrice * x.Amount) +
+            Products.Where(x => x.DiscountedPrice == 0).Sum(x => x.Price * x.Amount);
+
+        /// <summary>
+        /// Computes the total amount discounted for the cart.
+        /// </summary>
+        public float TotalDiscounts => TotalCartPrice - TotalPriceWithDiscounts;
+
+
+        /// <summary>
+        /// Adds a product to the shopping cart. If the product already exists in the cart, its quantity is updated.
+        /// Notifies the user of the addition. Also, triggers an update of the cart.
+        /// </summary>
+        /// <param name="product">The product to add to the cart.</param>
+        /// <returns>True if the operation succeeded, otherwise false.</returns>
+        public async Task<bool> AddToShoppingCartAsync(ProductDTO product)
         {
             var tempJson = "";
-            
+
             try
             {
                 var productsJson = await _localStorageService.GetItemAsStringAsync("cart");
-                var products = new List<ProductInfo>();
+                var products = string.IsNullOrEmpty(productsJson)
+                    ? new List<ProductDTO> { product }
+                    : JsonConvert.DeserializeObject<List<ProductDTO>>(productsJson);
 
-                if (string.IsNullOrEmpty(productsJson))
+                // Check if the product is already in the cart
+                var prod = products.FirstOrDefault(x => x.Id == product.Id);
+                if (prod is not null)
                 {
-                    products = new List<ProductInfo> { product };
-
-                    tempJson = JsonConvert.SerializeObject(products);
+                    // Update the quantity if the product is already present
+                    products.Remove(prod);
+                    product.Amount += prod.Amount;
                 }
-                else
-                {
-                    products = JsonConvert.DeserializeObject<List<ProductInfo>>(productsJson);
+                products.Add(product);
 
-                    // find if the product is already in the cart so we can add the amount on it
-                    var prod = products.FirstOrDefault(x => x.Id == product.Id);
+                tempJson = JsonConvert.SerializeObject(products);
 
-
-                    // if prod is found then we must modify it
-                    if (prod is not null)
-                    {
-                        products.Remove(prod);
-                        product.Amount+= prod.Amount;
-                        products.Add(product);
-                    }
-                    // if it is not found that we have to add argument object
-                    else
-                    {
-                        products.Add(product);
-                    }
-
-                    tempJson = JsonConvert.SerializeObject(products);
-                }
-
-                NumberOfProducts = products.Select(x => x.Amount).Sum();
+                NumberOfProducts = products.Sum(x => x.Amount);
                 Products = products;
-
 
                 await _localStorageService.SetItemAsStringAsync("cart", tempJson);
                 await RefreshShoppingCartAsync();
@@ -101,26 +85,24 @@ namespace PizzaPlace.BlazorServer.Services
             catch
             {
                 await _localStorageService.RemoveItemAsync("cart");
-                OnReloadShoppingCart?.Invoke();
+                OnShoppingCartChange?.Invoke();
                 return false;
             }
         }
 
+
         /// <summary>
-        /// Update/Refreshes parameters, also call OnReloadShoppingCart
+        /// Updates the shopping cart properties and notifies any listeners of the change.
         /// </summary>
-        /// <returns></returns>
         public async Task RefreshShoppingCartAsync()
         {
             try
             {
                 var jsonProducts = await _localStorageService.GetItemAsStringAsync("cart");
+                Products = JsonConvert.DeserializeObject<List<ProductDTO>>(jsonProducts);
+                NumberOfProducts = Products.Sum(x => x.Amount);
 
-                Products = JsonConvert.DeserializeObject<List<ProductInfo>>(jsonProducts);
-
-                NumberOfProducts = Products.Select(x => x.Amount).Sum();
-
-                await OnReloadShoppingCart.Invoke();
+                await OnShoppingCartChange.Invoke();
             }
             catch
             {
@@ -128,23 +110,19 @@ namespace PizzaPlace.BlazorServer.Services
             }
         }
 
+
         /// <summary>
-        /// Save new shopping cart
+        /// Persists the current state of the shopping cart to local storage.
         /// </summary>
-        /// <param name="products"></param>
-        /// <returns></returns>
         public async Task SaveShoppingCartAsync()
         {
             try
             {
-                var jsonProducts = JsonConvert.SerializeObject(Products); 
-                
+                var jsonProducts = JsonConvert.SerializeObject(Products);
+
                 await _localStorageService.SetItemAsStringAsync("cart", jsonProducts);
-
-                await _jSRuntime.LogAsync("Saving Shopping Cart");
-
+                await _jSRuntime.InvokeVoidAsync("console.log", "Saving Shopping Cart");
                 await RefreshShoppingCartAsync();
-
             }
             catch
             {
@@ -152,9 +130,18 @@ namespace PizzaPlace.BlazorServer.Services
             }
         }
 
+
+        /// <summary>
+        /// Deletes the entire shopping cart from local storage.
+        /// </summary>
         public async Task DeleteShoppingCartAsync() =>
             await _localStorageService.RemoveItemAsync("cart");
 
+
+        /// <summary>
+        /// Deletes a single product from the cart by its ID.
+        /// </summary>
+        /// <param name="productId">ID of the product to delete.</param>
         public async Task DeleteSingleProduct(int productId)
         {
             var product = Products.FirstOrDefault(p => p.Id == productId);
@@ -164,6 +151,5 @@ namespace PizzaPlace.BlazorServer.Services
                 await SaveShoppingCartAsync();
             }
         }
-
     }
 }

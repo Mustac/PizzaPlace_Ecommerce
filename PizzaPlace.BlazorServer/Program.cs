@@ -1,17 +1,17 @@
-global using PizzaPlace.BlazorServer;
-global using PizzaPlace.BlazorServer.Data;
-global using PizzaPlace.BlazorServer.Services;
 global using Blazored.LocalStorage;
+global using Blazored.Toast.Services;
+global using Microsoft.JSInterop;
+global using Newtonsoft.Json;
+global using PizzaPlace.BlazorServer.Data;
+global using PizzaPlace.BlazorServer.Helpers;
+global using PizzaPlace.BlazorServer.Helpers.Enums;
 global using PizzaPlace.BlazorServer.Models;
-
-
-
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using PizzaPlace.BlazorServer.Helpers;
-using PizzaPlace.BlazorServer.Shared.Component.ConfirmationModalPackage;
+global using PizzaPlace.BlazorServer.Models.DTOs.Products;
+global using PizzaPlace.BlazorServer.Services;
+global using System.Collections.Generic;
+global using System.Linq;
+global using System.Threading.Tasks;
+global using PizzaPlace.BlazorServer.Shared.Component.ConfirmationModalPackage;
 
 var builder = WebApplication.CreateBuilder(args);
 

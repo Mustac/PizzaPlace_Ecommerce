@@ -13,13 +13,6 @@
 <div class="hero-image " style="background:url('/images/pizza.jpg')">
     <div class="shade"></div>
     <h1 class="hero-title">Every Pizza Tells a Story, Taste Ours.</h1>
-    <!--
-    <div class="order-flow-wrapper shadow rounded p-3">
-        <h3>Speciality of the day : </h3>
-        <h6>Mushroom Manor Delight</h6>
-        <p>Ingridients : <b>mushroom</b>, <b>cherry tomato</b>, <b>champignon</b></p>
-    </div>
-    -->
 </div>
 
 <div class="ordering-menu">
@@ -104,7 +97,7 @@
 
 
 @code {
-    List<ProductInfo> products = new List<ProductInfo>();
+    IEnumerable<ProductDTO> products = new List<ProductDTO>();
 
     Timer timer = new Timer(4000);
 
@@ -120,18 +113,16 @@
             await ReloadProducts();
             await InvokeAsync(StateHasChanged);
         }
-
-
     }
 
-    protected async override Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         GlobalService.OnNavShowChanged += StateHasChanged;
         GlobalEventService.OnProductChange += ReloadProducts;
     }
 
 
-    void NextSlideCarousel(object sender, ElapsedEventArgs e) => JSRuntime.InvokeVoidAsync("caruselNext");
+    void NextSlideCarousel(object? sender, ElapsedEventArgs e) => JSRuntime.InvokeVoidAsync("caruselNext");
 
     void Print()
     {
@@ -140,20 +131,12 @@
 
     async Task ReloadProducts()
     {
-        products = new List<ProductInfo>();
-        var temp = await ProductService.GetProductsAsync();
-        products = temp.Where(x => x.DiscountedPrice > 0).Select(x => new ProductInfo
-            {
-                DiscountedPrice = x.DiscountedPrice,
-                Id = x.Id,
-                Name = x.Name,
-                Price = x.Price,
-                Ingredients = x.Ingredients
-             }).ToList();
+        var response = await ProductService.GetAsync(ProductRange.Discounted);
+
+        products = response.Data;
 
         await InvokeAsync(StateHasChanged);
-        await JSRuntime.LogAsync(products.Count.ToString());
-
+        //await JSRuntime.LogAsync(products.Count.ToString());
     }
 
     public void Dispose()

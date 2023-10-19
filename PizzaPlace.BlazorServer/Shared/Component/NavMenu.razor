@@ -110,7 +110,7 @@
         if (firstRender)
         {
             OnNavButtonClick += NavMenuService.SetNavState;
-            ShoppingCartService.OnReloadShoppingCart += ReloadComponent;
+            ShoppingCartService.OnShoppingCartChange += ReloadComponent;
             await ShoppingCartService.RefreshShoppingCartAsync();
             await JSRuntime.InvokeVoidAsync("initializeNav");
             StateHasChanged();
@@ -181,7 +181,7 @@
     public void Dispose()
     {
         OnNavButtonClick -= NavMenuService.SetNavState;
-        ShoppingCartService.OnReloadShoppingCart -= ReloadComponent;
+        ShoppingCartService.OnShoppingCartChange -= ReloadComponent;
     }
 
 }

@@ -79,7 +79,7 @@
 
 @code {
     IEnumerable<ProductDTO> products;
-    private Product selectedProduct = new Product();
+    private ProductDTO selectedProduct = new ProductDTO();
 
     TabState _tabState = TabState.Products;
 
@@ -93,7 +93,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var temp = await ProductService.GetProductsAsync();
+        var temp = await ProductService.GetAsync(ProductRange.Active);
         await RefreshProducts();
         GlobalEventService.OnProductChange += RefreshProducts;
     }
@@ -103,7 +103,6 @@
 
     async Task ProductCreated(Product product)
     {
-        selectedProduct = product;
         await RefreshProducts();
         StateHasChanged();
     }
@@ -113,9 +112,9 @@
         OperationResponse<IEnumerable<ProductDTO>> operationResponse = null;
 
         if(_tabState == TabState.Products)
-            operationResponse = await ProductService.GetProductsAsync();
+            operationResponse = await ProductService.GetAsync(ProductRange.Active);
         else if(_tabState == TabState.Archived)
-            operationResponse = await ProductService.GetProductsAsync(ProductService.ProductRange.Archived);
+            operationResponse = await ProductService.GetAsync(ProductRange.Archived);
 
         if (operationResponse is not null && operationResponse.Result == OperationResult.Ok)
             products = operationResponse.Data;
@@ -133,7 +132,7 @@
     /// <summary>
     /// Called when we want to edit an existing product
     /// </summary>
-    void EditProduct(Product product)
+    void EditProduct(ProductDTO product)
     {
         selectedProduct = product;
         _productRegistrationModal.Show();
@@ -141,18 +140,9 @@
 
     void SelectProduct(Product product) => selectedProduct = product;
 
-    async Task SoftDeleteProductAsync(Product product)
-    {
-        bool success = await ProductService.SoftDeleteAsync(product.Id);
+    async Task SoftDeleteProductAsync(Product product) =>
+        await ProductService.ArchiveAsync(product.Id);
 
-        if (success)
-        {
-            ToastService.ShowSuccess($"{product.Name} archived");
-            return;
-        }
-
-        ToastService.ShowError($"Something went wrong");
-    }
 
     async Task TabClicked(TabState state)
     {

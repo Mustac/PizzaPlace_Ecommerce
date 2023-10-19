@@ -49,15 +49,15 @@
 </div>
 @code {
     protected override void OnInitialized() =>
-        ShoppingCartService.OnReloadShoppingCart += ReloadComponent;
+        ShoppingCartService.OnShoppingCartChange += ReloadComponent;
 
     async Task ReloadComponent() =>
         await InvokeAsync(StateHasChanged);
 
     public void Dispose() =>
-        ShoppingCartService.OnReloadShoppingCart -= ReloadComponent;
+        ShoppingCartService.OnShoppingCartChange -= ReloadComponent;
 
-    async Task ModifyAmountAsync(ProductInfo product, bool sumup)
+    async Task ModifyAmountAsync(ProductDTO product, bool sumup)
     {
         if (sumup)
             product.Amount++;
