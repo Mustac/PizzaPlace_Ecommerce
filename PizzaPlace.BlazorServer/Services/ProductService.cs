@@ -41,22 +41,26 @@ public class ProductService : BaseService
     /// </summary>
     /// <param name="productDto">The data transfer object containing product details.</param>
     /// <returns>The created product entity or null if the creation fails.</returns>
-    public async Task<OperationResponse> CreateProductAsync(ProductDTO productDto)
-        => await ProcessRequestAsync(async (context) =>
+    public async Task<OperationResponse<ProductDTO>> CreateProductAsync(ProductDTO productDto)
+        => await ProcessRequestAsync<ProductDTO>(async (context) =>
         {
             Product product = new Product(productDto.Name, productDto.Price, productDto.Ingredients);
 
-            context.Products.Add(product);
+            var response = await context.Products.AddAsync(product);
 
             var successSave = await context.SaveChangesAsync() > 0;
 
             if (successSave)
             {
-                if (_globalEventService.OnProductChange is not null) await _globalEventService.OnProductChange.Invoke();
-                return OperationResponse.Ok();
+
+                if (_globalEventService.OnProductChange is not null) 
+                    await _globalEventService.OnProductChange.Invoke();
+
+                var productDTO = _mapper.Map<ProductDTO>(product);
+                return OperationResponse<ProductDTO>.Ok(productDTO);
             }
 
-            return OperationResponse.Fail();
+            return OperationResponse<ProductDTO>.Fail();
         }, notifications: true);
 
 
@@ -80,6 +84,8 @@ public class ProductService : BaseService
          {
              if (_globalEventService.OnProductChange is not null)
                  await _globalEventService.OnProductChange.Invoke();
+
+             return OperationResponse.Ok();
          }
 
          return OperationResponse.Fail();
@@ -135,12 +141,11 @@ public class ProductService : BaseService
          {
              if (_globalEventService.OnProductChange is not null)
                  await _globalEventService.OnProductChange.Invoke();
-
              return OperationResponse.Ok();
          }
 
          return OperationResponse.Fail();
-     }, notifications:true);
+     }, notifications:false);
 
 
     /// <summary>

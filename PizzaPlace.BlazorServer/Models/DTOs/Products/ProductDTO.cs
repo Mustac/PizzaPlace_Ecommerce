@@ -29,7 +29,5 @@ public class ProductInputDTO
     [StringLength(maximumLength: 300, MinimumLength = 3)]
     public string Ingredients { get; set; } = string.Empty;
 
-    [FloatRange(minimum: 0, maximum: 999, ErrorMessage = "The price must be between 0 and 999")]
-    [LessThan("Price", ErrorMessage = "Discounted Price must be less than the regular Price")]
     public float? DiscountedPrice { get; set; }
 }

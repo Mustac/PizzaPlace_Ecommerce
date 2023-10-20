@@ -1,7 +1,6 @@
 ﻿@inject ProductService ProductService
 @inject IToastService ToastService
 @inject IMapper Mapper
-@inject IJSRuntime JsRuntime
 
 @if (_product is not null && show)
 {
@@ -97,7 +96,7 @@
     public EventCallback OnHide { get; set; }
 
     [Parameter]
-    public EventCallback OnStateChange { get; set; }
+    public EventCallback OnComponentLoad { get; set; }
 
 
     private void OnPromoChanged(ChangeEventArgs e)
@@ -105,9 +104,7 @@
         enablePromo = (bool)e.Value;
 
         if (!enablePromo)
-        {
             _product.DiscountedPrice = 0;
-        }
     }
 
 
@@ -119,22 +116,16 @@
             product.DiscountedPrice = 0;
 
         await ProductService.UpdateProductAsync(product);
-
         Hide();
     }
 
     public async Task Show(ProductDTO product)
     {
-        await JsRuntime.LogAsync("Show triggered, product name : " + product?.Name);
         _product = Mapper.Map<ProductInputDTO>(product);
-
         enablePromo = _product.DiscountedPrice > 0;
         show = true;
-        await JsRuntime.LogAsync("Set show to true : " + show.ToString());
         enableEdit = false;
-        StateHasChanged();
-        await OnStateChange.InvokeAsync();
-
+        await OnComponentLoad.InvokeAsync();
     }
 
     public void Hide()
