@@ -162,6 +162,7 @@ th {
     background-color: #f5f5f5;
     border: 1px solid #ddd;
     padding:0px 10px;
+    height:60px;
 }
 
 /* Style table data cells (optional) */
@@ -185,7 +186,7 @@ tr:hover{
     }
 
     th:nth-child(3), td:nth-child(3) {
-        width: 15%;
+        width: 5%;
     }
 
     th:nth-child(4), td:nth-child(4) {

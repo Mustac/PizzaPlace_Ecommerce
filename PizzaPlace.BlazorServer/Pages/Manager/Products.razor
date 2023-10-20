@@ -1,6 +1,8 @@
 ﻿@page "/manager/products"
+@page "/manager/products/{PageState}"
 @layout ManagerLayout
 @inject ProductService ProductService
+@inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject IToastService ToastService
 @inject ConfirmationModal ConfirmationModal
@@ -10,10 +12,10 @@
 <div class="container" style="min-width:1200px">
     <div class="d-flex justify-content-between">
         <div class="d-flex">
-            <div @onclick="@(()=>TabClicked(TabState.Products))" class="btn-option-select @(_tabState == TabState.Products?"bg-primary":"bg-soft-gray") p-2">
+            <div @onclick="@(()=>NavigationManager.NavigateTo("/manager/products"))" class="btn-option-select @(_tabState == TabState.Products?"bg-primary":"bg-soft-gray") p-2">
                 <h3 class="p-2 px-5 mb-0 text-white">Products</h3>
             </div>
-            <div @onclick="@(()=>TabClicked(TabState.Archived))" class="p-2 btn-option-select  @(_tabState == TabState.Archived?"bg-primary":"bg-soft-gray") align-self-">
+            <div @onclick="@(()=>NavigationManager.NavigateTo("/manager/products/archived"))" class="p-2 btn-option-select  @(_tabState == TabState.Archived?"bg-primary":"bg-soft-gray") align-self-">
                 <h3 class="p-1 text-white ml-2 mb-0">Archived</h3>
             </div>
         </div>
@@ -31,7 +33,7 @@
                 <tr id="table-header">
                     <th>Product Name</th>
                     <th>Price</th>
-                    <th>Discounted Price</th>
+                    <th>Promo</th>
                     <th>Ingredients</th>
                     <th>Action</th>
                 </tr>
@@ -46,7 +48,7 @@
                             <td><i class="fa-solid fa-pizza-slice"></i>&nbsp; @product.Name</td>
                             <td>@product.Price$</td>
                             <td>
-                                @(product.DiscountedPrice == 0 ? "--" : product.DiscountedPrice.ToString("#.##"))
+                                @(product.DiscountedPrice == 0 ? "--" : product.DiscountedPrice.ToString("#.##") + "$")
                             </td>
                             <td>@product.Ingredients</td>
                            
@@ -81,6 +83,9 @@
     ProductCreateModal? _productCreateModal; 
     ProductUpdateModal? _productUpdateModal; 
 
+    [Parameter]
+    public string? PageState { get; set; }
+
     IEnumerable<ProductDTO>? products; // Collection of products to be displayed on the UI.
 
     private ProductDTO selectedProduct = new ProductDTO();  // Represents the currently selected product.
@@ -95,12 +100,21 @@
     // CSS class for visually indicating the currently selected product in the UI.
     string activeSelectedClass = "border border-2 border-dark"; 
 
+    protected async override Task OnParametersSetAsync()
+    {
+        if (PageState == "archived")
+            _tabState = TabState.Archived;
+        else
+            _tabState = TabState.Products;
+
+        await RefreshProducts();
+    }
+
     // Initializes the component by fetching active products, refreshing the product list in the UI,
     // and subscribing to product change events.
     protected override async Task OnInitializedAsync()
     {
-        var temp = await ProductService.GetAsync(ProductRange.Active);
-        await RefreshProducts();
+         
         GlobalEventService.OnProductChange += RefreshProducts;
     }
 
@@ -124,7 +138,6 @@
 
         if (operationResponse is not null && operationResponse.Result == OperationResult.Ok)
             products = operationResponse.Data;
-
 
         await InvokeAsync(StateHasChanged);
     }
