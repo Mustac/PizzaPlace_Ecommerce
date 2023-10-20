@@ -69,7 +69,6 @@
 
                     }
                 }
-                <!-- More rows as needed -->
             </tbody>
         </table>
     </div>
@@ -79,23 +78,25 @@
 <ProductUpdateModal @ref="_productUpdateModal" OnComponentLoad="@(()=>InvokeAsync(StateHasChanged))" />
 
 @code {
-    ProductCreateModal _productCreateModal;
-    ProductUpdateModal _productUpdateModal;
+    ProductCreateModal? _productCreateModal; 
+    ProductUpdateModal? _productUpdateModal; 
 
-    IEnumerable<ProductDTO> products;
+    IEnumerable<ProductDTO>? products; // Collection of products to be displayed on the UI.
 
-    private ProductDTO selectedProduct = new ProductDTO();
+    private ProductDTO selectedProduct = new ProductDTO();  // Represents the currently selected product.
 
-    TabState _tabState = TabState.Products;
+    TabState _tabState = TabState.Products; // Keeps track of the current tab state: Products or Archived.
 
     enum TabState{
-        Products,
-        Archived
+        Products, // Represents the active products tab.
+        Archived // Represents the archived products tab.
     }
 
-    string activeSelectedClass = "border border-2 border-dark";
+    // CSS class for visually indicating the currently selected product in the UI.
+    string activeSelectedClass = "border border-2 border-dark"; 
 
-
+    // Initializes the component by fetching active products, refreshing the product list in the UI,
+    // and subscribing to product change events.
     protected override async Task OnInitializedAsync()
     {
         var temp = await ProductService.GetAsync(ProductRange.Active);
@@ -103,6 +104,7 @@
         GlobalEventService.OnProductChange += RefreshProducts;
     }
 
+    // Handler to be called when a new product is created. It sets the created product as the selected one and refreshes the product list.
     async Task ProductCreated(ProductDTO product)
     {
         selectedProduct = product;
@@ -110,6 +112,7 @@
         StateHasChanged();
     }
 
+    // Retrieves and refreshes the product list based on the current tab state.
     async Task RefreshProducts()
     {
         OperationResponse<IEnumerable<ProductDTO>> operationResponse = null;
@@ -126,19 +129,14 @@
         await InvokeAsync(StateHasChanged);
     }
 
+    // Opens the product update modal and sets the given product as the selected one.
     async Task EditProduct(ProductDTO product)
     {
         selectedProduct = product;
         await _productUpdateModal.Show(product);
     }
 
-    /// <summary>
-    /// Used for archiving products
-    /// </summary>
-    /// <remarks>
-    /// The notifications will not be triggered automaticaly
-    /// </remarks>
-    /// <param name="product"></param>
+    // Archives a given product after seeking user confirmation.
     async void ArchiveProduct(ProductDTO product)
     {
         var confirmation = await ConfirmationModal.ShowAsync($"Set {product.Name} to archive ?");
@@ -155,13 +153,7 @@
             ToastService.ShowError($"Product could not be found, please refresh the page");
     }
 
-    /// <summary>
-    /// Used for restoring archived products
-    /// </summary>
-    /// <remarks>
-    /// The notifications will not be triggered automaticaly
-    /// </remarks>
-    /// <param name="product"></param>
+    // Restores a given archived product and notifies the user about the operation result.
     async Task RestoreArchivedProduct(ProductDTO product)
     {
         var response = await ProductService.RestoreArchivedAsync(product.Id);
@@ -173,14 +165,7 @@
             ToastService.ShowError($"Product could not be found, please refresh the page");
     }
 
-    /// <summary>
-    /// Used for deleting products once the products is in "archived" state
-    /// </summary>
-    /// <remarks>
-    /// The notifications will not be triggered automaticaly
-    /// </remarks>   
-    /// <param name="product"></param>
-    /// <returns></returns>
+    // Permanently deletes a product in the "archived" state after seeking user confirmation.
     async Task HardDeleteProductAsync(ProductDTO product)
     {
         var confirmation = await ConfirmationModal.ShowAsync($"Are you sure you want to delete {product.Name}?");
@@ -198,17 +183,17 @@
 
     }
 
+    // Switches between the Products and Archived tabs and refreshes the product list accordingly.
     async Task TabClicked(TabState state)
     {
         _tabState = state;
         await RefreshProducts();
     }
 
+    // Cleanup: Unsubscribe from the product change events when the component is disposed.
     public void Dispose()
     {
         GlobalEventService.OnProductChange -= RefreshProducts;
     }
-
-
 }
 
