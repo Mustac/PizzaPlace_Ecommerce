@@ -3,7 +3,7 @@
 @inject NavMenuService GlobalService
 @inject IJSRuntime JSRuntime
 @inject ProductService ProductService
-@inject GlobalEventService GlobalEventService
+@inject GlobalService GlobalEventService
 @implements IDisposable
 
 <PageTitle>Index</PageTitle>
@@ -115,10 +115,14 @@
         }
     }
 
+    ProductEventHandler prodEventHandler;
+
     protected override void OnInitialized()
     {
+        prodEventHandler = (prodDTO) => ReloadProducts();
+
         GlobalService.OnNavShowChanged += StateHasChanged;
-        GlobalEventService.OnProductChange += ReloadProducts;
+        GlobalEventService.Product.OnProductChange += prodEventHandler;
     }
 
 
@@ -141,6 +145,7 @@
 
     public void Dispose()
     {
+        GlobalEventService.Product.OnProductChange -= prodEventHandler;
         GlobalService.OnNavShowChanged -= StateHasChanged;
         timer.Stop();
         timer.Elapsed -= NextSlideCarousel;

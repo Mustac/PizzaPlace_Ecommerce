@@ -13,6 +13,24 @@ public class ProductDTO
     public int Amount { get; set; }
 }
 
+public class ProductOrderDTO
+{
+    public bool CanUserOrder { get; set; } = true;
+    public List<ProductCartDTO> ProductCart { get; set;} = new List<ProductCartDTO>();
+}
+
+public class ProductCartDTO
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Ingredients { get; set; } = string.Empty;
+    public float Price { get; set; }
+    public float DiscountedPrice { get; set; }
+    public bool ProductNeedsUpdate { get; set; }
+    public bool ProductNeedsDeletion { get; set; }
+    public int Amount { get; set; }
+}
+
 public class ProductInputDTO
 {
     public int Id { get; set; }

@@ -30,9 +30,5 @@ namespace PizzaPlace.BlazorServer.Services
             CartShow = state;
             OnShoppingCartClicked?.Invoke();
         }
-
-
-
-
     }
 }

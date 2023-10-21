@@ -1,63 +1,138 @@
 ﻿@inject ShoppingCartService ShoppingCartService
 @implements IDisposable
+@inject IToastService ToastService
 @inject IJSRuntime JSRuntime
+@inject ProductService ProductService
+@inject GlobalService GlobalService
 
 
 <div>
-    @if (ShoppingCartService.Products is null || ShoppingCartService.NumberOfProducts == 0)
+    @if (ShoppingCartService.ProductCart is null || ShoppingCartService.ProductCart.Count == 0)
     {
         <h5>Your cart is empty ...</h5>
     }
     else
     {
-        @foreach (var product in ShoppingCartService.Products)
+        @foreach (var product in ShoppingCartService.ProductCart)
         {
-            <div class="order-item row">
-                <div class="col-12 d-flex justify-content-between px-0 pb-2 mb-1 border-bottom">
-                    <h6 class="d-inline mb-0"><i class="fa-solid fa-pizza-slice"></i>&nbsp;@product.Name</h6>
-                    <button @onclick="@(()=>ShoppingCartService.DeleteSingleProduct(product.Id))" class="btn-delete"><i class="fa-solid fa-trash"></i></button>
+            @if (product.ProductNeedsDeletion)
+            {
+                <div class="order-item row bg-gray">
+                    
+                    <div class="col-12 d-flex justify-content-between px-0 pb-2 mb-1 border-bottom">
+                        <h6 class="d-inline mb-0"><i class="fa-solid fa-pizza-slice"></i>&nbsp;@product.Name</h6>
+                        
+                    </div>
+                    <div class="col-12 border-bottom pb-2">
+                        <small><b>Ingridients:</b> @product.Ingredients</small>
+                    </div>
+                    <div class="col-12 bg-danger text-light fw-border rounded p-2">
+                                <div class="d-flex justify-content-between align-items-center"><i class="fa-solid fa-triangle-exclamation"></i> Item not available <i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <button @onclick="@(()=>ShoppingCartService.DeleteSingleProduct(product.Id))" class="btn btn-light form-control mt-2">Click to remove</button>
+                    </div>
                 </div>
-                <div class="col-12 border-bottom pb-2">
-                    <small><b>Ingridients:</b> @product.Ingredients</small>
-                </div>
-                <div class="col-12 d-flex justify-content-between">
-                    <div>
-                        <button @onclick="@(()=>ModifyAmountAsync(product, false))" class="btn-adjustment">-</button>
-                        <span>@product.Amount</span>
-                        <button @onclick="@(()=>ModifyAmountAsync(product, true))" class="btn-adjustment">+</button>
+            }
+            else if (product.ProductNeedsUpdate)
+            {
+                <div class="order-item row bg-gray">
+                    <div class="col-12 d-flex justify-content-between px-0 pb-2 mb-1 border-bottom">
+                        <h6 class="d-inline mb-0"><i class="fa-solid fa-pizza-slice"></i>&nbsp;@product.Name</h6>
+                        <button @onclick="@(()=>ShoppingCartService.DeleteSingleProduct(product.Id))" class="btn-delete"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <div class="col-12 border-bottom pb-2">
+                        <small><b>Ingridients:</b> @product.Ingredients</small>
+                    </div>
+                    <div class="col-12 bg-white rounded p-2 my-2">
+                        <div class="text-center mb-2">This product is changed recently</div>
+
+                        <button @onclick="@(()=>UpdateCartProduct(product))" class="btn btn-success form-control">Update Product Now</button>
 
                     </div>
-                    <div>
-                        @if(product.DiscountedPrice > 0)
-                        {
-                            <span class="text-decoration-line-through" style="font-size:.7rem;">@product.DiscountedPrice</span>
-                        }
-                        <span>@product.Price</span>
+                </div>
+            }
+            else
+            {
+                <div class="order-item row">
+                    <div class="col-12 d-flex justify-content-between px-0 pb-2 mb-1 border-bottom">
+                        <h6 class="d-inline mb-0"><i class="fa-solid fa-pizza-slice"></i>&nbsp;@product.Name</h6>
+                        <button @onclick="@(()=>ShoppingCartService.DeleteSingleProduct(product.Id))" class="btn-delete"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <div class="col-12 border-bottom pb-2">
+                        <small><b>Ingridients:</b> @product.Ingredients</small>
+                    </div>
+                    <div class="col-12 d-flex justify-content-between">
+                        <div>
+                            <button @onclick="@(()=>ModifyAmountAsync(product, false))" class="btn-adjustment">-</button>
+                            <span>@product.Amount</span>
+                            <button @onclick="@(()=>ModifyAmountAsync(product, true))" class="btn-adjustment">+</button>
+
+                        </div>
+                        <div>
+                            @if (product.DiscountedPrice > 0)
+                            {
+                                <span class ="text-decoration-line-through" style="font-size:.7rem;">@product.Price$</span>
+                                <span >@product.DiscountedPrice$</span>
+                            }
+                            else
+                            {
+                                <span>@product.Price$</span>
+                            }
+
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
         }
         <div class="px-2">
             <div class="mt-3 text-secondary">Order Summary : <span class="float-end">@ShoppingCartService.TotalCartPrice.ToString("#.##") $</span></div>
-            <div class="mt-1 text-secondary">Discounts : <span class="float-end">@(ShoppingCartService.TotalDiscounts == 0?0:ShoppingCartService.TotalDiscounts.ToString("#.##")) $</span></div>
+            <div class="mt-1 text-secondary">Discounts : <span class="float-end">@(ShoppingCartService.TotalDiscounts == 0 ? 0 : ShoppingCartService.TotalDiscounts.ToString("#.##")) $</span></div>
             <h5 class="mt-2">Pay : <span class="float-end">@ShoppingCartService.TotalPriceWithDiscounts.ToString("#.##") $</span></h5>
         </div>
         <div class="py-1">
-            <button class="btn btn-danger mt-2 d-block w-100"><i class="fa-solid fa-credit-card"></i>&nbsp;&nbsp;Order now</button>
+            <button class="btn btn-danger mt-2 d-block w-100 @(ShoppingCartService.ProductOrder.CanUserOrder?"":"disabled")"><i class="fa-solid fa-credit-card"></i>&nbsp;&nbsp;Order now</button>
         </div>
     }
 </div>
 @code {
-    protected override void OnInitialized() =>
+
+    protected override void OnInitialized()
+    {
         ShoppingCartService.OnShoppingCartChange += ReloadComponent;
+        GlobalService.Product.OnProductChange += ProductChanged;
+        ShoppingCartService.OnAddToCartProductExist += ProductExist;
+
+
+    }
+
+    async Task ProductChanged(ProductDTO product)
+    {
+
+    }
 
     async Task ReloadComponent() =>
         await InvokeAsync(StateHasChanged);
 
-    public void Dispose() =>
+    public void Dispose()
+    {
+        GlobalService.Product.OnProductChange -= ProductChanged;
         ShoppingCartService.OnShoppingCartChange -= ReloadComponent;
+        ShoppingCartService.OnAddToCartProductExist -= ProductExist;
+    }
 
-    async Task ModifyAmountAsync(ProductDTO product, bool sumup)
+    async Task ProductExist(ProductDTO product)
+    {
+        ToastService.ShowInfo($"{product.Name} is already in the cart");
+    }
+
+    async Task UpdateCartProduct(ProductCartDTO productCartDTO)
+    {
+        var response = await ProductService.GetByIdAsync(productCartDTO.Id);
+
+        if(response.Result == OperationResult.Ok)
+            await ShoppingCartService.ClickUpdateProductAsync(response.Data);
+    }
+
+    async Task ModifyAmountAsync(ProductCartDTO product, bool sumup)
     {
         if (sumup)
             product.Amount++;
@@ -66,12 +141,11 @@
 
         if (product.Amount <= 0)
         {
-            // delete this product
             await ShoppingCartService.DeleteSingleProduct(product.Id);
             return;
         }
 
-        await ShoppingCartService.SaveShoppingCartAsync();
+        await ShoppingCartService.SaveShoppingCartToLocalStorageAsync();
     }
 
 

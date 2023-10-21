@@ -171,9 +171,13 @@ td {
     padding: 8px;
 }
 
-tr:hover{
-    background-color:dimgray !important;
-    color:white !important;
+tr:hover {
+    background-color: rgb(250, 254, 205) !important;
+    /* color:white !important;*/
+}
+
+.bg-light-red {
+    background-color: rgba(189, 0, 0, 0.3);
 }
 
     /* Set the width of each column by percentage */

@@ -6,7 +6,7 @@
 @inject IJSRuntime JSRuntime
 @inject IToastService ToastService
 @inject ConfirmationModal ConfirmationModal
-@inject GlobalEventService GlobalEventService
+@inject GlobalService GlobalService
 @implements IDisposable
 
 <div class="container" style="min-width:1200px">
@@ -44,7 +44,7 @@
                     @foreach (var product in products)
                     {
 
-                        <tr class="@(product.DiscountedPrice != 0 && _tabState == TabState.Products?"bg-yellow fw-bold":"") @(_tabState == TabState.Archived?"text-secondary":"") @(product.Id == selectedProduct.Id?activeSelectedClass:"")">
+                        <tr class="@(product.DiscountedPrice > 0?"bg-light-red fw-bold":"") @(product.Id == selectedProduct.Id?activeSelectedClass:"")">
                             <td><i class="fa-solid fa-pizza-slice"></i>&nbsp; @product.Name</td>
                             <td>@product.Price$</td>
                             <td>
@@ -55,16 +55,17 @@
                             @if(_tabState == TabState.Products)
                             {
                                 <td class="text-center">
-                                        <button class="btn btn-sm text-white" style="background-color:green" @onclick="@(()=>EditProduct(product))">Edit</button>
-                                        <button class="btn btn-sm btn-danger" @onclick="@(()=>ArchiveProduct(product))">Archive</button>
+                                    <button data-toggle="tooltip" title="Edit Product" class="btn btn-sm btn-outline-dark mx-1" @onclick="@(()=>EditProduct(product))"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button data-toggle="tooltip" title="Archive Product" class="btn btn-sm btn-outline-dark mx-1" @onclick="@(()=>ArchiveProduct(product))"><i class="fa-solid fa-ban"></i></button>
                                 </td>
                             }
                             
                             @if(_tabState == TabState.Archived)
                             {
                                 <td class="text-center">
-                                    <button class="btn btn-sm text-white" style="background-color:green" @onclick="@(()=>RestoreArchivedProduct(product))">Restore</button>
-                                    <button class="btn btn-sm btn-danger" @onclick="@(()=>HardDeleteProductAsync(product))">Delete</button>
+                                    <button data-toggle="tooltip" title="Restore Product" class="btn btn-sm btn-outline-dark" @onclick="@(()=>RestoreArchivedProduct(product))"><i class="fa-solid fa-trash-can-arrow-up mx-1"></i></button>
+                                    <button data-toggle="tooltip" title="Edit Product" class="btn btn-sm btn-outline-dark" @onclick="@(()=>EditProduct(product))"><i class="fa-solid fa-pen-to-square mx-1"></i></button>
+                                    <button data-toggle="tooltip" title="Delete Product" class="btn btn-sm btn-outline-dark" @onclick="@(()=>HardDeleteProductAsync(product))"><i class="fa-solid fa-trash mx-1"></i></button>
                                 </td>
                             }
                         </tr>
@@ -110,12 +111,14 @@
         await RefreshProducts();
     }
 
+    ProductEventHandler? prodHandler;
+
     // Initializes the component by fetching active products, refreshing the product list in the UI,
     // and subscribing to product change events.
     protected override async Task OnInitializedAsync()
     {
-         
-        GlobalEventService.OnProductChange += RefreshProducts;
+        prodHandler = (prodDTO) => RefreshProducts();
+        GlobalService.Product.OnProductChange += prodHandler;
     }
 
     // Handler to be called when a new product is created. It sets the created product as the selected one and refreshes the product list.
@@ -206,7 +209,7 @@
     // Cleanup: Unsubscribe from the product change events when the component is disposed.
     public void Dispose()
     {
-        GlobalEventService.OnProductChange -= RefreshProducts;
+        GlobalService.Product.OnProductChange -= prodHandler;
     }
 }
 

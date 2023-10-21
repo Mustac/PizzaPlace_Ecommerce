@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Hosting;
+using PizzaPlace.BlazorServer.Services.EventServices;
 
 namespace PizzaPlace.BlazorServer.Helpers;
 
@@ -43,9 +44,7 @@ public class ServicesRegistrator
 
         services.AddScoped<ProductService>();
 
-        services.AddScoped<MyStorageService>();
-
-        services.AddSingleton<GlobalEventService>();
+        services.AddSingleton<GlobalService>();
 
         var userManager = services.BuildServiceProvider().GetRequiredService(typeof(UserManager<ApplicationUser>)) as UserManager<ApplicationUser>;
         var roleManager = services.BuildServiceProvider().GetRequiredService(typeof(RoleManager<IdentityRole>)) as RoleManager<IdentityRole>;

@@ -6,6 +6,7 @@ using PizzaPlace.BlazorServer.Helpers.Enums;
 using PizzaPlace.BlazorServer.Models.DTOs;
 using PizzaPlace.BlazorServer.Models.DTOs.Products;
 using PizzaPlace.BlazorServer.Services.BaseServices;
+using PizzaPlace.BlazorServer.Services.EventServices;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,15 +30,16 @@ public class ProductService : BaseService
     /// - Restoring an archived product, making it available again for normal operations.
     /// - Permanently deleting a product from the database.
     /// </summary>
-    public ProductService(GlobalEventService globalEventService, IMapper mapper, IToastService toastService)
-        : base(globalEventService, mapper, toastService)
+    public ProductService(GlobalService globalService, IMapper mapper, IToastService toastService)
+        : base(globalService, mapper, toastService)
     {
-        
+
     }
 
 
     /// <summary>
     /// Asynchronously creates a new product in the database.
+    /// Upon successful creation, this method will trigger the "ProductCreated" and "ProductChanged" events.
     /// </summary>
     /// <param name="productDto">The data transfer object containing product details.</param>
     /// <returns>The created product entity or null if the creation fails.</returns>
@@ -52,11 +54,8 @@ public class ProductService : BaseService
 
             if (successSave)
             {
-
-                if (_globalEventService.OnProductChange is not null) 
-                    await _globalEventService.OnProductChange.Invoke();
-
-                var productDTO = _mapper.Map<ProductDTO>(product);
+                var productDTO = _mapper.Map<ProductDTO>(response.Entity);
+                await _globalService.Product.EventTriggers.TriggerProductCreated(productDTO);
                 return OperationResponse<ProductDTO>.Ok(productDTO);
             }
 
@@ -66,6 +65,7 @@ public class ProductService : BaseService
 
     /// <summary>
     /// Asynchronously updates a product in the database.
+    /// Upon successful update, this method will trigger the "ProductUpdated" and "ProductChanged" events.
     /// </summary>
     /// <param name="productDto">The data transfer object containing updated product details.</param>
     /// <returns>An <see cref="OperationResponse"/> indicating the result of the update operation.</returns>
@@ -82,9 +82,7 @@ public class ProductService : BaseService
 
          if (success)
          {
-             if (_globalEventService.OnProductChange is not null)
-                 await _globalEventService.OnProductChange.Invoke();
-
+             await _globalService.Product.EventTriggers.TriggerProductUpdated(productDto);
              return OperationResponse.Ok();
          }
 
@@ -109,8 +107,8 @@ public class ProductService : BaseService
              products = await context.Products.Where(x => !x.IsArchived).OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
          else if (productRange == ProductRange.Archived)
              products = await context.Products.Where(x => x.IsArchived).OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
-         else if(productRange == ProductRange.Discounted)
-             products = await context.Products.Where(x => !x.IsArchived).OrderBy(x => x.DiscountedPrice > 0).ThenBy(x => x.Name).ToListAsync();
+         else if (productRange == ProductRange.Discounted)
+             products = await context.Products.Where(x => !x.IsArchived && x.DiscountedPrice > 0).OrderBy(x => x.DiscountedPrice > 0).ThenBy(x => x.Name).ToListAsync();
 
          var dto = _mapper.Map<IEnumerable<ProductDTO>>(products);
 
@@ -119,13 +117,34 @@ public class ProductService : BaseService
          return response;
      });
 
-
     /// <summary>
-    /// Asynchronously restores a previously archived product.
+    /// Asynchronously retrieves a collection of products based on a specified criteria.
     /// </summary>
-    /// <param name="Id">The unique identifier of the product to be restored.</param>
-    /// <returns>An <see cref="OperationResponse"/> indicating the result of the restoration.</returns>
-    public async Task<OperationResponse> RestoreArchivedAsync(int Id)
+    /// <param name="productRange">The range or category of products to retrieve.</param>
+    /// <returns>A collection of products that match the specified criteria.</returns>
+    public async Task<OperationResponse<ProductDTO>> GetByIdAsync(int Id)
+    => await ProcessRequestAsync<ProductDTO>(async (context) =>
+    {
+        var product = await context.Products.FirstOrDefaultAsync(x=>x.Id == Id);
+
+        if (product is null)
+            return OperationResponse<ProductDTO>.NotFound();
+
+        var productDTO = _mapper.Map<ProductDTO>(product);
+
+        return OperationResponse<ProductDTO>.Ok(productDTO);
+
+    });
+
+
+
+        /// <summary>
+        /// Asynchronously restores a previously archived product.
+        /// Upon successful restoration, this method will trigger the "ProductRestored" and "ProductChanged" events.
+        /// </summary>
+        /// <param name="Id">The unique identifier of the product to be restored.</param>
+        /// <returns>An <see cref="OperationResponse"/> indicating the result of the restoration.</returns>
+        public async Task<OperationResponse> RestoreArchivedAsync(int Id)
      => await ProcessRequestAsync(async (context) =>
      {
          var product = await context.Products.FirstOrDefaultAsync(x => x.Id == Id);
@@ -139,45 +158,47 @@ public class ProductService : BaseService
 
          if (success)
          {
-             if (_globalEventService.OnProductChange is not null)
-                 await _globalEventService.OnProductChange.Invoke();
+             var productDTO = _mapper.Map<ProductDTO>(product);
+             await _globalService.Product.EventTriggers.TriggerProductRestored(productDTO);
              return OperationResponse.Ok();
          }
 
          return OperationResponse.Fail();
-     }, notifications:false);
+     }, notifications: false);
 
 
     /// <summary>
     /// Asynchronously archives a product.
+    /// Upon successful archiving, this method will trigger the "ProductArchived" and "ProductChanged" events.
     /// </summary>
     /// <param name="Id">The unique identifier of the product to be archived.</param>
     /// <returns>An <see cref="OperationResponse"/> indicating the result of the archiving process.</returns>
     public async Task<OperationResponse> ArchiveAsync(int Id)
-     =>await ProcessRequestAsync(async (context) =>
+     => await ProcessRequestAsync(async (context) =>
      {
-            var product = await context.Products.FirstOrDefaultAsync(x => x.Id == Id);
+         var product = await context.Products.FirstOrDefaultAsync(x => x.Id == Id);
 
-            if (product == null)
-                return OperationResponse.NotFound();
+         if (product == null)
+             return OperationResponse.NotFound();
 
-            product.IsArchived = true;
+         product.IsArchived = true;
 
-            bool success = await context.SaveChangesAsync() > 0;
+         bool success = await context.SaveChangesAsync() > 0;
 
-            if (success)
-            {
-                if (_globalEventService.OnProductChange is not null)
-                    await _globalEventService.OnProductChange.Invoke();
-                return OperationResponse.Ok();
-            }
+         if (success)
+         {
+             var productDTO = _mapper.Map<ProductDTO>(product);
+             await _globalService.Product.EventTriggers.TriggerProductArchived(productDTO);
+             return OperationResponse.Ok();
+         }
 
-            return OperationResponse.Fail();
+         return OperationResponse.Fail();
      });
 
 
     /// <summary>
     /// Asynchronously deletes a product from the database permanently.
+    /// Upon successful deletion, this method will trigger the "ProductDeleted" and "ProductChanged" events.
     /// </summary>
     /// <param name="Id">The unique identifier of the product to be deleted.</param>
     /// <returns>An <see cref="OperationResponse"/> indicating the result of the deletion process.</returns>
@@ -195,8 +216,8 @@ public class ProductService : BaseService
 
          if (success)
          {
-             if (_globalEventService.OnProductChange is not null)
-                 await _globalEventService.OnProductChange.Invoke();
+             var productDTO = _mapper.Map<ProductDTO>(product);
+             await _globalService.Product.EventTriggers.TriggerProductDeleted(productDTO);
              return OperationResponse.Ok();
          }
 

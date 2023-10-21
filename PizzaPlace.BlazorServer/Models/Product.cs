@@ -1,4 +1,5 @@
-﻿namespace PizzaPlace.BlazorServer.Models;
+﻿
+namespace PizzaPlace.BlazorServer.Models;
 
 public class Product
 {

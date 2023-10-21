@@ -2,6 +2,7 @@
 using Blazored.Toast.Services;
 using Microsoft.EntityFrameworkCore;
 using PizzaPlace.BlazorServer.Helpers;
+using PizzaPlace.BlazorServer.Services.EventServices;
 
 namespace PizzaPlace.BlazorServer.Services.BaseServices
 {
@@ -10,7 +11,7 @@ namespace PizzaPlace.BlazorServer.Services.BaseServices
     /// </summary>
     public class BaseService
     {
-        protected readonly GlobalEventService _globalEventService;
+        protected readonly GlobalService _globalService;
         protected readonly IMapper _mapper;
         protected readonly IToastService _toastService;
 
@@ -28,10 +29,10 @@ namespace PizzaPlace.BlazorServer.Services.BaseServices
             }
         }
 
-        public BaseService(GlobalEventService globalEventService, IMapper mapper, IToastService toastService)
+        public BaseService(GlobalService globalEventService, IMapper mapper, IToastService toastService)
         {
             
-            _globalEventService = globalEventService;
+            _globalService = globalEventService;
             _mapper = mapper;
             _toastService = toastService;
         }

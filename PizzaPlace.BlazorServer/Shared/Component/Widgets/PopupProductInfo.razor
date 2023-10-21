@@ -2,26 +2,26 @@
 @inject ShoppingCartService ShoppingCartService
 @inject NavMenuService NavMenuService
 
-@if (Show && ProductInfo is not null)
+@if (Show && Product is not null)
 {
     <div class="modal-popup p-3" style="max-width:300px;">
         <div @onclick="HidePopupAsync" style="position:absolute; right:16px; top:16px; cursor:pointer; z-index:1250;"><i class="fa-solid fa-rectangle-xmark fa-2x"></i></div>
        <div class="position-relative">
             <img src="/images/pizza_popup.png" class="img-fluid"/>
-            <div class="pizza-overlay"><h4 class="text-center pt-2 text-primary">@ProductInfo.Name</h4></div>
+            <div class="pizza-overlay"><h4 class="text-center pt-2 text-primary">@Product.Name</h4></div>
        </div>
         <h6 class="text-primary my-0 py-0">Ingridients : </h6>
-        <p class="m-1 pt-1" style="font-size:.8rem; padding-left:10px;">@ProductInfo.Ingredients</p>
+        <p class="m-1 pt-1" style="font-size:.8rem; padding-left:10px;">@Product.Ingredients</p>
         
             <div class="float-end" style="margin-right:10px;">
-            @if (ProductInfo.DiscountedPrice > 0)
+            @if (Product.DiscountedPrice > 0)
             {
-                <small style="font-size:.7rem;" class="text-decoration-line-through text-secondary">@ProductInfo.Price$</small>
-                <span class="fw-bold">@ProductInfo.DiscountedPrice$</span>
+                <small style="font-size:.7rem;" class="text-decoration-line-through text-secondary">@Product.Price$</small>
+                <span class="fw-bold">@Product.DiscountedPrice$</span>
             }
             else
             {
-                <span class="fw-bold">@ProductInfo.Price$</span>
+                <span class="fw-bold">@Product.Price$</span>
             }
         </div>
        
@@ -39,7 +39,7 @@
     public EventCallback OnHideCallback { get; set; }
 
     [Parameter]
-    public ProductDTO ProductInfo { get; set; } = new ProductDTO();
+    public ProductDTO Product { get; set; } = new ProductDTO();
 
     async Task HidePopupAsync(){
         Show = false;
@@ -48,9 +48,9 @@
 
     async Task AddToCart()
     {
-        ProductInfo.Amount = 1;
-        var success = await ShoppingCartService.AddToShoppingCartAsync(ProductInfo);
-        await ShoppingCartService.RefreshShoppingCartAsync();
+        Product.Amount = 1;
+        var success = await ShoppingCartService.AddToShoppingCartAsync(Product);
+        await ShoppingCartService.ReloadShoppingCartListAsync();
 
         if (success)
             await HidePopupAsync();
