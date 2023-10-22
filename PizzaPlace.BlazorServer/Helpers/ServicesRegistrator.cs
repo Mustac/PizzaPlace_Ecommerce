@@ -46,6 +46,8 @@ public class ServicesRegistrator
 
         services.AddSingleton<GlobalService>();
 
+        services.AddScoped<LocalService>();
+
         var userManager = services.BuildServiceProvider().GetRequiredService(typeof(UserManager<ApplicationUser>)) as UserManager<ApplicationUser>;
         var roleManager = services.BuildServiceProvider().GetRequiredService(typeof(RoleManager<IdentityRole>)) as RoleManager<IdentityRole>;
 

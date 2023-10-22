@@ -12,7 +12,7 @@ global using System.Collections.Generic;
 global using System.Linq;
 global using System.Threading.Tasks;
 global using PizzaPlace.BlazorServer.Shared.Component.ConfirmationModalPackage;
-using PizzaPlace.BlazorServer.Services.BaseServices;
+global using PizzaPlace.BlazorServer.Services.BaseServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
