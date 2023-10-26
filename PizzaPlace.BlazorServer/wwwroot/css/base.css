@@ -1,0 +1,191 @@
+@import url('https://fonts.googleapis.com/css2?family=Delicious+Handrawn&family=Lato:wght@300;400;700;900&family=Lobster&display=swap');
+
+
+:root {
+    --light: #FFFFF7;
+    --charcoal: #393E46;
+    --espresso: #3c2e21;
+    --brick: #df5603;
+    --ember: #8f1901;
+    --moss: #648907;
+    --honey: #f5cd69;
+    --navigation-padding-y: 15px;
+    --font-lobster: 'Lobster', sans-serif;
+    --font-lato: 'Lato', sans-serif;
+    --font-hand: 'Delicious Handrawn', cursive;
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+a {
+    all: unset;
+    cursor: pointer;
+}
+
+body {
+    font-family: var(--font-lato);
+    background-color: var(--light);
+    color: black;
+    background-color: var(--light);
+    display: block;
+    width: 100%;
+}
+
+#body-wrapper {
+    max-width: 1200px;
+    position: relative;
+    margin: 0 auto;
+}
+
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #F90;
+    background-image: -webkit-linear-gradient(45deg,
+            rgba(255, 255, 255, .2) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, .2) 50%,
+            rgba(255, 255, 255, .2) 75%,
+            transparent 75%,
+            transparent);
+}
+
+
+.text-light {
+    color: var(--light);
+}
+
+.bg-light {
+    background-color: var(--light);
+}
+
+.text-charcoal {
+    color: var(--charcoal);
+}
+
+.bg-charcoal {
+    background-color: var(--charcoal);
+}
+
+.text-espresso {
+    color: var(--espresso);
+}
+
+.bg-espresso {
+    background-color: var(--espresso);
+}
+
+.text-brick {
+    color: var(--brick);
+}
+
+.bg-brick {
+    background-color: var(--brick);
+}
+
+.text-ember {
+    color: var(--ember);
+}
+
+.bg-ember {
+    background-color: var(--ember);
+}
+
+.text-moss {
+    color: var(--moss);
+}
+
+.bg-moss {
+    background-color: var(--moss);
+}
+
+.text-honey {
+    color: var(--honey);
+}
+
+.bg-honey {
+    background-color: var(--honey);
+}
+
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-light {
+    background-color: var(--light);
+    color: var(--charcoal);
+}
+
+.btn-charcoal {
+    background-color: var(--charcoal);
+    color: var(--light);
+}
+
+.btn-espresso {
+    background-color: var(--espresso);
+    color: var(--honey);
+}
+
+.btn-brick {
+    background-color: var(--brick);
+    color: var(--light);
+}
+
+.btn-ember {
+    background-color: var(--ember);
+    color: var(--light);
+}
+
+.btn-moss {
+    background-color: var(--moss);
+    color: var(--light);
+}
+
+.btn-honey {
+    background-color: var(--honey);
+    color: var(--charcoal);
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+
+
+@media screen and (max-width: 800px) {
+    #body-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 40px;
+        overflow-y: auto;
+    }
+}

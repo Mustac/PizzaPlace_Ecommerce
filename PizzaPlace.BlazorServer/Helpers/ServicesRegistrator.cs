@@ -34,7 +34,7 @@ public class ServicesRegistrator
 
         services.AddAutoMapper(typeof(Program));
 
-        services.AddScoped<NavMenuService>();
+        services.AddScoped<NavigationService>();
 
         services.AddBlazoredToast();
 
@@ -45,8 +45,6 @@ public class ServicesRegistrator
         services.AddScoped<ProductService>();
 
         services.AddSingleton<GlobalService>();
-
-        services.AddScoped<LocalService>();
 
         var userManager = services.BuildServiceProvider().GetRequiredService(typeof(UserManager<ApplicationUser>)) as UserManager<ApplicationUser>;
         var roleManager = services.BuildServiceProvider().GetRequiredService(typeof(RoleManager<IdentityRole>)) as RoleManager<IdentityRole>;

@@ -1,0 +1,66 @@
+﻿@inject ShoppingCartService ShoppingCartService
+@inject NavigationService NavMenuService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationService NavigationService
+@inject IJSRuntime JsRuntime
+
+<section id="navigation">
+    <div id="desktop-navigation">
+        <div id="desktop-navigation-wrapper">
+            <div class="logo-container">
+                <img src="/images/logo.png" alt="pizza logo">
+            </div>
+            <div id="menu-items-desktop">
+                <NavLink href="/" class="menu-item" ActiveClass="active">Home</NavLink>
+                <NavLink href="/menu" class="menu-item" ActiveClass="active">Menu</NavLink>
+                <NavLink href="/aboutus" class="menu-item" ActiveClass="active">About us</NavLink>
+                <NavLink href="/contact" class="menu-item" ActiveClass="active">Contact</NavLink>
+               </div>
+            <div class="action-buttons">
+                <button class="btn btn-ember"><i class="fas fa-user"></i>&nbsp;Login</button>
+                <button class="btn btn-moss"><i class="fa-solid fa-cart-shopping">&nbsp;</i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mobile-navigation">
+        <div class="mobile-bottom-navigation">
+            <div @onclick="@NavBarsClicked" class="mobile-nav-item hamburger-bars selected @GetMobileState()">
+                <i class="fa-solid fa-bars text-espresso"></i>
+            </div>
+            <NavLink href="/menu" ActiveClass="active" class="mobile-nav-item"><i class="fa-solid fa-pizza-slice"></i></NavLink>
+            <NavLink href="/profile" ActiveClass="active" class="mobile-nav-item"><i class="fa-solid fa-user"></i></NavLink>
+            <NavLink href="/shopping-cart" ActiveClass="active" class="mobile-nav-item"><i class="fa-solid fa-cart-shopping"></i></NavLink>
+        </div>
+        <div class="mobile-navigation-slider @GetMobileState()">
+            <div class="mobile-nav-items">
+                <NavLink href="/" ActiveClass="active"><i class="fa-solid fa-house"></i>Home</NavLink>
+                <hr />
+                <NavLink href="/aboutus" ActiveClass="active"><i class="fa-solid fa-users"></i>About us</NavLink>
+            <hr />
+                <NavLink href="/contact" ActiveClass="active"><i class="fa-solid fa-envelope"></i>Contact</NavLink>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@code{
+    private bool isOpen = false;
+    private bool sliderMenuItemSelected = false;
+
+    protected override void OnInitialized()
+    {
+    }
+
+    void NavBarsClicked()
+    {
+        isOpen = !isOpen;
+        NavigationService.MobileNav.NavigationClick(isOpen);
+    }
+
+    string GetMobileState()
+    {
+        return isOpen ? "active" : "";
+    }
+}

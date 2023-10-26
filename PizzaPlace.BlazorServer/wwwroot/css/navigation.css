@@ -1,0 +1,215 @@
+#navigation {
+    padding: 0px;
+    position: absolute;
+    height: 140px;
+    width: 100%;
+    top: 0;
+    left: 0;
+    padding: 0 20px;
+}
+
+#desktop-navigation {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+}
+
+#desktop-navigation-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+.logo-container {
+    height: 70%;
+}
+
+.logo-container img {
+    height: 100%;
+}
+
+#menu-items-desktop {
+    display: flex;
+    font-size: calc(16px + 0.6vw);
+    font-family: var(--font-lato);
+    font-weight: bolder;
+}
+
+#menu-items-desktop a{
+    margin:0 30px;
+}
+
+    .menu-item {
+        cursor: pointer;
+        transition: 0.2s color;
+        position: relative;
+    }
+
+/* Bottom line setup (from left to right) */
+.menu-item::before {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background-color: var(--brick);
+    transition: width 0.2s ease-in-out;
+}
+
+/* Top line setup (from right to left) */
+.menu-item::after {
+    content: "";
+    position: absolute;
+    top: -5px;
+    right: 0;
+    width: 0;
+    height: 3px;
+    background-color: var(--brick);
+    transition: width 0.2s ease-in-out;
+}
+
+.menu-item:hover::before {
+    width: 100%;
+}
+
+.menu-item:hover::after {
+    width: 100%;
+}
+
+.menu-item.active {
+    color: var(--ember) !important;
+}
+
+.menu-item:hover {
+    opacity: 0.9;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#mobile-navigation {
+    z-index: 5;
+    display: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-lato);
+    background-color: var(--light);
+    font-weight: bolder;
+    height: 300px;
+}
+
+#mobile-navigation i {
+    padding: 6px;
+}
+
+.mobile-bottom-navigation {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+}
+
+
+.mobile-bottom-navigation {
+    display: grid;
+    grid-template-columns: 50px 1fr 1fr 1fr;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
+.mobile-nav-item {
+    border-left: 1px solid var(--espresso);
+    height: 100%;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--light);
+    cursor: pointer;
+}
+
+.mobile-bottom-navigation div i {
+    color: inherit;
+}
+
+.mobile-bottom-navigation div.active {
+    background-color: white !important;
+    background: var(--brick) !important;
+    color: var(--light) !important;
+}
+
+.mobile-navigation-slider {
+    border-top: 4px solid var(--espresso);
+    height: 0px;
+    background-color: var(--light);
+    z-index: 4 !important;
+    position: fixed;
+    bottom: 20px;
+    overflow: hidden;
+    left: 0;
+    width: 100%;
+    transition: .3s all;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
+.mobile-navigation-slider.active {
+    height: 185px;
+}
+
+.mobile-nav-items{
+    width:100%;
+}
+
+.mobile-nav-items a {
+    height: 20px;
+    text-align: center;
+    width: 100%;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    position: relative;
+    display: block;
+}
+
+.mobile-nav-items a:hover {
+    background-color: var(--espresso);
+    color: var(--light);
+}
+
+.mobile-nav-items a i {
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+@media screen and (max-width: 1400px) {}
+
+
+
+
+
+
+@media screen and (max-width: 800px) {
+    #desktop-navigation {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 800px) {
+    #mobile-navigation {
+        display: none;
+    }
+}

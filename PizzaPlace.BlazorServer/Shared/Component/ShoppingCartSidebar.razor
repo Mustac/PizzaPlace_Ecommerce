@@ -1,21 +1,5 @@
 ﻿@inject ShoppingCartService ShoppingCartService
-@inject NavMenuService NavMenuService
+@inject NavigationService NavMenuService
 @inject IToastService ToastService
-@implements IDisposable
 
 
-<div class="shopping-cart p-4 @(NavMenuService.CartShow?"active":"")" style="overflow:auto;">
-    <h5>Order List : </h5>
-    <OrderList/>
-</div>
-
-@code {
-
-    protected override void OnInitialized() =>
-        NavMenuService.OnShoppingCartClicked += StateHasChanged;
-
-    public void Dispose() =>
-        NavMenuService.OnShoppingCartClicked -= StateHasChanged;
-    
-
-}
