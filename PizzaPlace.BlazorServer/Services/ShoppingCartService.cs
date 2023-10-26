@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using PizzaPlace.BlazorServer.Models;
 using PizzaPlace.BlazorServer.Services.EventServices;
-
 namespace PizzaPlace.BlazorServer.Services;
 
 public class ShoppingCartService : IDisposable

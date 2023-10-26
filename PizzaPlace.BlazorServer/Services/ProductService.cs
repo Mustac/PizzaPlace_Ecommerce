@@ -18,7 +18,8 @@ namespace PizzaPlace.BlazorServer.Services;
 /// </summary>
 public class ProductService : BaseService
 {
-    private readonly IJSRuntime _jSRuntime;
+
+        private readonly IJSRuntime _jSRuntime;
 
     /// <summary>
     /// The ProductService provides methods for managing product-related operations in the system, such as 
@@ -103,7 +104,9 @@ public class ProductService : BaseService
 
          if (productRange == ProductRange.All)
              products = await context.Products.OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
-         else if (productRange == ProductRange.Active)
+         else if (productRange == ProductRange.FullPrice)
+             products = await context.Products.Where(x => !x.IsArchived && x.DiscountedPrice == 0).OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
+         else if (productRange == ProductRange.ALlActive)
              products = await context.Products.Where(x => !x.IsArchived).OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
          else if (productRange == ProductRange.Archived)
              products = await context.Products.Where(x => x.IsArchived).OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();

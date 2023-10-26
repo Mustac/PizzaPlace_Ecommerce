@@ -135,7 +135,7 @@
         OperationResponse<IEnumerable<ProductDTO>> operationResponse = null;
 
         if(_tabState == TabState.Products)
-            operationResponse = await ProductService.GetAsync(ProductRange.Active);
+            operationResponse = await ProductService.GetAsync(ProductRange.ALlActive);
         else if(_tabState == TabState.Archived)
             operationResponse = await ProductService.GetAsync(ProductRange.Archived);
 

@@ -47,5 +47,6 @@ public class ProductInputDTO
     [StringLength(maximumLength: 300, MinimumLength = 3)]
     public string Ingredients { get; set; } = string.Empty;
 
+    [LessThan("Price", ErrorMessage ="Has to be less than price")]
     public float? DiscountedPrice { get; set; }
 }

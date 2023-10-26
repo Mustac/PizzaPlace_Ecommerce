@@ -1,8 +1,11 @@
-﻿body {
+﻿.background {
     background: url("/images/pizza.jpg");
     width: 100%;
     height: 100%;
     background-size: cover;
+    background-repeat:no-repeat;
+    background-position:center;
+    position:absolute;
 }
 
 .login-container {

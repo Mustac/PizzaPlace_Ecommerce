@@ -6,7 +6,8 @@
 public enum ProductRange
 {
     All,
-    Active,
+    FullPrice,
+    ALlActive,
     Archived,
     Discounted
 }

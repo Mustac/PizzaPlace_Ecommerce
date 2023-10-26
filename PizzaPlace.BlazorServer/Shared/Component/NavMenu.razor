@@ -171,7 +171,7 @@
         if (AccessFrom == Page.ManagerPage)
         {
             NavBarClass = "bg-dark";
-           // NavBarLogoText = "Manager Page";
+            // NavBarLogoText = "Manager Page";
             NavBarLogoText = "";
         }
 
@@ -180,6 +180,8 @@
 
     public void Dispose()
     {
+        NavMenuService.SetCartState(false);
+        NavMenuService.SetNavState(false);
         OnNavButtonClick -= NavMenuService.SetNavState;
         ShoppingCartService.OnShoppingCartChange -= ReloadComponent;
     }
