@@ -189,7 +189,7 @@
         if (!confirmation)
             return;
 
-        var response = await ProductService.HardDeleteAsync(product.Id);
+        var response = await ProductService.DeleteAsync(product.Id);
 
         if (response.Result == OperationResult.Ok)
             ToastService.ShowSuccess($"{product.Name} has been removed");

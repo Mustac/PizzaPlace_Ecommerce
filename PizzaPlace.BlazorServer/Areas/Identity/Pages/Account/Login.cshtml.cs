@@ -30,12 +30,14 @@ namespace PizzaPlace.BlazorServer.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly AccountService _accountService;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public LoginModel(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, AccountService accountService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _roleManager = roleManager;
+            _accountService = accountService;
         }
 
         /// <summary>
@@ -123,6 +125,9 @@ namespace PizzaPlace.BlazorServer.Areas.Identity.Pages.Account
                 }
              
                 await _signInManager.SignInAsync(user, true);
+
+                if(_accountService.OnLogoutAsync is not null)
+                     await _accountService.OnLoginAsync.Invoke();
 
                 Login = LoginState.Success;
             }

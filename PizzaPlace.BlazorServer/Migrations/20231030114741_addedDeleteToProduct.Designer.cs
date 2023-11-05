@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PizzaPlace.BlazorServer.Data;
@@ -11,9 +12,11 @@ using PizzaPlace.BlazorServer.Data;
 namespace PizzaPlace.BlazorServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231030114741_addedDeleteToProduct")]
+    partial class addedDeleteToProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -333,7 +336,7 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ProductId")
+                    b.Property<int>("ProductVersionId")
                         .HasColumnType("integer");
 
                     b.Property<int>("Id")
@@ -342,9 +345,9 @@ namespace PizzaPlace.BlazorServer.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
-                    b.HasKey("OrderId", "ProductId");
+                    b.HasKey("OrderId", "ProductVersionId");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductVersionId");
 
                     b.ToTable("OrderProducts");
                 });
@@ -357,8 +360,8 @@ namespace PizzaPlace.BlazorServer.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<int?>("ActiveProductVersionId")
+                        .HasColumnType("integer");
 
                     b.Property<float>("DiscountedPrice")
                         .HasColumnType("real");
@@ -382,13 +385,14 @@ namespace PizzaPlace.BlazorServer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ActiveProductVersionId");
+
                     b.ToTable("Products");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(271),
                             DiscountedPrice = 0f,
                             Ingredients = "Tomato, Mozzarella, Basil",
                             IsArchived = false,
@@ -399,7 +403,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 2,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(278),
                             DiscountedPrice = 0f,
                             Ingredients = "Tomato, Mozzarella, Pepperoni",
                             IsArchived = false,
@@ -410,7 +413,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 3,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(280),
                             DiscountedPrice = 0f,
                             Ingredients = "Tomato, Mozzarella, Ham, Pineapple",
                             IsArchived = false,
@@ -421,7 +423,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 4,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(281),
                             DiscountedPrice = 0f,
                             Ingredients = "BBQ Sauce, Mozzarella, Chicken, Red Onion",
                             IsArchived = false,
@@ -432,7 +433,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 5,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(282),
                             DiscountedPrice = 0f,
                             Ingredients = "Tomato, Mozzarella, Pepperoni, Ham, Bacon, Sausage",
                             IsArchived = false,
@@ -443,7 +443,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 6,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(285),
                             DiscountedPrice = 0f,
                             Ingredients = "Tomato, Mozzarella, Bell Pepper, Onion, Mushroom, Olives",
                             IsArchived = false,
@@ -454,7 +453,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 7,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(286),
                             DiscountedPrice = 0f,
                             Ingredients = "Tomato, Mozzarella, Mushroom",
                             IsArchived = false,
@@ -465,7 +463,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 8,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(287),
                             DiscountedPrice = 0f,
                             Ingredients = "Tomato, Mozzarella, Cheddar, Feta, Parmesan",
                             IsArchived = false,
@@ -476,7 +473,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 9,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(288),
                             DiscountedPrice = 0f,
                             Ingredients = "Buffalo Sauce, Mozzarella, Chicken, Celery",
                             IsArchived = false,
@@ -487,7 +483,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 10,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(290),
                             DiscountedPrice = 0f,
                             Ingredients = "Tomato, Mozzarella, Pepperoni, Bell Pepper, Onion, Mushroom, Olives, Sausage",
                             IsArchived = false,
@@ -498,7 +493,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 11,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(291),
                             DiscountedPrice = 0f,
                             Ingredients = "Alfredo Sauce, Mozzarella, Chicken",
                             IsArchived = false,
@@ -509,7 +503,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 12,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(292),
                             DiscountedPrice = 0f,
                             Ingredients = "Olive Oil, Mozzarella, Tomato, Basil",
                             IsArchived = false,
@@ -520,7 +513,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 13,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(293),
                             DiscountedPrice = 0f,
                             Ingredients = "Olive Oil, Mozzarella, Shrimp, Garlic",
                             IsArchived = false,
@@ -531,7 +523,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 14,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(294),
                             DiscountedPrice = 0f,
                             Ingredients = "Tomato, Mozzarella, Steak, Bell Pepper, Onion",
                             IsArchived = false,
@@ -542,7 +533,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 15,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(295),
                             DiscountedPrice = 0f,
                             Ingredients = "Tomato, Mozzarella, Ground Beef, Tomato, Lettuce, Cheddar",
                             IsArchived = false,
@@ -553,7 +543,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 16,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(296),
                             DiscountedPrice = 0f,
                             Ingredients = "Tomato, Mozzarella, Sausage",
                             IsArchived = false,
@@ -564,7 +553,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 17,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(297),
                             DiscountedPrice = 0f,
                             Ingredients = "Tomato, Mozzarella, Chicken, Garlic",
                             IsArchived = false,
@@ -575,7 +563,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 18,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(299),
                             DiscountedPrice = 0f,
                             Ingredients = "Tomato, Mozzarella, Spinach, Feta",
                             IsArchived = false,
@@ -586,7 +573,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 19,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(300),
                             DiscountedPrice = 0f,
                             Ingredients = "Pesto Sauce, Mozzarella, Bell Pepper, Onion, Mushroom, Olives",
                             IsArchived = false,
@@ -597,13 +583,249 @@ namespace PizzaPlace.BlazorServer.Migrations
                         new
                         {
                             Id = 20,
-                            DateCreated = new DateTime(2023, 11, 5, 14, 42, 55, 165, DateTimeKind.Utc).AddTicks(301),
                             DiscountedPrice = 0f,
                             Ingredients = "Ranch Sauce, Mozzarella, Bacon, Chicken",
                             IsArchived = false,
                             IsDeleted = false,
                             Name = "Bacon Ranch",
                             Price = 14f
+                        });
+                });
+
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.ProductVersion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<float>("DiscountedPrice")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Ingredients")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductVersions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6646),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Tomato, Mozzarella, Basil",
+                            Name = "Margherita",
+                            Price = 10f,
+                            ProductId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6651),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Tomato, Mozzarella, Pepperoni",
+                            Name = "Pepperoni",
+                            Price = 12f,
+                            ProductId = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6652),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Tomato, Mozzarella, Ham, Pineapple",
+                            Name = "Hawaiian",
+                            Price = 13f,
+                            ProductId = 3
+                        },
+                        new
+                        {
+                            Id = 4,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6653),
+                            DiscountedPrice = 0f,
+                            Ingredients = "BBQ Sauce, Mozzarella, Chicken, Red Onion",
+                            Name = "BBQ Chicken",
+                            Price = 14f,
+                            ProductId = 4
+                        },
+                        new
+                        {
+                            Id = 5,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6654),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Tomato, Mozzarella, Pepperoni, Ham, Bacon, Sausage",
+                            Name = "Meat Lover",
+                            Price = 15f,
+                            ProductId = 5
+                        },
+                        new
+                        {
+                            Id = 6,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6655),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Tomato, Mozzarella, Bell Pepper, Onion, Mushroom, Olives",
+                            Name = "Veggie",
+                            Price = 13f,
+                            ProductId = 6
+                        },
+                        new
+                        {
+                            Id = 7,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6655),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Tomato, Mozzarella, Mushroom",
+                            Name = "Mushroom",
+                            Price = 12f,
+                            ProductId = 7
+                        },
+                        new
+                        {
+                            Id = 8,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6656),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Tomato, Mozzarella, Cheddar, Feta, Parmesan",
+                            Name = "Four Cheese",
+                            Price = 14f,
+                            ProductId = 8
+                        },
+                        new
+                        {
+                            Id = 9,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6657),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Buffalo Sauce, Mozzarella, Chicken, Celery",
+                            Name = "Buffalo Chicken",
+                            Price = 14f,
+                            ProductId = 9
+                        },
+                        new
+                        {
+                            Id = 10,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6657),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Tomato, Mozzarella, Pepperoni, Bell Pepper, Onion, Mushroom, Olives, Sausage",
+                            Name = "Supreme",
+                            Price = 16f,
+                            ProductId = 10
+                        },
+                        new
+                        {
+                            Id = 11,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6658),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Alfredo Sauce, Mozzarella, Chicken",
+                            Name = "Chicken Alfredo",
+                            Price = 14f,
+                            ProductId = 11
+                        },
+                        new
+                        {
+                            Id = 12,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6659),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Olive Oil, Mozzarella, Tomato, Basil",
+                            Name = "White Pizza",
+                            Price = 13f,
+                            ProductId = 12
+                        },
+                        new
+                        {
+                            Id = 13,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6659),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Olive Oil, Mozzarella, Shrimp, Garlic",
+                            Name = "Shrimp Scampi",
+                            Price = 16f,
+                            ProductId = 13
+                        },
+                        new
+                        {
+                            Id = 14,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6660),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Tomato, Mozzarella, Steak, Bell Pepper, Onion",
+                            Name = "Philly Cheesesteak",
+                            Price = 15f,
+                            ProductId = 14
+                        },
+                        new
+                        {
+                            Id = 15,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6661),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Tomato, Mozzarella, Ground Beef, Tomato, Lettuce, Cheddar",
+                            Name = "Taco Pizza",
+                            Price = 14f,
+                            ProductId = 15
+                        },
+                        new
+                        {
+                            Id = 16,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6662),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Tomato, Mozzarella, Sausage",
+                            Name = "Sausage",
+                            Price = 12f,
+                            ProductId = 16
+                        },
+                        new
+                        {
+                            Id = 17,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6662),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Tomato, Mozzarella, Chicken, Garlic",
+                            Name = "Garlic Chicken",
+                            Price = 14f,
+                            ProductId = 17
+                        },
+                        new
+                        {
+                            Id = 18,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6663),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Tomato, Mozzarella, Spinach, Feta",
+                            Name = "Spinach and Feta",
+                            Price = 13f,
+                            ProductId = 18
+                        },
+                        new
+                        {
+                            Id = 19,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6664),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Pesto Sauce, Mozzarella, Bell Pepper, Onion, Mushroom, Olives",
+                            Name = "Pesto Veggie",
+                            Price = 14f,
+                            ProductId = 19
+                        },
+                        new
+                        {
+                            Id = 20,
+                            DateCreated = new DateTime(2023, 10, 30, 11, 47, 41, 175, DateTimeKind.Utc).AddTicks(6664),
+                            DiscountedPrice = 0f,
+                            Ingredients = "Ranch Sauce, Mozzarella, Bacon, Chicken",
+                            Name = "Bacon Ranch",
+                            Price = 14f,
+                            ProductId = 20
                         });
                 });
 
@@ -715,13 +937,34 @@ namespace PizzaPlace.BlazorServer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PizzaPlace.BlazorServer.Models.Product", "Product")
+                    b.HasOne("PizzaPlace.BlazorServer.Models.ProductVersion", "ProductVersion")
                         .WithMany("OrderProducts")
-                        .HasForeignKey("ProductId")
+                        .HasForeignKey("ProductVersionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Order");
+
+                    b.Navigation("ProductVersion");
+                });
+
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Product", b =>
+                {
+                    b.HasOne("PizzaPlace.BlazorServer.Models.ProductVersion", "ActiveProductVersion")
+                        .WithMany()
+                        .HasForeignKey("ActiveProductVersionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ActiveProductVersion");
+                });
+
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.ProductVersion", b =>
+                {
+                    b.HasOne("PizzaPlace.BlazorServer.Models.Product", "Product")
+                        .WithMany("ProductVersions")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Product");
                 });
@@ -743,6 +986,11 @@ namespace PizzaPlace.BlazorServer.Migrations
                 });
 
             modelBuilder.Entity("PizzaPlace.BlazorServer.Models.Product", b =>
+                {
+                    b.Navigation("ProductVersions");
+                });
+
+            modelBuilder.Entity("PizzaPlace.BlazorServer.Models.ProductVersion", b =>
                 {
                     b.Navigation("OrderProducts");
                 });

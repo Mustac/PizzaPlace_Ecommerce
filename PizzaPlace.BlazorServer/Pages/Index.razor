@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using System.Timers
+
 @inject NavMenuService GlobalService
 @inject IJSRuntime JSRuntime
 @inject ProductService ProductService
@@ -15,16 +16,18 @@
     <h1 class="hero-title">Every Pizza Tells a Story, Taste Ours.</h1>
 </div>
 
-<div class="ordering-menu">
-    <div class="container ">
-        <h1 class="text-primary" style="padding-left:10px;">Popular Today :</h1>
-        <div class="row px-2 py-1 justify-content-center">
-            <div class="col-12">
-                <ProductList Products="products" />
+@if(products is not null && products.Count() > 0){
+    <div class="ordering-menu">
+        <div class="container ">
+            <h1 class="text-primary" style="padding-left:10px;">Popular Today :</h1>
+            <div class="row px-2 py-1 justify-content-center">
+                <div class="col-12">
+                    <ProductList Products="products" />
+                </div>
             </div>
         </div>
     </div>
-</div>
+}
 
 
 <div class="position-relative  bg-primary py-4">

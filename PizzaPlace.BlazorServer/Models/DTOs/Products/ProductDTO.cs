@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PizzaPlace.BlazorServer.Models.DTOs.Products;
+namespace PizzaPlace.Models.DTOs.Products;
 
 public class ProductDTO
 {
@@ -11,6 +11,7 @@ public class ProductDTO
     public float DiscountedPrice { get; set; }
     public bool IsHovering { get; set; }
     public int Amount { get; set; }
+    public bool IsArchived { get; set; }
 }
 
 public class ProductOrderDTO
@@ -26,7 +27,6 @@ public class ProductCartDTO
     public string Ingredients { get; set; } = string.Empty;
     public float Price { get; set; }
     public float DiscountedPrice { get; set; }
-    public bool ProductNeedsUpdate { get; set; }
     public bool ProductNeedsDeletion { get; set; }
     public int Amount { get; set; }
 }

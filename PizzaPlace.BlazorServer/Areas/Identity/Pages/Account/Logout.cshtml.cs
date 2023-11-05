@@ -15,15 +15,21 @@ namespace PizzaPlace.BlazorServer.Areas.Identity.Pages.Account
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly AccountService _accountService;
 
-        public LogoutModel(SignInManager<ApplicationUser> signInManager)
+        public LogoutModel(SignInManager<ApplicationUser> signInManager, AccountService accountService)
         {
             _signInManager = signInManager;
+            _accountService = accountService;
         }
 
         public async Task<IActionResult> OnGet()
         {
             await _signInManager.SignOutAsync();
+
+            if(_accountService.OnLogoutAsync is not null)
+                await _accountService.OnLogoutAsync.Invoke();
+
             return Redirect("/");
         }
     }

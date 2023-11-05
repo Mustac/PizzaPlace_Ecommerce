@@ -1,15 +1,4 @@
-﻿using AutoMapper;
-using Blazored.Toast.Services;
-using Microsoft.EntityFrameworkCore;
-using PizzaPlace.BlazorServer.Helpers;
-using PizzaPlace.BlazorServer.Helpers.Enums;
-using PizzaPlace.BlazorServer.Models.DTOs;
-using PizzaPlace.BlazorServer.Models.DTOs.Products;
-using PizzaPlace.BlazorServer.Services.BaseServices;
-using PizzaPlace.BlazorServer.Services.EventServices;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace PizzaPlace.BlazorServer.Services;
 
@@ -18,8 +7,8 @@ namespace PizzaPlace.BlazorServer.Services;
 /// </summary>
 public class ProductService : BaseService
 {
-
-        private readonly IJSRuntime _jSRuntime;
+    private readonly IJSRuntime _jSRuntime;
+    private IEnumerable<ProductDTO> _products { get => _globalService.Product.ProductDTOs; }
 
     /// <summary>
     /// The ProductService provides methods for managing product-related operations in the system, such as 
@@ -56,6 +45,7 @@ public class ProductService : BaseService
             if (successSave)
             {
                 var productDTO = _mapper.Map<ProductDTO>(response.Entity);
+                await UpdateProductsInMemory(context);
                 await _globalService.Product.EventTriggers.TriggerProductCreated(productDTO);
                 return OperationResponse<ProductDTO>.Ok(productDTO);
             }
@@ -71,54 +61,72 @@ public class ProductService : BaseService
     /// <param name="productDto">The data transfer object containing updated product details.</param>
     /// <returns>An <see cref="OperationResponse"/> indicating the result of the update operation.</returns>
     public async Task<OperationResponse> UpdateProductAsync(ProductDTO productDto)
-     => await ProcessRequestAsync(async (context) =>
-     {
-         var product = await context.Products.FirstOrDefaultAsync(x => x.Id == productDto.Id);
+    => await ProcessRequestAsync(async (context) =>
+    {
+        var product = await context.Products.FirstOrDefaultAsync(x => x.Id == productDto.Id);
 
-         if (product is null) return OperationResponse.NotFound();
+        if (product is null) return OperationResponse.NotFound();
 
-         _mapper.Map(productDto, product);
+        product.IsDeleted = true;
 
-         var success = await context.SaveChangesAsync() > 0;
+        Product newProd = _mapper.Map<Product>(productDto);
+        newProd.Id = 0;
+        newProd.IsDeleted = false;
 
-         if (success)
-         {
-             await _globalService.Product.EventTriggers.TriggerProductUpdated(productDto);
-             return OperationResponse.Ok();
-         }
+        await context.AddAsync(newProd);
 
-         return OperationResponse.Fail();
+        // Save changes and check success
+        var success = await context.SaveChangesAsync() > 0;
+        if (success)
+        {
+            await UpdateProductsInMemory(context);
+            await _globalService.Product.EventTriggers.TriggerProductUpdated(productDto);
+            return OperationResponse.Ok();
+        }
 
-     }, notifications: true);
+        return OperationResponse.Fail();
+    }, notifications: true);
+
 
 
     /// <summary>
-    /// Asynchronously retrieves a collection of products based on a specified criteria.
+    /// Retrieves a collection of products based on a specified criteria.
     /// </summary>
     /// <param name="productRange">The range or category of products to retrieve.</param>
     /// <returns>A collection of products that match the specified criteria.</returns>
-    public async Task<OperationResponse<IEnumerable<ProductDTO>>> GetAsync(ProductRange productRange = ProductRange.Discounted)
+    public async Task<OperationResponse<IEnumerable<ProductDTO>>> GetAsync(ProductRange productRange = ProductRange.All)
      => await ProcessRequestAsync<IEnumerable<ProductDTO>>(async (context) =>
      {
-         IEnumerable<Product> products = new List<Product>();
+         await LoadProductsInMemory(context);
+
+         IEnumerable<ProductDTO>? selectedProducts = new List<ProductDTO>();
+
+         if (_products is null)
+             return OperationResponse<IEnumerable<ProductDTO>>.Fail();
 
          if (productRange == ProductRange.All)
-             products = await context.Products.OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
+             selectedProducts = _products;
          else if (productRange == ProductRange.FullPrice)
-             products = await context.Products.Where(x => !x.IsArchived && x.DiscountedPrice == 0).OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
+             selectedProducts = _products.Where(x => x.DiscountedPrice == 0 && !x.IsArchived);
          else if (productRange == ProductRange.ALlActive)
-             products = await context.Products.Where(x => !x.IsArchived).OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
+             selectedProducts = _products.Where(x => !x.IsArchived);
          else if (productRange == ProductRange.Archived)
-             products = await context.Products.Where(x => x.IsArchived).OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
+             selectedProducts = _products.Where(x => x.IsArchived);
          else if (productRange == ProductRange.Discounted)
-             products = await context.Products.Where(x => !x.IsArchived && x.DiscountedPrice > 0).OrderBy(x => x.DiscountedPrice > 0).ThenBy(x => x.Name).ToListAsync();
+             selectedProducts = _products.Where(x => x.DiscountedPrice > 0 && !x.IsArchived);
 
-         var dto = _mapper.Map<IEnumerable<ProductDTO>>(products);
+         selectedProducts = selectedProducts.ToList();
 
-         var response = OperationResponse<IEnumerable<ProductDTO>>.CreateDataResponse(dto);
+         if (selectedProducts is null)
+             return OperationResponse<IEnumerable<ProductDTO>>.NotFound();
 
-         return response;
+         return OperationResponse<IEnumerable<ProductDTO>>.Ok(selectedProducts);
+
      });
+
+
+
+
 
     /// <summary>
     /// Asynchronously retrieves a collection of products based on a specified criteria.
@@ -128,46 +136,47 @@ public class ProductService : BaseService
     public async Task<OperationResponse<ProductDTO>> GetByIdAsync(int Id)
     => await ProcessRequestAsync<ProductDTO>(async (context) =>
     {
-        var product = await context.Products.FirstOrDefaultAsync(x=>x.Id == Id);
+        await LoadProductsInMemory(context);
+
+        var product = _products.FirstOrDefault(x => x.Id == Id);
 
         if (product is null)
             return OperationResponse<ProductDTO>.NotFound();
 
-        var productDTO = _mapper.Map<ProductDTO>(product);
-
-        return OperationResponse<ProductDTO>.Ok(productDTO);
+        return OperationResponse<ProductDTO>.Ok(product);
 
     });
 
 
 
-        /// <summary>
-        /// Asynchronously restores a previously archived product.
-        /// Upon successful restoration, this method will trigger the "ProductRestored" and "ProductChanged" events.
-        /// </summary>
-        /// <param name="Id">The unique identifier of the product to be restored.</param>
-        /// <returns>An <see cref="OperationResponse"/> indicating the result of the restoration.</returns>
-        public async Task<OperationResponse> RestoreArchivedAsync(int Id)
-     => await ProcessRequestAsync(async (context) =>
+    /// <summary>
+    /// Asynchronously restores a previously archived product.
+    /// Upon successful restoration, this method will trigger the "ProductRestored" and "ProductChanged" events.
+    /// </summary>
+    /// <param name="Id">The unique identifier of the product to be restored.</param>
+    /// <returns>An <see cref="OperationResponse"/> indicating the result of the restoration.</returns>
+    public async Task<OperationResponse> RestoreArchivedAsync(int Id)
+ => await ProcessRequestAsync(async (context) =>
+ {
+     var product = await context.Products.FirstOrDefaultAsync(x => x.Id == Id);
+
+     if (product == null)
+         return OperationResponse.NotFound();
+
+     product.IsArchived = false;
+
+     bool success = await context.SaveChangesAsync() > 0;
+
+     if (success)
      {
-         var product = await context.Products.FirstOrDefaultAsync(x => x.Id == Id);
+         var productDTO = _mapper.Map<ProductDTO>(product);
+         await UpdateProductsInMemory(context);
+         await _globalService.Product.EventTriggers.TriggerProductRestored(productDTO);
+         return OperationResponse.Ok();
+     }
 
-         if (product == null)
-             return OperationResponse.NotFound();
-
-         product.IsArchived = false;
-
-         bool success = await context.SaveChangesAsync() > 0;
-
-         if (success)
-         {
-             var productDTO = _mapper.Map<ProductDTO>(product);
-             await _globalService.Product.EventTriggers.TriggerProductRestored(productDTO);
-             return OperationResponse.Ok();
-         }
-
-         return OperationResponse.Fail();
-     }, notifications: false);
+     return OperationResponse.Fail();
+ }, notifications: false);
 
 
     /// <summary>
@@ -191,6 +200,7 @@ public class ProductService : BaseService
          if (success)
          {
              var productDTO = _mapper.Map<ProductDTO>(product);
+             await UpdateProductsInMemory(context);
              await _globalService.Product.EventTriggers.TriggerProductArchived(productDTO);
              return OperationResponse.Ok();
          }
@@ -205,25 +215,47 @@ public class ProductService : BaseService
     /// </summary>
     /// <param name="Id">The unique identifier of the product to be deleted.</param>
     /// <returns>An <see cref="OperationResponse"/> indicating the result of the deletion process.</returns>
-    public async Task<OperationResponse> HardDeleteAsync(int Id)
-     => await ProcessRequestAsync(async (context) =>
-     {
-         var product = await context.Products.FirstOrDefaultAsync(x => x.Id == Id);
+    public async Task<OperationResponse> DeleteAsync(int Id)
+    => await ProcessRequestAsync(async (context) =>
+    {
+        var product = await context.Products.FirstOrDefaultAsync(x => x.Id == Id);
 
-         if (product == null)
-             return OperationResponse.NotFound();
+        if (product is null)
+            return OperationResponse.NotFound();
 
-         context.Products.Remove(product);
+        product.IsDeleted = true;
 
-         bool success = await context.SaveChangesAsync() > 0;
+        bool success = await context.SaveChangesAsync() > 0;
 
-         if (success)
-         {
-             var productDTO = _mapper.Map<ProductDTO>(product);
-             await _globalService.Product.EventTriggers.TriggerProductDeleted(productDTO);
-             return OperationResponse.Ok();
-         }
+        if (success)
+        {
+            var productDTO = _mapper.Map<ProductDTO>(product);
+            await UpdateProductsInMemory(context);
+            await _globalService.Product.EventTriggers.TriggerProductDeleted(productDTO);
+            return OperationResponse.Ok();
+        }
 
-         return OperationResponse.Fail();
-     });
+        return OperationResponse.Fail();
+    });
+
+    /// <summary>
+    /// Checks if the products are loaded into memory, and if not then load them
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    private async Task LoadProductsInMemory(DataContext context)
+    {
+        if (_globalService.Product.ProductDTOs is null)
+        {
+            var temp = (IEnumerable<Product>)await context.Products.Where(x=>!x.IsDeleted).OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
+            _globalService.Product.ProductDTOs = _mapper.Map<IEnumerable<ProductDTO>>(temp);
+        }
+    }
+
+    // pulls and reloads products that are storred in memory
+    private async Task UpdateProductsInMemory(DataContext context)
+    {
+        var temp = (IEnumerable<Product>)await context.Products.Where(x=>!x.IsDeleted).OrderBy(x => x.DiscountedPrice == 0).ThenBy(x => x.Name).ToListAsync();
+        _globalService.Product.ProductDTOs = _mapper.Map<IEnumerable<ProductDTO>>(temp);
+    }
 }

@@ -1,23 +1,29 @@
-﻿namespace PizzaPlace.BlazorServer.Services.EventServices;
+﻿namespace PizzaPlace.GlobalService
 
 public delegate Task ProductEventHandler(ProductDTO productDto);
 
 public class GlobalService
 {
-    public ProductEvents Product { get; set; }
+    public ProductData Product { get; set; }
 
     public GlobalService()
     {
-        Product = new ProductEvents();
+        Product = new ProductData();
     }
 
-    public class ProductEvents
+    public class ProductData
     {
-        public ProductEvents()
+        public ProductData()
         {
             EventTriggers = new Triggers(this);
         }
 
+        public IEnumerable<ProductDTO>? ProductDTOs { get; set; }
+        public IEnumerable<ProductDTO>? AvailableProductsDTO { get => ProductDTOs?.Where(x => !x.IsArchived).OrderBy(x => x.DiscountedPrice > 0).ThenBy(x => x.Name); }
+        public IEnumerable<ProductDTO>? ArchivedProductsDTO { get => ProductDTOs?.Where(x => x.IsArchived).OrderBy(x => x.DiscountedPrice > 0).ThenBy(x => x.Name); }
+        public IEnumerable<ProductDTO>? DiscountedProductsDTO { get => ProductDTOs?.Where(x => !x.IsArchived && x.DiscountedPrice > 0).OrderBy(x => x.Name); }
+        public IEnumerable<ProductDTO>? FullPriceProductsDTO { get => ProductDTOs?.Where(x => !x.IsArchived && x.DiscountedPrice == 0).OrderBy(x => x.Name); }
+ 
         public Triggers EventTriggers { get; }
 
         public event ProductEventHandler? OnProductUpdated;
@@ -32,9 +38,9 @@ public class GlobalService
         /// </summary>
         public class Triggers
         {
-            private readonly ProductEvents _productEvents;
+            private readonly ProductData _productEvents;
 
-            public Triggers(ProductEvents productEvents)
+            public Triggers(ProductData productEvents)
             {
                 _productEvents = productEvents;
             }
