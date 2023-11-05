@@ -57,7 +57,13 @@ public class ShoppingCartService : IDisposable
     /// </summary>
     public float TotalDiscounts => TotalCartPrice - TotalPriceWithDiscounts;
 
-    public async Task CheckShoppingCartProducts(ProductDTO product)
+    public async Task LoadCartAsync()
+    => await ErrorHanding(async () =>
+    {
+        
+    });
+
+        public async Task CheckShoppingCartProducts(ProductDTO product)
         => await ErrorHanding(async () =>
         {
             var response = await _productService.GetAsync(ProductRange.ALlActive);

@@ -106,6 +106,7 @@
         if (firstRender)
         {
             await ShoppingCartService.ReloadShoppingCartListAsync();
+            await ShoppingCartService.CheckShoppingCartProducts(new ProductDTO());
         }
     }
 

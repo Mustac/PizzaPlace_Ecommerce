@@ -49,6 +49,8 @@
 
         if (responseFulLPrice.Result == OperationResult.Ok)
             fullPriceList = responseFulLPrice.Data;
+
+        await InvokeAsync(StateHasChanged);
     }
 
 
