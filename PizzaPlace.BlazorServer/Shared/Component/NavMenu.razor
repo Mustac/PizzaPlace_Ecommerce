@@ -84,6 +84,8 @@
     [Parameter]
     public Page AccessFrom { get; set; } = Page.CustomerPage;
 
+    bool shoppingCartEnabled = true;
+
     string NavBarClass = "bg-danger";
     string NavBarLogoText = "Pizza Place";
 
@@ -109,15 +111,36 @@
     {
         if (firstRender)
         {
+            NavigationManager.LocationChanged += LocationChanged;
             OnNavButtonClick += NavMenuService.SetNavState;
             ShoppingCartService.OnShoppingCartChange += ReloadComponent;
             await ShoppingCartService.ReloadShoppingCartListAsync();
             await JSRuntime.InvokeVoidAsync("initializeNav");
+            CheckLocation();
             StateHasChanged();
         }
     }
 
     async Task ReloadComponent() => await InvokeAsync(StateHasChanged);
+
+    void LocationChanged(object? sender, LocationChangedEventArgs? e)
+    {
+        CheckLocation();
+    }
+
+    void CheckLocation()
+    {
+        if (NavigationManager.Uri.Split("/")[3].ToString().ToLower() == "order")
+        {
+            shoppingCartEnabled = false;
+            cartActive = false;
+            NavMenuService.SetCartState(cartActive);
+        }
+        else
+        {
+            shoppingCartEnabled = true;
+        }
+    }
 
     async Task ToggleUserBtn()
     {
@@ -133,6 +156,8 @@
 
     public async Task ToggleMenu()
     {
+
+
         if (!await IsMenuToggable())
             return;
 
@@ -152,14 +177,22 @@
 
     async void ShoppingCartClick()
     {
-        cartActive = !cartActive;
-
-        if (navOpen)
+        if (shoppingCartEnabled)
         {
-            await ToggleMenu();
+            cartActive = !cartActive;
+
+            if (navOpen)
+            {
+                await ToggleMenu();
+            }
+
+            NavMenuService.SetCartState(cartActive);
+            return;
         }
 
+        cartActive = false;
         NavMenuService.SetCartState(cartActive);
+
     }
 
     public async Task<bool> IsMenuToggable() =>
@@ -184,6 +217,7 @@
         NavMenuService.SetNavState(false);
         OnNavButtonClick -= NavMenuService.SetNavState;
         ShoppingCartService.OnShoppingCartChange -= ReloadComponent;
+        NavigationManager.LocationChanged -= LocationChanged;
     }
 
 }

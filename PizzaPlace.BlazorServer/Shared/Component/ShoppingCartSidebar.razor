@@ -2,12 +2,13 @@
 @inject NavMenuService NavMenuService
 @inject AccountService AccountService
 @inject IToastService ToastService
+@inject NavigationManager NavigationManager
 @implements IDisposable
 
 
 <div class="shopping-cart p-4 @(NavMenuService.CartShow?"active":"")" style="overflow:auto;">
     <h5>Order List : </h5>
-    <OrderList/>
+    <OrderList ButtonText="Go to order page" OnButtonClick="@(()=>NavigationManager.NavigateTo("/order"))"/>
 </div>
 
 @code {

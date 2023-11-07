@@ -108,6 +108,7 @@ public class ShoppingCartService : IDisposable
             if (productsOrderDTO is null || productsOrderDTO.ProductCart is null || productsOrderDTO.ProductCart.Count == 0)
             {
                 ProductOrder.ProductCart.Add(productCartDTO);
+                ProductOrder.CanUserOrder = true;
             }
             else
             {
@@ -115,16 +116,18 @@ public class ShoppingCartService : IDisposable
 
                 if (tempProd is not null && ProductOrder.ProductCart.Any(x => x.Id == tempProd.Id))
                 {
+                    
                     if (OnAddToCartProductExist is not null)
                         await OnAddToCartProductExist.Invoke(product);
                 }
                 else
                 {
                     ProductOrder.ProductCart.Add(productCartDTO);
+          
                 }
 
             }
-
+            await LoadCartAsync();
             await SaveShoppingCartToLocalStorageAsync();
             return true;
         });

@@ -272,6 +272,8 @@ a{
     margin: 10px 0;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     transition:0.2s all;
+    max-width:400px;
+    width:100%;
 }
 
     .order-item:hover {
@@ -421,6 +423,34 @@ a{
     background-color:rgb(26, 26, 26);
     color:rgb(237, 237, 237)
 }
+
+.order-item-wrapper{
+  display:flex;
+  justify-content:center;
+  margin: 50px 0;
+}
+
+.pizza-list-item{
+    list-style:none;
+    padding:0;
+    margin:10px;
+}
+
+.pizza-list-item li:not(:last-child){
+    padding-left:20px;
+    border:10px;
+    margin-left:10px;
+    padding:2px 2px 2px 2px;
+    border-bottom: 1px dotted gray;
+    max-width:400px;
+    width:100%;
+}
+
+.pizza-list-item li div{
+    display:flex;
+    justify-content:space-between;
+}
+
 
 @media (max-width: 991.98px) {
     .stripe-red {

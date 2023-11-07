@@ -4,6 +4,7 @@
 @inject IJSRuntime JSRuntime
 @inject ProductService ProductService
 @inject GlobalService GlobalService
+@inject NavigationManager NavigationManager
 
 
 <div>
@@ -89,11 +90,16 @@
             <h5 class="mt-2">Pay : <span class="float-end">@ShoppingCartService.TotalPriceWithDiscounts.ToString("#.##") $</span></h5>
         </div>
         <div class="py-1">
-            <button class="btn btn-danger mt-2 d-block w-100 @(ShoppingCartService.ProductOrder.CanUserOrder?"":"disabled")"><i class="fa-solid fa-credit-card"></i>&nbsp;&nbsp;Order now</button>
+                <button @onclick="@(()=>OnButtonClick.InvokeAsync())" class="btn btn-danger mt-2 d-block w-100 @(ShoppingCartService.ProductOrder.CanUserOrder?"":"disabled")"><i class="fa-solid fa-credit-card"></i>&nbsp;&nbsp;@ButtonText</button>
         </div>
     }
 </div>
 @code {
+    [Parameter]
+    public string ButtonText { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnButtonClick { get; set; }
 
     protected override void OnInitialized()
     {
@@ -123,7 +129,7 @@
 
     async Task ProductExist(ProductDTO product)
       => ToastService.ShowInfo($"{product.Name} is already in the cart");
- 
+
     async Task ModifyAmountAsync(ProductCartDTO product, bool sumup)
     {
         if (sumup)
@@ -139,6 +145,8 @@
 
         await ShoppingCartService.SaveShoppingCartToLocalStorageAsync();
     }
+
+  
 
 
 }

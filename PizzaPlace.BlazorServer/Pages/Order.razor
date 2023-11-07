@@ -1,0 +1,58 @@
+﻿@page "/order"
+@inject ShoppingCartService ShoppingCartService
+<div class="order-item-wrapper">
+    <div class="order-item">
+        @if(stage == Stage.ModifyProducts)
+        {
+            <OrderList ButtonText="Next" OnButtonClick="OrderListNext"/>
+        }
+        else if(stage == Stage.SelectAddAddress)
+        {
+            <div>
+                Products : 
+                <ul class="pizza-list-item">
+                    @foreach(var product in ShoppingCartService.ProductCart)
+                    {
+                        <li>
+                            <div>
+                                <div>@product.Name</div>
+                                @if (product.DiscountedPrice > 0)
+                                {
+                                    <div><span class="text-secondary">@product.Amount X @product.DiscountedPrice</span>&nbsp;Nok</div>
+                                }
+                                else
+                                {
+                                    <div>@product.Amount X @product.Price&nbsp;Nok</div>
+                                }
+                            </div>
+                        </li>
+                    }
+                    <li style="border-top:2px solid black;">
+                        <div>
+                            <div>Total : </div>
+                            <div>@ShoppingCartService.TotalPriceWithDiscounts Nok</div>
+                        </div>
+                    </li>
+                </ul>
+
+                Select Address
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    Stage stage = Stage.ModifyProducts;
+
+    enum Stage
+    {
+        ModifyProducts,
+        SelectAddAddress,
+        Payement
+    }
+
+    void OrderListNext()
+    {
+        stage = Stage.SelectAddAddress;
+    }
+}

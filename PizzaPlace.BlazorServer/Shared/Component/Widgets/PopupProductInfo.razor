@@ -50,7 +50,7 @@
     {
         Product.Amount = 1;
         var success = await ShoppingCartService.AddToShoppingCartAsync(Product);
-        await ShoppingCartService.ReloadShoppingCartListAsync();
+        //await ShoppingCartService.ReloadShoppingCartListAsync();
 
         if (success)
             await HidePopupAsync();
