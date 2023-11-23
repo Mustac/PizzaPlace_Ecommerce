@@ -1,5 +1,9 @@
 ﻿@page "/order"
+@using System.Security.Claims
 @inject ShoppingCartService ShoppingCartService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject AccountService AccountService
+
 <div class="order-item-wrapper">
     <div class="order-item">
         @if(stage == Stage.ModifyProducts)
@@ -34,15 +38,43 @@
                         </div>
                     </li>
                 </ul>
-
-                Select Address
+                <h5 class="text-center mt-2 mb-3">Deliver to : </h5>
+                <div>
+                    @if(_addresses is not null && _addresses.Count() > 0)
+                    {
+                        @foreach(var address in _addresses)
+                        {
+                            <div class="alert alert-dark address" role="alert">
+                                @address.Street, @address.Zip @address.City
+                            </div>
+                        }
+                    }
+                        <div>
+                            <a>Create new Address</a>
+                        </div>
+                </div>
             </div>
         }
+        
+
     </div>
 </div>
 
 @code {
     Stage stage = Stage.ModifyProducts;
+    string userId = string.Empty;
+
+    IEnumerable<AddressDTO> _addresses = new List<AddressDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
+
+        if (authstate is null || authstate.User is null || authstate.User.Claims is null)
+            return;
+
+        userId = authstate.User.Claims.FirstOrDefault(x=>x.Type == ClaimTypes.NameIdentifier).Value;
+    }
 
     enum Stage
     {
@@ -51,8 +83,18 @@
         Payement
     }
 
-    void OrderListNext()
+    async Task OrderListNext()
     {
         stage = Stage.SelectAddAddress;
+        await GetAddressAsync();
+    }
+
+    async Task GetAddressAsync()
+    {
+        var response = await AccountService.GetAddressAsync(userId);
+
+        if (response.Result == OperationResult.Ok)
+            _addresses = response.Data;
+
     }
 }

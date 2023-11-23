@@ -126,7 +126,7 @@ namespace PizzaPlace.BlazorServer.Areas.Identity.Pages.Account
              
                 await _signInManager.SignInAsync(user, true);
 
-                if(_accountService.OnLogoutAsync is not null)
+                if(_accountService.OnLoginAsync is not null)
                      await _accountService.OnLoginAsync.Invoke();
 
                 Login = LoginState.Success;

@@ -15,6 +15,8 @@ global using System.Linq;
 global using System.Threading.Tasks;
 global using PizzaPlace.GlobalServices;
 global using AutoMapper;
+global using PizzaPlace.BlazorServer.Models.DTOs.Address;
+
 
 
 

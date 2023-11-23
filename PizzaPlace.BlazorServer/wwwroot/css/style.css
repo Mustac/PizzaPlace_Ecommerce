@@ -275,11 +275,12 @@ a{
     max-width:400px;
     width:100%;
 }
-
+/*
     .order-item:hover {
         background-color: rgb(216, 216, 216);
         box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
     }
+*/
 
 .btn-delete{
     width:20px;
@@ -436,15 +437,17 @@ a{
     margin:10px;
 }
 
-.pizza-list-item li:not(:last-child){
-    padding-left:20px;
-    border:10px;
-    margin-left:10px;
-    padding:2px 2px 2px 2px;
-    border-bottom: 1px dotted gray;
-    max-width:400px;
-    width:100%;
-}
+
+
+    .pizza-list-item li:not(:last-child) {
+        padding-left: 20px;
+        border: 10px;
+        margin-left: 10px;
+        padding: 2px 2px 2px 2px;
+        border-bottom: 1px dotted gray;
+        max-width: 400px;
+        width: 100%;
+    }
 
 .pizza-list-item li div{
     display:flex;
@@ -469,6 +472,13 @@ a{
 
 .needs-update{
     background-color:gray;
+}
+
+.address:hover {
+    background-color: green;
+    cursor: pointer;
+    border: 1px solid black;
+    color: white;
 }
 
 @media (max-width: 767.98px) {

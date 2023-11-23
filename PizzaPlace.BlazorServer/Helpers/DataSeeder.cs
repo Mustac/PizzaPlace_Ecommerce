@@ -31,7 +31,6 @@ namespace PizzaPlace.BlazorServer.Helpers
                     new Address
                     {
                         City = "Oslo",
-                        State = "Norway",
                         Street = "Torggata 18",
                         Zip = "0181",
                     }
@@ -46,7 +45,6 @@ namespace PizzaPlace.BlazorServer.Helpers
                     new Address
                     {
                         City = "Oslo",
-                        State = "Norway",
                         Street = "Karl Johans gate 22",
                         Zip = "0159",
                     }
@@ -61,7 +59,6 @@ namespace PizzaPlace.BlazorServer.Helpers
                     new Address
                     {
                         City = "Oslo",
-                        State = "Norway",
                         Street = "Storgata 32",
                         Zip = "0184",
                     }
@@ -76,7 +73,6 @@ namespace PizzaPlace.BlazorServer.Helpers
                     new Address
                     {
                         City = "Oslo",
-                        State = "Norway",
                         Street = "Prinsens gate 15",
                         Zip = "0152",
                     }
@@ -99,7 +95,6 @@ namespace PizzaPlace.BlazorServer.Helpers
                     new Address
                     {
                         City = "Oslo",
-                        State = "Norway",
                         Street = "Torggata 18",
                         Zip = "0181",
                     }
@@ -114,7 +109,6 @@ namespace PizzaPlace.BlazorServer.Helpers
                     new Address
                     {
                         City = "Oslo",
-                        State = "Norway",
                         Street = "Karl Johans gate 22",
                         Zip = "0159",
                     }
@@ -129,7 +123,6 @@ namespace PizzaPlace.BlazorServer.Helpers
                     new Address
                     {
                         City = "Oslo",
-                        State = "Norway",
                         Street = "Storgata 32",
                         Zip = "0184",
                     }
@@ -144,7 +137,6 @@ namespace PizzaPlace.BlazorServer.Helpers
                     new Address
                     {
                         City = "Oslo",
-                        State = "Norway",
                         Street = "Prinsens gate 15",
                         Zip = "0152",
                     }
@@ -167,7 +159,6 @@ namespace PizzaPlace.BlazorServer.Helpers
                     new Address
                     {
                         City = "Oslo",
-                        State = "Norway",
                         Street = "Hjeramoen 46A",
                         Zip = "2072",
                     }
