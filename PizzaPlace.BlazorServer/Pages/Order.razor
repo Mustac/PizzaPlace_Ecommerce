@@ -3,19 +3,21 @@
 @inject ShoppingCartService ShoppingCartService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject AccountService AccountService
+@inject ConfirmationModal ConfirmationModal
+@inject IToastService ToastService
 
 <div class="order-item-wrapper">
     <div class="order-item">
-        @if(stage == Stage.ModifyProducts)
+        @if (stage == Stage.ModifyProducts)
         {
-            <OrderList ButtonText="Next" OnButtonClick="OrderListNext"/>
+            <OrderList ButtonText="Next" OnButtonClick="OrderListNext" />
         }
-        else if(stage == Stage.SelectAddAddress)
+        else if (stage == Stage.SelectAddAddress)
         {
             <div>
-                Products : 
+                Products :
                 <ul class="pizza-list-item">
-                    @foreach(var product in ShoppingCartService.ProductCart)
+                    @foreach (var product in ShoppingCartService.ProductCart)
                     {
                         <li>
                             <div>
@@ -40,29 +42,41 @@
                 </ul>
                 <h5 class="text-center mt-2 mb-3">Deliver to : </h5>
                 <div>
-                    @if(_addresses is not null && _addresses.Count() > 0)
+                    @if (_addresses is not null && _addresses.Count() > 0)
                     {
-                        @foreach(var address in _addresses)
+                        @foreach (var address in _addresses)
                         {
-                            <div class="alert alert-dark address" role="alert">
-                                @address.Street, @address.Zip @address.City
+                            <div class="address">
+                                <div class="address-info">
+                                    @address.Street, @address.Zip @address.City
+                                </div>
+                                <div @onclick="@(()=>DeleteAddressAsync(address.Id))" class="address-delete-icon">
+                                    <i class="fa-solid fa-trash"></i>
+                                </div>
                             </div>
                         }
                     }
-                        <div>
-                            <a>Create new Address</a>
-                        </div>
+                    <div>
+                        <button @onclick="@(()=>_addressRegistrationPopup.Show = true)">Create new Address</button>
+                    </div>
                 </div>
             </div>
         }
-        
+
 
     </div>
 </div>
 
+<AuthorizeView>
+    <AddressRegistrationPopup OnSuccessfulAddressAdd="GetAddressAsync" UserId="@(context.User.Claims.FirstOrDefault(x=>x.Type == ClaimTypes.NameIdentifier).Value)" @ref="_addressRegistrationPopup" />
+
+</AuthorizeView>
+
 @code {
     Stage stage = Stage.ModifyProducts;
     string userId = string.Empty;
+
+    AddressRegistrationPopup _addressRegistrationPopup;
 
     IEnumerable<AddressDTO> _addresses = new List<AddressDTO>();
 
@@ -73,8 +87,9 @@
         if (authstate is null || authstate.User is null || authstate.User.Claims is null)
             return;
 
-        userId = authstate.User.Claims.FirstOrDefault(x=>x.Type == ClaimTypes.NameIdentifier).Value;
+        userId = authstate.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
     }
+
 
     enum Stage
     {
@@ -97,4 +112,16 @@
             _addresses = response.Data;
 
     }
+
+    async Task DeleteAddressAsync(int addressId)
+    {
+        var response = await ConfirmationModal.ShowAsync("Delete the address ?");
+
+        if (!response)
+            return;
+
+        await AccountService.DeleteAddressAsync(userId, addressId);
+        await GetAddressAsync();
+    }
+
 }

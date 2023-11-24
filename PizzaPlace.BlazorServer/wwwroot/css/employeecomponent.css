@@ -11,6 +11,7 @@
     flex-direction:column;
     border:5px solid gray;
     border-left:0;
+    z-index:4;
 }
 
 .employee-menu a{

@@ -1,0 +1,74 @@
+﻿@inject IJSRuntime JSRuntime
+@inject AccountService AccountService
+
+@if (Show)
+{
+    <div class="modal-popup p-3" style="max-width:300px;">
+        <h5>Add a new Address</h5>
+            <div @onclick="HidePopupAsync" style="position:absolute; right:16px; top:16px; cursor:pointer; z-index:1250;"><i class="fa-solid fa-rectangle-xmark fa-2x"></i></div>
+          <hr  class="mt-4"/>
+          <EditForm Model="_addressDTO" OnValidSubmit="ValidSubmitAsync">
+                <DataAnnotationsValidator />
+                <label for="input-street" class="mt-2">Street :</label>
+            <InputText id="input-street" class="form-control my-1" @bind-Value="_addressDTO.Street"></InputText>
+            <ValidationMessage class="validation-error" For="(()=>_addressDTO.Street)"></ValidationMessage>
+
+                <label for="input-zip" class="mt-2">Zip code :</label>
+            <InputText id="input-zip" class="form-control my-1" @bind-Value="_addressDTO.Zip"></InputText>
+                <ValidationMessage class="validation-error" For="(()=>_addressDTO.Zip)"></ValidationMessage>
+
+            <label for="input-city" class="mt-2">City :</label>
+            <InputText id="input-city" class="form-control my-1" @bind-Value="_addressDTO.City"></InputText>
+            <ValidationMessage class="validation-error" For="(()=>_addressDTO.City)"></ValidationMessage>
+
+           
+           
+            <button type="submit" style="display:block; width:100%;" class="btn btn-primary mt-4">Add</button>
+           </EditForm>
+
+        </div>
+
+
+<ShadowOverlay OnOverlayClick="HidePopupAsync" Show="true" />
+}
+
+@code {
+    [Parameter]
+    public string UserId { get; set; }
+
+    [Parameter] 
+    public EventCallback OnSuccessfulAddressAdd { get; set; }
+
+    private bool show = false;
+
+    public bool Show {
+        get => show;
+        set
+        {
+            show = value;
+            StateHasChanged();
+        }
+    }
+
+
+    [Parameter]
+    public EventCallback OnHideCallback { get; set; }
+
+    AddressDTO _addressDTO = new AddressDTO();
+
+    async Task HidePopupAsync()
+    {
+        Show = false;
+        await OnHideCallback.InvokeAsync();
+    }
+
+    async Task ValidSubmitAsync()
+    {
+        var result = await AccountService.AddAddressToUserAsync(UserId, _addressDTO);
+
+        if (result.Result == OperationResult.Ok)
+            await HidePopupAsync();
+
+        await OnSuccessfulAddressAdd.InvokeAsync();
+    }
+}
