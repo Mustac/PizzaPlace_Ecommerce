@@ -4,7 +4,9 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject AccountService AccountService
 @inject ConfirmationModal ConfirmationModal
+@inject OrderService OrderService
 @inject IToastService ToastService
+@inject IJSRuntime JSRuntime
 
 <div class="order-item-wrapper">
     <div class="order-item">
@@ -12,12 +14,12 @@
         {
             <OrderList ButtonText="Next" OnButtonClick="OrderListNext" />
         }
-        else if (stage == Stage.SelectAddAddress)
+        else if (stage == Stage.SelectAddAddress || stage == Stage.Payement)
         {
             <div>
                 Products :
                 <ul class="pizza-list-item">
-                    @foreach (var product in ShoppingCartService.ProductCart)
+                    @foreach (var product in ShoppingCartService.Products)
                     {
                         <li>
                             <div>
@@ -40,32 +42,48 @@
                         </div>
                     </li>
                 </ul>
-                <h5 class="text-center mt-2 mb-3">Deliver to : </h5>
-                <div>
-                    @if (_addresses is not null && _addresses.Count() > 0)
-                    {
-                        @foreach (var address in _addresses)
-                        {
-                            <div class="address">
-                                <div class="address-info">
-                                    @address.Street, @address.Zip @address.City
-                                </div>
-                                <div @onclick="@(()=>DeleteAddressAsync(address.Id))" class="address-delete-icon">
-                                    <i class="fa-solid fa-trash"></i>
-                                </div>
-                            </div>
-                        }
-                    }
+                Deliver to :
+                @if(stage == Stage.SelectAddAddress)
+                {
                     <div>
-                        <button @onclick="@(()=>_addressRegistrationPopup.Show = true)">Create new Address</button>
+                        @if (_addresses is not null && _addresses.Count() > 0)
+                        {
+                            @foreach (var address in _addresses)
+                            {
+                                <div class="address ">
+                                    <div @onclick="@(()=>SelectAddress(address))" class="address-info @(_selectedAddress==address?"active":"")">
+                                        @address.Street, @address.Zip @address.City
+                                    </div>
+                                    <div @onclick="@(()=>DeleteAddressAsync(address.Id))" class="address-delete-icon">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        <div>
+                            <button @onclick="@(()=>_addressRegistrationPopup.Show = true)">Create new Address</button>
+                        </div>
                     </div>
-                </div>
+                } else if(stage == Stage.Payement)
+                {
+                        <p style="margin-left:20px">@_selectedAddress.Street, 
+                            @_selectedAddress.Zip @_selectedAddress.City&nbsp;</p>
+                }
             </div>
+            <hr class="my-3"/>
+                <button @onclick="Back" class="btn btn-dark d-block w-100" style="margin-right:5px;">Back</button>
+            @if(stage == Stage.Payement)
+            {
+                <button @onclick="PayAsync" class="btn btn-primary d-block w-100" style="margin-right:5px; margin-top:10px;">Pay</button>
+
+            }
         }
 
 
     </div>
 </div>
+
+<PopupMessage NavigateTo="@popupNavigate" ButtonText="@popupButton" Show="popupMessage" OnHideCallback="@(()=>popupMessage = false)" Success="popupSuccess" />
 
 <AuthorizeView>
     <AddressRegistrationPopup OnSuccessfulAddressAdd="GetAddressAsync" UserId="@(context.User.Claims.FirstOrDefault(x=>x.Type == ClaimTypes.NameIdentifier).Value)" @ref="_addressRegistrationPopup" />
@@ -76,9 +94,15 @@
     Stage stage = Stage.ModifyProducts;
     string userId = string.Empty;
 
+    bool popupMessage = false;
+    bool popupSuccess = false;
+    string popupButton = string.Empty;
+    string popupNavigate = string.Empty;
+
     AddressRegistrationPopup _addressRegistrationPopup;
 
     IEnumerable<AddressDTO> _addresses = new List<AddressDTO>();
+    AddressDTO _selectedAddress = new AddressDTO();
 
     protected override async Task OnInitializedAsync()
     {
@@ -90,12 +114,23 @@
         userId = authstate.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
     }
 
-
     enum Stage
     {
         ModifyProducts,
         SelectAddAddress,
         Payement
+    }
+
+    void SelectAddress(AddressDTO address)
+    {
+        _selectedAddress = address;
+        stage = Stage.Payement;
+    }
+
+    void Back()
+    {
+        stage = stage - 1;
+        _selectedAddress = new AddressDTO();
     }
 
     async Task OrderListNext()
@@ -122,6 +157,39 @@
 
         await AccountService.DeleteAddressAsync(userId, addressId);
         await GetAddressAsync();
+    }
+
+    async Task PayAsync()
+    {
+        ProductOrderDTO productOrder = new ProductOrderDTO
+            {
+                Address = _selectedAddress,
+                DiscountedPrice = ShoppingCartService.TotalPriceWithDiscounts,
+                TotalPrice = ShoppingCartService.TotalCartPrice,
+                UserId = userId,
+                Products = ShoppingCartService.Products
+            };
+
+        var response = await OrderService.OrderProductsAsnyc(productOrder);
+
+
+        if(response.Result != OperationResult.Ok)
+        {
+            popupNavigate = string.Empty;
+            popupButton = "Close";
+            popupSuccess = false;
+        }
+
+        if(response.Result == OperationResult.Ok)
+        {
+            popupNavigate = "account/orders";
+            popupButton = "Orders page";
+            popupSuccess = true;
+        }
+
+        await ShoppingCartService.DeleteShoppingCartAsync();
+        popupMessage = true;
+
     }
 
 }

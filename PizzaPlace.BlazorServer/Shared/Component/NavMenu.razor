@@ -29,7 +29,7 @@
                 <div @onclick="ShoppingCartClick" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
                     <i class="fa-solid fa-cart-shopping nav-icon"></i>
                     <div class="notification text-white fw-bold">
-                        <span class="notification-number">@ShoppingCartService.ProductCart.Count</span>
+                        <span class="notification-number">@ShoppingCartService.Products.Count</span>
                     </div>
                 </div>
             </div>
@@ -72,7 +72,7 @@
             <div @onclick="ShoppingCartClick" data-toggle="tooltip" title="Cart" class="nav-icon-wrap @(cartActive?"bg-white text-danger":"text-white")">
                 <i class="fa-solid fa-cart-shopping  nav-icon"></i>
                 <div class="notification text-white fw-bold">
-                        <span class="notification-number">@ShoppingCartService.ProductCart.Count</span>
+                        <span class="notification-number">@ShoppingCartService.Products.Count</span>
                 </div>
             </div>
         </div>

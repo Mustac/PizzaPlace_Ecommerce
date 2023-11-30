@@ -26,7 +26,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 BaseService.ConnString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 ServicesRegistrator.Register(builder.Services, builder.Configuration);
+
 builder.Services.AddScoped<ConfirmationModal>();
 
 var app = builder.Build();

@@ -11,25 +11,20 @@ public class ProductDTO
     public float DiscountedPrice { get; set; }
     public bool IsHovering { get; set; }
     public int Amount { get; set; }
+    public bool ProductNeedsDeletion { get; set; }
     public bool IsArchived { get; set; }
 }
 
 public class ProductOrderDTO
 {
+    public string? UserId { get; set; }
     public bool CanUserOrder { get; set; } = true;
-    public List<ProductCartDTO> ProductCart { get; set;} = new List<ProductCartDTO>();
+    public float TotalPrice { get; set; }
+    public float DiscountedPrice { get; set; }
+    public AddressDTO? Address { get; set; }
+    public List<ProductDTO>? Products { get; set;}
 }
 
-public class ProductCartDTO
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Ingredients { get; set; } = string.Empty;
-    public float Price { get; set; }
-    public float DiscountedPrice { get; set; }
-    public bool ProductNeedsDeletion { get; set; }
-    public int Amount { get; set; }
-}
 
 public class ProductInputDTO
 {

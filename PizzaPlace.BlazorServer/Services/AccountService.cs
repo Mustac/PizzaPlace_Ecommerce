@@ -47,12 +47,12 @@ public class AccountService : BaseService
 
             if (success)
             {
-                OperationResponse.Ok("Address added");
+                return OperationResponse.Ok("Address added");
             }
             else
             {
                 _toastService.ShowError("Address could not be added");
-                OperationResponse.Fail();
+               return OperationResponse.Fail();
             }
 
 

@@ -8,13 +8,13 @@
 
 
 <div>
-    @if (ShoppingCartService.ProductCart is null || ShoppingCartService.ProductCart.Count == 0)
+    @if (ShoppingCartService.Products is null || ShoppingCartService.Products.Count == 0)
     {
         <h5>Your cart is empty ...</h5>
     }
     else
     {
-        @foreach (var product in ShoppingCartService.ProductCart)
+        @foreach (var product in ShoppingCartService.Products)
         {
             @if (product.ProductNeedsDeletion)
             {
@@ -130,7 +130,7 @@
     async Task ProductExist(ProductDTO product)
       => ToastService.ShowInfo($"{product.Name} is already in the cart");
 
-    async Task ModifyAmountAsync(ProductCartDTO product, bool sumup)
+    async Task ModifyAmountAsync(ProductDTO product, bool sumup)
     {
         if (sumup)
             product.Amount++;

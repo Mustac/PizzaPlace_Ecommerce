@@ -40,6 +40,8 @@ public class ServicesRegistrator
 
         services.AddScoped<AccountService>();
 
+        services.AddScoped<OrderService>();
+        
         services.AddSingleton<GlobalService>();
 
         var userManager = services.BuildServiceProvider().GetRequiredService(typeof(UserManager<ApplicationUser>)) as UserManager<ApplicationUser>;

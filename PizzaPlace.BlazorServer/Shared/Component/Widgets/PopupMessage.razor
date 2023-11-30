@@ -1,0 +1,109 @@
+﻿@using System.Timers;
+@inject NavigationManager NavigationManager
+@implements IDisposable
+@if (Show)
+{
+    <div class="modal-popup p-3 text-center">
+        @if (stage == 0)
+        {
+            <img src="/images/pizzaloader.gif" width="100" />
+            <p>Ordering ...</p>
+            <p>Please wait</p>
+        }
+        else if(stage == 1 && Success)
+        {
+            <img src="/images/ok.gif" width="100" />
+            <p>Your order is on the way</p>
+        } else if(stage == 1 && !Success)
+        {
+            <img src="/images/X.png" width="100" />
+            <p>Could not order, please try again</p>
+        }
+
+        @if(stage == 1)
+        {
+            <button @onclick="HidePopupAsync" class="btn btn-primary my-2">@ButtonText</button>
+        }
+    </div>
+}
+
+<ShadowOverlay Show="Show" />
+
+@code {
+    private Timer? timer;
+    private int stage = 0;
+    private bool show = false;
+
+    [Parameter]
+    public string ButtonText { get; set; } = "Close";
+
+    [Parameter]
+    public string NavigateTo { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool Success { get; set; }
+
+    [Parameter]
+    public bool Show
+    {
+        get => show;
+        set
+        {
+            if (value)
+            {
+                show = true;
+                stage = 0; // Set 1stage to 0 when Show is set to true
+                StartTimer();
+            }
+            else
+            {
+                show = false;
+                timer?.Stop();
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        timer = new Timer(2000);
+        timer.Elapsed += OnTimerElapsed;
+    }
+
+    private void StartTimer()
+    {
+        timer?.Stop(); // Stop the timer if it's already running
+        timer?.Start(); // Start the timer
+    }
+
+    private void OnTimerElapsed(object source, ElapsedEventArgs e)
+    {
+        stage = 1; // Change stage to 1 after 2 seconds
+        timer?.Stop(); // Stop the timer
+
+        InvokeAsync(() =>
+        {
+            StateHasChanged(); // Refresh the UI
+        });
+    }
+
+    [Parameter]
+    public EventCallback OnHideCallback { get; set; }
+
+    async Task HidePopupAsync()
+    {
+        if (NavigateTo != string.Empty)
+            NavigationManager.NavigateTo(NavigateTo);
+
+        await OnHideCallback.InvokeAsync();
+        Show = false;
+    }
+
+    public void Dispose()
+    {
+        if (timer != null)
+        {
+            timer.Elapsed -= OnTimerElapsed;
+            timer.Dispose();
+        }
+    }
+}

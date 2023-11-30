@@ -24,14 +24,14 @@ public class ShoppingCartService : IDisposable
 
     public ProductOrderDTO ProductOrder { get; set; } = new ProductOrderDTO();
 
-    public List<ProductCartDTO> ProductCart
+    public List<ProductDTO> Products
     {
         get
         {
-            if (ProductOrder is not null && ProductOrder.ProductCart is not null)
-                return ProductOrder.ProductCart;
+            if (ProductOrder is not null && ProductOrder.Products is not null)
+                return ProductOrder.Products;
 
-            return new List<ProductCartDTO>();
+            return new List<ProductDTO>();
         }
     }
 
@@ -40,15 +40,15 @@ public class ShoppingCartService : IDisposable
     /// <summary>
     /// Gets the total cart price of the products without discounts.
     /// </summary>
-    public float TotalCartPrice => ProductCart.Where(x => !x.ProductNeedsDeletion).Sum(x => x.Amount * x.Price);
+    public float TotalCartPrice => Products.Where(x => !x.ProductNeedsDeletion).Sum(x => x.Amount * x.Price);
 
     /// <summary>
     /// Gets the total price with discounts applied.
     /// </summary>
     public float TotalPriceWithDiscounts =>
-        ProductCart.Where(x => x.DiscountedPrice > 0 && !x.ProductNeedsDeletion)
+        Products.Where(x => x.DiscountedPrice > 0 && !x.ProductNeedsDeletion)
                 .Sum(x => x.DiscountedPrice * x.Amount) +
-        ProductCart.Where(x => x.DiscountedPrice == 0 && !x.ProductNeedsDeletion)
+        Products.Where(x => x.DiscountedPrice == 0 && !x.ProductNeedsDeletion)
                .Sum(x => x.Price * x.Amount);
 
 
@@ -57,11 +57,7 @@ public class ShoppingCartService : IDisposable
     /// </summary>
     public float TotalDiscounts => TotalCartPrice - TotalPriceWithDiscounts;
 
-    public async Task LoadCartAsync()
-    => await ErrorHanding(async () =>
-    {
-        
-    });
+
 
         public async Task CheckShoppingCartProducts(ProductDTO product)
         => await ErrorHanding(async () =>
@@ -73,7 +69,7 @@ public class ShoppingCartService : IDisposable
 
             var productsDB = response.Data;
 
-            var prodsToDelete = ProductCart.Where(x => !productsDB.Any(y => y.Id == x.Id)).ToList();
+            var prodsToDelete = Products.Where(x => !productsDB.Any(y => y.Id == x.Id)).ToList();
 
             ProductOrder.CanUserOrder = prodsToDelete.Count == 0;
 
@@ -102,19 +98,19 @@ public class ShoppingCartService : IDisposable
                 return false;
 
             var productsOrderDTO = await _localStorageService.GetItemAsync<ProductOrderDTO>("cart");
-            var productCartDTO = _mapper.Map<ProductCartDTO>(product);
+            var productCartDTO = _mapper.Map<ProductDTO>(product);
 
-
-            if (productsOrderDTO is null || productsOrderDTO.ProductCart is null || productsOrderDTO.ProductCart.Count == 0)
+            if (productsOrderDTO is null || productsOrderDTO.Products is null || productsOrderDTO.Products.Count == 0)
             {
-                ProductOrder.ProductCart.Add(productCartDTO);
+                ProductOrder.Products = new List<ProductDTO>();
+                ProductOrder.Products.Add(productCartDTO);
                 ProductOrder.CanUserOrder = true;
             }
             else
             {
-                var tempProd = productsOrderDTO.ProductCart.FirstOrDefault(x => x.Id == product.Id);
+                var tempProd = productsOrderDTO.Products.FirstOrDefault(x => x.Id == product.Id);
 
-                if (tempProd is not null && ProductOrder.ProductCart.Any(x => x.Id == tempProd.Id))
+                if (tempProd is not null && ProductOrder.Products.Any(x => x.Id == tempProd.Id))
                 {
                     
                     if (OnAddToCartProductExist is not null)
@@ -122,12 +118,11 @@ public class ShoppingCartService : IDisposable
                 }
                 else
                 {
-                    ProductOrder.ProductCart.Add(productCartDTO);
+                    ProductOrder.Products.Add(productCartDTO);
           
                 }
 
             }
-            await LoadCartAsync();
             await SaveShoppingCartToLocalStorageAsync();
             return true;
         });
@@ -148,7 +143,7 @@ public class ShoppingCartService : IDisposable
                 return;
             }
 
-            NumberOfProducts = ProductCart.Where(x => !x.ProductNeedsDeletion).Sum(x => x.Amount);
+            NumberOfProducts = Products.Where(x => !x.ProductNeedsDeletion).Sum(x => x.Amount);
 
 
         });
@@ -174,8 +169,13 @@ public class ShoppingCartService : IDisposable
     /// <summary>
     /// Deletes the entire shopping cart from local storage.
     /// </summary>
-    public async Task DeleteShoppingCartAsync() =>
+    public async Task DeleteShoppingCartAsync()
+    {
         await _localStorageService.RemoveItemAsync("cart");
+        ProductOrder.Products = new List<ProductDTO>();
+        if (OnShoppingCartChange is not null)
+            await OnShoppingCartChange.Invoke();
+    }
 
 
     /// <summary>
@@ -185,15 +185,15 @@ public class ShoppingCartService : IDisposable
     public async Task DeleteSingleProduct(int productId)
     => await ErrorHanding(async () =>
     {
-        var product = ProductCart.FirstOrDefault(p => p.Id == productId);
+        var product = Products.FirstOrDefault(p => p.Id == productId);
         if (product != null)
         {
-            ProductCart.Remove(product);
+            Products.Remove(product);
             await SaveShoppingCartToLocalStorageAsync();
         }
         await ReloadShoppingCartListAsync();
 
-        ProductOrder.CanUserOrder = ProductCart.Any(x => !x.ProductNeedsDeletion);
+        ProductOrder.CanUserOrder = Products.Any(x => !x.ProductNeedsDeletion);
 
         if (OnShoppingCartChange is not null)
             await OnShoppingCartChange.Invoke();
