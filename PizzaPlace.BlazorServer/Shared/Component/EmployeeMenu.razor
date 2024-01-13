@@ -11,7 +11,7 @@
             }
             @if(userClaims.IsInRole(Role.Manager) || userClaims.IsInRole(Role.Chef))
             {
-                <a class="btn btn-primary" data-toggle="tooltip" title="Chef panel"><i class="fa-solid fa-utensils"></i></a>
+                <a class="btn btn-primary" href="/chef/orderlist" data-toggle="tooltip" title="Chef panel"><i class="fa-solid fa-utensils"></i></a>
             }
             @if(userClaims.IsInRole(Role.Manager) || userClaims.IsInRole(Role.Delivery))
             {

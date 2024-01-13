@@ -1,0 +1,34 @@
+﻿.work-table{
+    height:95vh;
+    background-color:gray;
+    display:grid;
+    grid-template-columns: 50% 50%;
+}
+
+.pending-orders {
+    border-right:1px solid black;
+    overflow:auto;
+}
+
+.accepted-orders {
+}
+
+.work-table-head{
+    text-align:center;
+    padding:5px 0;
+    background-color:black;
+    color:white;
+}
+
+.order {
+    width: 80%;
+    background-color: rgb(197, 197, 197);
+    margin: 20px auto;
+    border-radius:10px;
+}
+
+.user-name{
+    height:5vh;
+    padding:0;
+    margin:0;
+}

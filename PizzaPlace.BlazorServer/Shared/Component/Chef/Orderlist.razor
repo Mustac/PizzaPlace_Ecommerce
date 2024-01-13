@@ -1,0 +1,57 @@
+﻿@page "/chef/orderlist"
+@layout ChefLayout
+@inject OrderService OrderService
+
+<AuthorizeView>
+    <Authorized>
+                <h5 class="user-name">User : @context.User.Identity.Name </h5>
+        <div class="work-table" style="background-color:darkblue;">
+            <div class="pending-orders">
+                <h6 class="work-table-head sticky-top">Pending Orders</h6>
+                    @if(pendingOrders is not null)
+                    {
+                        @foreach(var pendingOrder in pendingOrders)
+                        {
+                <div class="order">
+                    <div class="d-flex justify-content-between mx-3">
+                            <p>@pendingOrder.TimeOrdered.ToShortDateString()</p>
+                            <p>@pendingOrder.TimeOrdered.ToShortTimeString()</p>
+                        </div>
+                </div>
+                        }
+                    }
+
+            </div>
+            <div class="accepted-orders" style="background-color:cornflowerblue;">
+                <h6 class="work-table-head sticky-top">Accepted Orders</h6>
+                @if (acceptedOrders is not null)
+                {
+                    @foreach (var acceptedOrder in acceptedOrders)
+                    {
+                    <div class="order">
+                        <p>@acceptedOrder.TimeOrdered</p>
+                        </div>
+
+                    }
+                }
+
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+@code{
+    List<Order> pendingOrders = new List<Order>();
+    List<Order> acceptedOrders = new List<Order>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        var response = await OrderService.GetProcessingOrders();
+
+        if (response.Result != OperationResult.Ok)
+            return;
+
+        pendingOrders = response.Data.Where(x => x.OrderStatus == OrderStatus.Pending).ToList();
+        acceptedOrders = response.Data.Where(x => x.OrderStatus == OrderStatus.Cooking).ToList();
+    }
+}

@@ -3,7 +3,7 @@
     public enum OrderStatus
     {
         Pending,
-        Processing,
+        Cooking,
         Shipped,
         Delivered
     }
