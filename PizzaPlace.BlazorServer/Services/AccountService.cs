@@ -1,6 +1,8 @@
 ﻿
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using PizzaPlace.BlazorServer.Pages.Manager;
 using System.Configuration;
 
 namespace PizzaPlace.BlazorServer.Services;
@@ -78,4 +80,23 @@ public class AccountService : BaseService
         return await context.SaveChangesAsync() > 0 ? OperationResponse.Ok() : OperationResponse.Fail();
 
     }, notifications:true);
+
+    public async Task<OperationResponse<ApplicationUser>> GetUserAsync(string userId)
+        => await ProcessRequestAsync(async context =>
+        {
+            var user = await context.Users.Include(x => x.Addresses).FirstOrDefaultAsync(x => x.Id == userId);
+
+            if(user is null)
+                return OperationResponse<ApplicationUser>.NotFound();
+
+            return OperationResponse<ApplicationUser>.CreateDataResponse(user);
+        });
+
+    public async Task<OperationResponse<IEnumerable<Order>>> GetUserOrders(string userId, int fromRecord, int amount)
+        => await ProcessRequestAsync(async context =>
+        {
+            IEnumerable<Order> orders = await context.Orders.Include(x=>x.OrderProducts).ThenInclude(x=>x.Product).Where(x=>x.UserId == userId).Skip(fromRecord).Take(amount).ToListAsync() as IEnumerable<Order>;
+
+            return OperationResponse<IEnumerable<Order>>.CreateDataResponse(orders);
+        });
 }

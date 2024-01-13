@@ -2,10 +2,9 @@
 {
     public enum OrderStatus
     {
-        JustPaid,
-        NotMadeNotDelivered,
-        MadeNotDelivered,
-        MadeTakenForDelivery,
-        MadeDelivered
+        Pending,
+        Processing,
+        Shipped,
+        Delivered
     }
 }

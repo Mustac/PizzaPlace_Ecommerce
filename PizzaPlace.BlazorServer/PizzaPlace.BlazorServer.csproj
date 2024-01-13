@@ -38,6 +38,7 @@
 
   <ItemGroup>
     <Folder Include="Services\GlobalServices\" />
+    <Folder Include="Shared\Component\Chef\" />
   </ItemGroup>
 
   <ItemGroup>

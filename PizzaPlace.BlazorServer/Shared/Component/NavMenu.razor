@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
-<nav class="sticky-top navbar navbar-expand-md @NavBarClass shadow-sm border-bottom border-white" style="z-index:4 !important">
+<nav class="sticky-top navbar navbar-expand-md @NavBarClass shadow-sm border-bottom border-white" style="z-index:20 !important">
     <div class="container">
         <a class="navbar-brand text-light" href="#"><h4 class="m-0 p-0">@NavBarLogoText</h4></a>
         @if(AccessFrom == Page.CustomerPage)
@@ -64,7 +64,7 @@
             else
             {
                 <div class="nav-icon-wrap ico">
-                    <NavLink @onclick="ToggleMenu" Match="NavLinkMatch.All" class="nav-link text-white" data-toggle="tooltip" title="Account" href="/account">
+                    <NavLink @onclick="ToggleMenu" Match="NavLinkMatch.Prefix" class="nav-link text-white" data-toggle="tooltip" title="Account" href="/account">
                         <i class="fa-solid fa-user-check " style="padding:12px;"></i>
                     </NavLink>
                 </div>

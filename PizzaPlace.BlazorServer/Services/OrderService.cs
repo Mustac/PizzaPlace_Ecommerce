@@ -43,7 +43,7 @@ namespace PizzaPlace.BlazorServer.Services
             Order order = new Order
             {
                 DiscountedPrice = productOrder.DiscountedPrice,
-                OrderStatus = OrderStatus.JustPaid,
+                OrderStatus = OrderStatus.Pending,
                 TimeOrdered = DateTime.UtcNow,
                 TotalPrice = productOrder.TotalPrice,
                 UserId = user.Id,
@@ -61,6 +61,7 @@ namespace PizzaPlace.BlazorServer.Services
                     ProductId = prod.Id,
                     Quantity = prod.Amount,
                     Order = order,
+                    Price = prod.DiscountedPrice==0?prod.Price:prod.DiscountedPrice
                 });
             }
 

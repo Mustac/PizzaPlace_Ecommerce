@@ -478,6 +478,37 @@ a {
     justify-content: space-between;
 }
 
+.status-pending {
+    background-color: yellow !important;
+    color:black !important;
+    font-weight:bolder;
+    /* Additional styling as needed */
+    
+}
+
+.status-processing {
+    background-color: blue !important;
+    /* Additional styling as needed */
+}
+
+.status-shipped {
+    background-color: orange !important;
+    /* Additional styling as needed */
+}
+
+.status-delivered {
+    background-color: green !important;
+    /* Additional styling as needed */
+}
+
+.status-unknown {
+    background-color: gray !important;
+    /* Additional styling for unknown status */
+}
+
+
+
+
 
 .address-info {
     background-color: rgb(234, 234, 234);
@@ -522,6 +553,15 @@ a {
         box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     }
 
+
+.card-order-item{
+    border:1px solid black;
+    border-radius:5px;
+    padding:10px;
+    display:flex;
+    justify-content:space-between;
+    color:white;
+}
 
 
 @media (max-width: 767.98px) {

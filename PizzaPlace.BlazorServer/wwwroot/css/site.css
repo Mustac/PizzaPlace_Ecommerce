@@ -17,6 +17,10 @@
     color: red;
 }
 
+.text-delivered{
+    color:green;
+}
+
 
 #blazor-error-ui {
     background: lightyellow;

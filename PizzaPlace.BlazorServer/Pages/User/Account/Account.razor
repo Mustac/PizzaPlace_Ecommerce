@@ -1,72 +1,134 @@
 ﻿@page "/account"
 @using System.Security.Claims;
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager NavigationManager
+@inject AccountService AccountService
 
 <AuthorizeView>
     <Authorized>
 
 
-<div class="container mb-5">
-    <div class="row mt-5  justify-content-center">
-        <div class="col-12 col-md-3">
-        <h1 class="mb-4">User Profile : </h1>
-      </div>
-    </div>
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-3">
-            <img src="/images/blank-profile-picture.png" class="img-fluid border-1 border border-secondary p-2 rounded shadow" alt="blank-profile-picture.png" />
-        </div>
-        <div class="col-12 col-md-6 mt-5 mt-md-0" >
-            <table class="user-info w-100">
-                <tr>
-                    <td>Name : </td>
-                    <td>Marijan </td>
-                </tr>
-                <tr>
-                    <td>Last Name : </td>
-                    <td>Mustac</td>
-                </tr>
-                <tr>
-                    <td>Email :</td>
-                    <td>mustac.marijan@gmail.com</td>
-
-                </tr>
-                <tr>
-                    <td>Phone :</td>
-                    <td>+47 484 40 716 </td>
-                </tr>
-                <tr>
-                    <td>Address :</td>
-                    <td>Hjeramoen 46A, 2072 Dal </td>
-                </tr>
-                <tr>
-                    <td>Position :</td>
-                              <td>@context.User?.FindFirst(ClaimTypes.Role).Value</td>  
-                </tr>
-            </table>
-
-        </div>
-            <div class="col-12 col-md-8 mt-4">
-                <h4 class="mb-4">Order History : </h4>
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam tincidunt ligula quis arcu gravida, sed interdum risus dapibus. Sed rhoncus metus non lectus consectetur commodo. Phasellus eu malesuada ex. Phasellus convallis dapibus volutpat. Maecenas pellentesque gravida nunc in ornare. Curabitur nec dictum massa. Vestibulum ac eros ipsum. Nullam quam ligula, laoreet eu ligula quis, ultricies consequat tortor. In nulla ipsum, pellentesque quis mi ut, iaculis porta augue. Suspendisse et justo non mi gravida mattis eu eget sapien. Vivamus sodales sollicitudin mi. Aenean sed orci ut tortor vestibulum pretium. Etiam purus nisl, condimentum id molestie non, lobortis a massa. Fusce in vehicula quam. Praesent non pulvinar mi, sed pellentesque urna.
-
-                Aliquam ac justo ut nisl efficitur convallis. Quisque volutpat lobortis erat vel dictum. Maecenas suscipit nisl in suscipit pellentesque. Vivamus erat est, facilisis sed risus ullamcorper, finibus varius dolor. In tortor eros, interdum sit amet neque non, malesuada suscipit sapien. Proin tincidunt commodo rhoncus. Nulla facilisi.
-
-                Mauris neque nibh, lobortis ac rhoncus vel, consectetur ut mauris. Quisque iaculis ex dui. Vivamus ut quam metus. In hac habitasse platea dictumst. Mauris non massa eu arcu auctor tincidunt vel vitae quam. In hac habitasse platea dictumst. Nullam tincidunt risus odio, vitae mollis eros tempor at.
-            </p>
+        <div class="container mb-5">
+            <div class="row mt-5  justify-content-center">
+                <div class="col-12 col-md-3">
+                    <h1 class="mb-4">User Profile : </h1>
+                </div>
             </div>
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-3">
+                    <img src="/images/blank-profile-picture.png" class="img-fluid border-1 border border-secondary p-2 rounded shadow" alt="blank-profile-picture.png" />
+                </div>
+                <div class="col-12 col-md-6 mt-5 mt-md-0">
+                    <table class="user-info">
+                        <tr>
+                            <td>Name : </td>
+                            <td> Placeholder </td>
+                        </tr>
+                        <tr>
+                            <td>Last Name : </td>
+                            <td> Placeholder </td>
+                        </tr>
+                        <tr>
+                            <td>Email :</td>
+                            <td>@User.UserName</td>
+
+                        </tr>
+                        <tr>
+                            <td>Phone :</td>
+                            <td> Placeholder </td>
+                        </tr>
+                        <tr>
+                            <td>Address :</td>
+                            <td style="font-size:0.9rem;">
+                                @if (User.Addresses is not null)
+                                {
+                                    @foreach (var add in User.Addresses)
+                                    {
+                                        <div class="border border-0 border-bottom border-dark">@add.Street, @add.Zip @add.City</div>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Position :</td>
+                            <td>@context.User?.FindFirst(ClaimTypes.Role).Value</td>
+                        </tr>
+                    </table>
+
+                </div>
                 <div class="col-12 col-md-8 mt-4">
-                    <a href="/identity/account/logout" class="btn btn-outline-danger w-100">Logout</a>
+                    <h4 class="mb-4">Order History : </h4>
+                    @foreach (var order in orders)
+                    {
+                        <div class="border-1 border rounded border-dark mt-3">
+                            <div class="card-order-item @( GetStatusClass(order.OrderStatus))">
+                                <div>Date : @(order.TimeOrdered.ToShortDateString()) Price : @order.DiscountedPrice.ToString("#.##")$</div>
+                                <div>Order Status : <span>@order.OrderStatus</span></div>
+                            </div>
+                            @if(order.OrderProducts is not null)
+                            {
+                                @foreach(var orderItem in order.OrderProducts)
+                                {
+                                    <div class="px-5 py-1">
+                                        <div class="d-flex justify-content-between border border-0 border-bottom border-dark">
+                                            <div>@orderItem.Product.Name<span class="text-danger"> x @orderItem.Quantity</span></div>
+                                            <div class="float-end">@(orderItem.Price*orderItem.Quantity)</div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="col-12 col-md-8 mt-4">
+                    <a href="/identity/account/logout" class="btn btn-outline-danger d-block">Logout</a>
+
+                </div>
 
             </div>
-        
-    </div>
-</div>
+        </div>
 
 
     </Authorized>
 </AuthorizeView>
 
 @code {
+    ApplicationUser User = new ApplicationUser();
+    IEnumerable<Order> orders = new List<Order>();
 
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+
+        if (authState is null || authState.User is null || authState.User.Claims is null)
+            NavigationManager.NavigateTo("/", true);
+
+        var userId = authState.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+
+        var response = await AccountService.GetUserAsync(userId);
+
+        if (response.Result != OperationResult.Ok)
+            NavigationManager.NavigateTo("/identity/account/logout", true);
+
+        User = response.Data;
+
+        var orderResult = await AccountService.GetUserOrders(userId, 0, 10);
+
+        if (orderResult.Result != OperationResult.Ok)
+            return;
+
+        orders = orderResult.Data;
+    }
+
+
+    string GetStatusClass(OrderStatus orderStatus)
+     => orderStatus switch
+     {
+         OrderStatus.Pending => "status-pending",
+         OrderStatus.Processing => "status-processing",
+         OrderStatus.Shipped => "status-shipped",
+         OrderStatus.Delivered => "status-delivered",
+         _ => "status-unknown"
+     };
 }
