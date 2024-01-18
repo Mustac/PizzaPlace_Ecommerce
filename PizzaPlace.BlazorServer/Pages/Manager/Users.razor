@@ -1,0 +1,112 @@
+﻿@page "/manager/users/{pagestate}"
+@inject NavigationManager NavigationManager
+@inject ManagerService ManagerService
+@layout ManagerLayout
+
+<div class="container" style="min-width:1200px">
+    <div class="d-flex justify-content-between">
+        <div class="d-flex">
+            <div @onclick="@(()=>NavigationManager.NavigateTo("/manager/users/employees"))" class="btn-option-select @(_tabState == TabState.Employee?"bg-secondary":"bg-soft-gray") p-2">
+                <h3 class="p-2 px-5 mb-0 text-white">Employees</h3>
+            </div>
+            <div @onclick="@(()=>NavigationManager.NavigateTo("/manager/users/customers"))" class="p-2 btn-option-select  @(_tabState == TabState.Customers?"bg-secondary":"bg-soft-gray") align-self-">
+                <h3 class="p-1 text-white ml-2 mb-0">Customers</h3>
+            </div>
+        </div>
+        
+            <div class="align-self-end mb-2">
+                <button class="btn btn-primary btn-sm" >Register new @(_tabState == TabState.Employee?"emplyee":"customer")</button>
+            </div>
+        
+    </div>
+    <div class="product-table bg-primary p-2">
+
+        <table class="bg-white ">
+            <thead>
+                <tr id="table-header">
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (applicationUsers is not null)
+                {
+                    @foreach (var user in applicationUsers)
+                    {
+
+                        <tr>
+                            <td>@user</td>
+                            <td>@user.UserName</td>
+                            <td>
+                                @user.PhoneNumber
+                            </td>
+                            <td>
+                                @if(user.Addresses is not null)
+                                {
+                                    foreach(var address in user.Addresses)
+                                    {
+                                        <div>@address</div>
+                                    }
+                                }
+                             </td>
+
+                            @if (_tabState == TabState.Employee)
+                            {
+                                <td class="text-center">
+                                    <button data-toggle="tooltip" title="Edit Product" class="btn btn-sm btn-outline-dark mx-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button data-toggle="tooltip" title="Archive Product" class="btn btn-sm btn-outline-dark mx-1"><i class="fa-solid fa-ban"></i></button>
+                                </td>
+                            }
+
+                            @if (_tabState == TabState.Customers)
+                            {
+                                <td class="text-center">
+                                    <button data-toggle="tooltip" title="Restore Product" class="btn btn-sm btn-outline-dark" ><i class="fa-solid fa-trash-can-arrow-up mx-1"></i></button>
+                                    <button data-toggle="tooltip" title="Edit Product" class="btn btn-sm btn-outline-dark"><i class="fa-solid fa-pen-to-square mx-1"></i></button>
+                                    <button data-toggle="tooltip" title="Delete Product" class="btn btn-sm btn-outline-dark"><i class="fa-solid fa-trash mx-1"></i></button>
+                                </td>
+                            }
+                        </tr>
+
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public string? PageState { get; set; }
+
+    enum TabState
+    {
+        Employee,
+        Customers
+    }
+
+    TabState _tabState = TabState.Employee;
+
+    IEnumerable<ApplicationUser> applicationUsers = new List<ApplicationUser>();
+
+    protected async override Task OnInitializedAsync()
+    {
+         var responseGetEmployees = await ManagerService.GetEmployeesAsync();
+
+         if (responseGetEmployees.Result == OperationResult.Ok)
+             applicationUsers = responseGetEmployees.Data;
+
+    }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        if (PageState == "employees")
+            _tabState = TabState.Employee;
+        
+        if(PageState == "customers")
+            _tabState = TabState.Customers;
+    }
+
+}

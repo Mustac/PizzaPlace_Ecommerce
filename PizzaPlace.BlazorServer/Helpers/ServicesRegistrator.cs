@@ -40,6 +40,8 @@ public class ServicesRegistrator
 
         services.AddScoped<AccountService>();
 
+        services.AddScoped<ManagerService>();
+
         services.AddScoped<OrderService>();
         
         services.AddSingleton<GlobalService>();
