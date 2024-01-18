@@ -26,8 +26,10 @@ namespace PizzaPlace.BlazorServer.Helpers
 
             ApplicationUser[] applicationUsers = new[] { new ApplicationUser
             {
-                Email = "chef1@gmail.com",
-                UserName = "chef@gmail.com"
+                Email = "chef@gmail.com",
+                UserName = "chef@gmail.com",
+                FirstName = "BusinessAccount",
+                LastName = "BusinessAccount"
             }};
 
             foreach (var user in applicationUsers)
@@ -49,7 +51,9 @@ namespace PizzaPlace.BlazorServer.Helpers
                     }
                 },
                 Email = "delivery1@gmail.com",
-                UserName = "delivery1@gmail.com"
+                UserName = "delivery1@gmail.com",
+                FirstName = "Bjørn",
+                LastName = "Nilsen"
             },
             new ApplicationUser
             {
@@ -63,7 +67,9 @@ namespace PizzaPlace.BlazorServer.Helpers
                     }
                 },
                 Email = "delivery2@gmail.com",
-                UserName = "delivery2@gmail.com"
+                UserName = "delivery2@gmail.com",
+                FirstName = "Solveig",
+                LastName = "Haugen"
             },
             new ApplicationUser
             {
@@ -77,7 +83,9 @@ namespace PizzaPlace.BlazorServer.Helpers
                     }
                 },
                 Email = "delivery3@gmail.com",
-                UserName = "delivery3@gmail.com"
+                UserName = "delivery3@gmail.com",
+                FirstName = "Magnus",
+                LastName = "Andersen"
             },
             new ApplicationUser
             {
@@ -91,7 +99,9 @@ namespace PizzaPlace.BlazorServer.Helpers
                     }
                 },
                 Email = "delivery4@gmail.com",
-                UserName = "delivery4@gmail.com"
+                UserName = "delivery4@gmail.com",
+                FirstName = "Henrik",
+                LastName = "Larsen"
             }
         };
 
@@ -103,6 +113,7 @@ namespace PizzaPlace.BlazorServer.Helpers
 
             var manager = new ApplicationUser
             {
+                
                 Addresses = new List<Address>
                 {
                     new Address
@@ -114,6 +125,9 @@ namespace PizzaPlace.BlazorServer.Helpers
                 },
                 Email = "mustac.marijan@gmail.com",
                 UserName = "mustac.marijan@gmail.com",
+                LastName = "Mustac",
+                FirstName = "Marijan"
+               
             };
 
             

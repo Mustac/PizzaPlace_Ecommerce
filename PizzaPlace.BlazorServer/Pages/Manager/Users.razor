@@ -1,4 +1,5 @@
-﻿@page "/manager/users/{pagestate}"
+﻿@page "/manager/users"
+@page "/manager/users/{PageState}"
 @inject NavigationManager NavigationManager
 @inject ManagerService ManagerService
 @layout ManagerLayout
@@ -24,9 +25,9 @@
         <table class="bg-white ">
             <thead>
                 <tr id="table-header">
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Role</th>
                     <th>Address</th>
                     <th>Action</th>
                 </tr>
@@ -38,10 +39,10 @@
                     {
 
                         <tr>
-                            <td>@user</td>
-                            <td>@user.UserName</td>
+                            <td>@user.FirstName</td>
+                            <td>@user.LastName</td>
                             <td>
-                                @user.PhoneNumber
+                                @user.Role
                             </td>
                             <td>
                                 @if(user.Addresses is not null)
@@ -89,20 +90,30 @@
 
     TabState _tabState = TabState.Employee;
 
-    IEnumerable<ApplicationUser> applicationUsers = new List<ApplicationUser>();
+    List<UserDTO> applicationUsers = new List<UserDTO>();
 
     protected async override Task OnInitializedAsync()
     {
-         var responseGetEmployees = await ManagerService.GetEmployeesAsync();
+         var responseGetDelivery = await ManagerService.GetUsersInRoleAsync(Role.Delivery);
 
-         if (responseGetEmployees.Result == OperationResult.Ok)
-             applicationUsers = responseGetEmployees.Data;
+        if (responseGetDelivery.Result == OperationResult.Ok)
+            applicationUsers.AddRange(responseGetDelivery.Data);
+
+        var responseGetChef = await ManagerService.GetUsersInRoleAsync(Role.Chef);
+
+        if (responseGetChef.Result == OperationResult.Ok)
+            applicationUsers.AddRange(responseGetChef.Data);
+
+        var responseGetManager = await ManagerService.GetUsersInRoleAsync(Role.Manager);
+
+        if (responseGetChef.Result == OperationResult.Ok)
+            applicationUsers.AddRange(responseGetManager.Data);
 
     }
 
     protected async override Task OnParametersSetAsync()
     {
-        if (PageState == "employees")
+        if (PageState == "employees" || string.IsNullOrEmpty(PageState))
             _tabState = TabState.Employee;
         
         if(PageState == "customers")
