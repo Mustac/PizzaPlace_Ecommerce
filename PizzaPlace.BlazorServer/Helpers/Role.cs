@@ -2,8 +2,8 @@
 
 public static class Role
 {
-    public static readonly string Manager = "Manager";
-    public static readonly string Chef = "Chef";
-    public static readonly string Delivery = "Delivery";
-    public static readonly string Customer = "Customer";
+    public const string Manager = "Manager";
+    public const string Chef = "Chef";
+    public const string Delivery = "Delivery";
+    public const string Customer = "Customer";
 }

@@ -172,6 +172,7 @@ public class ShoppingCartService : IDisposable
     public async Task DeleteShoppingCartAsync()
     {
         await _localStorageService.RemoveItemAsync("cart");
+        ProductOrder = new ProductOrderDTO();
         ProductOrder.Products = new List<ProductDTO>();
         if (OnShoppingCartChange is not null)
             await OnShoppingCartChange.Invoke();

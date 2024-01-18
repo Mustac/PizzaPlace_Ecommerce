@@ -6,10 +6,12 @@ public delegate Task ProductEventHandler(ProductDTO productDto);
 public class GlobalService
 {
     public ProductData Product { get; set; }
+    public OrderData Order { get; set; }
 
     public GlobalService()
     {
         Product = new ProductData();
+        Order = new OrderData();
     }
 
     public class ProductData
@@ -33,6 +35,7 @@ public class GlobalService
         public event ProductEventHandler? OnProductDeleted;
         public event ProductEventHandler? OnProductCreated;
         public event ProductEventHandler? OnProductChange;
+
 
         /// <summary>
         /// Event trigger object for ProductEvents
@@ -116,6 +119,35 @@ public class GlobalService
                     await _productEvents.OnProductChange.Invoke(productDto);
             }
 
+        }
+    }
+
+    public class OrderData
+    {
+        public Func<Task>? OnOrderMade;
+        
+       public Triggers EventTriggers { get; set; }
+
+
+        public OrderData()
+        {
+            EventTriggers = new Triggers(this);
+        }
+        
+        public class Triggers
+        {
+            readonly OrderData _orderEvents;
+
+            public Triggers(OrderData orderData)
+            {
+                _orderEvents = orderData;
+            }
+
+            public async Task TriggerOnOrderMade()
+            {
+                if (_orderEvents.OnOrderMade is not null)
+                    await _orderEvents.OnOrderMade.Invoke();
+            }
         }
     }
 }

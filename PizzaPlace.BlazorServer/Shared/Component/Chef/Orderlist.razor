@@ -1,10 +1,12 @@
 ﻿@page "/chef/orderlist"
 @layout ChefLayout
 @inject OrderService OrderService
+@inject GlobalService GlobalService
+@implements IDisposable
+@attribute [Authorize(Roles = Role.Chef + ", " + Role.Manager)]
 
 <AuthorizeView>
     <Authorized>
-        <h5 class="user-name">User : @context.User.Identity.Name </h5>
         <div class="work-table" style="background-color:darkblue;">
             <div class="pending-orders">
                 <h6 class="work-table-head sticky-top">Pending Orders</h6>
@@ -58,6 +60,12 @@
 
     protected async override Task OnInitializedAsync()
     {
+        GlobalService.Order.OnOrderMade += RefreshTheListAsync;
+        await RefreshTheListAsync();
+    }
+
+    public async Task RefreshTheListAsync()
+    {
         var response = await OrderService.GetProcessingOrders();
 
         if (response.Result != OperationResult.Ok)
@@ -65,5 +73,11 @@
 
         pendingOrders = response.Data.Where(x => x.OrderStatus == OrderStatus.Pending).ToList();
         acceptedOrders = response.Data.Where(x => x.OrderStatus == OrderStatus.Baking).ToList();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        GlobalService.Order.OnOrderMade -= RefreshTheListAsync;
     }
 }

@@ -68,9 +68,14 @@ namespace PizzaPlace.BlazorServer.Services
 
             await context.OrderProducts.AddRangeAsync(orderProduct);
 
-            return await context.SaveChangesAsync() > 0 ?
-                OperationResponse.Ok("Order was paid and it is on its way") :
-                OperationResponse.Fail();
+            bool success = await context.SaveChangesAsync() > 0;
+
+            if (!success)
+                return OperationResponse.Fail();
+
+            await _globalService.Order.EventTriggers.TriggerOnOrderMade();
+
+            return OperationResponse.Ok("Order was paid and it is on its way");
 
         }, notifications: false);
 

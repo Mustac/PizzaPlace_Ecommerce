@@ -80,7 +80,6 @@ public class BaseService
         }
         catch (Exception ex)
         {
-            throw ex;
             _toastService.ShowError("Critical error, please try again later");
             return OperationResponse.Fail();
         }
@@ -125,7 +124,6 @@ public class BaseService
         }
         catch (Exception ex)
         {
-            throw ex;
             _toastService.ShowError("Critical error, please try again later");
             return OperationResponse<T>.Fail();
         }
