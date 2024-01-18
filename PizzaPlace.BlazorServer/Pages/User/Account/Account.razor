@@ -77,6 +77,11 @@
                                     </div>
                                 }
                             }
+                            @if(OrderStatus.Delivered != order.OrderStatus)
+                            {
+                                <PizzaStatus PizzaOrderStatus="order.OrderStatus" />
+                            }
+
                         </div>
                     }
                 </div>
@@ -126,8 +131,8 @@
      => orderStatus switch
      {
          OrderStatus.Pending => "status-pending",
-         OrderStatus.Cooking => "status-processing",
-         OrderStatus.Shipped => "status-shipped",
+         OrderStatus.Baking => "status-processing",
+         OrderStatus.Delivery => "status-shipped",
          OrderStatus.Delivered => "status-delivered",
          _ => "status-unknown"
      };

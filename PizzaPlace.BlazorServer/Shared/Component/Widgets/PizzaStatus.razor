@@ -1,0 +1,99 @@
+﻿<div class="progress-bar">
+    <div class="line line1">
+        <div class="line-fill" style="width: @(lineLevels[(int)PizzaOrderStatus]);">
+        </div>
+    </div>
+
+    <div class="icon-wrapper icon-paid">
+        @if (PizzaOrderStatus == OrderStatus.Pending)
+        {
+            <div class="pulsating-circle"></div>
+        }
+        <p class="icon-title">Paid </p>
+        <div class="icon">
+            <img class="icon-img" src="/images/pizza_status/credit-card.png" />
+        </div>
+
+    </div>
+
+    <div class="icon-wrapper icon-prep">
+
+        @if (PizzaOrderStatus == OrderStatus.Preping)
+        {
+            <div class="pulsating-circle"></div>
+        }
+
+        <p class="icon-title">Prep</p>
+        <div class="icon">
+            <img class="icon-img @((int)PizzaOrderStatus<1?"icon-transparent":"")" src="/images/pizza_status/pizza.png" />
+        </div>
+    </div>
+
+    <div class="icon-wrapper icon-baking">
+
+        @if (PizzaOrderStatus == OrderStatus.Baking)
+        {
+            <div class="pulsating-circle"></div>
+        }
+
+        <p class="icon-title">Baking</p>
+        <div class="icon">
+            <img class="icon-img @((int)PizzaOrderStatus<2?"icon-transparent":"")" src="/images/pizza_status/pizza-oven.png" />
+        </div>
+    </div>
+
+    <div class="icon-wrapper icon-delivery">
+
+        @if (PizzaOrderStatus == OrderStatus.Delivery)
+        {
+            <div class="pulsating-circle"></div>
+        }
+
+        <p class="icon-title">Delivery</p>
+        <div class="icon">
+            <img class="icon-img @((int)PizzaOrderStatus<3?"icon-transparent":"")" src="/images/pizza_status/delivery.png" />
+        </div>
+    </div>
+
+    <div class="icon-wrapper icon-delivered">
+
+        @if (PizzaOrderStatus == OrderStatus.Delivered)
+        {
+            <div class="pulsating-circle"></div>
+        }
+
+        <p class="icon-title">Delivered</p>
+        <div class="icon">
+            <img class="icon-img @((int)PizzaOrderStatus<4?"icon-transparent":"")" src="/images/pizza_status/delivery-man.png" />
+        </div>
+    </div>
+
+</div>
+
+@code{
+    [Parameter]
+    public OrderStatus PizzaOrderStatus { get; set; } = OrderStatus.Pending;
+
+    static readonly string[] lineLevels = { "0%", "25%", "50%", "75%", "100%" };
+
+    private int widthlevel = 0;
+
+    // protected override void OnParametersSet()
+    // {
+    //     switch (PizzaOrderStatus)
+    //     {
+    //         case OrderStatus.Pending: width = lineLevels[0]; break;
+    //         case OrderStatus.Preping: width = lineLevels[1]; break;
+    //         case OrderStatus.Baking: width = lineLevels[2]; break;
+    //         case OrderStatus.Delivery: width = lineLevels[3]; break;
+    //         case OrderStatus.Delivered: width = lineLevels[4]; break;
+
+    //         default:width = lineLevels[0]; break;
+    //     }
+
+    // }
+
+
+
+
+}

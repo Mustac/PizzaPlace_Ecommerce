@@ -17,10 +17,6 @@ public class Order
     public string UserId { get; set; } = string.Empty;
     public ApplicationUser? User { get; set; }
 
-    [ForeignKey("Chef")]
-    public string? ChefId { get; set; }
-    public ApplicationUser? Chef { get; set; }
-
     [ForeignKey("Delivery")]
     public string? DeliveryId { get; set; }
     public ApplicationUser? Delivery { get; set; }

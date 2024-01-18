@@ -4,22 +4,34 @@
 
 <AuthorizeView>
     <Authorized>
-                <h5 class="user-name">User : @context.User.Identity.Name </h5>
+        <h5 class="user-name">User : @context.User.Identity.Name </h5>
         <div class="work-table" style="background-color:darkblue;">
             <div class="pending-orders">
                 <h6 class="work-table-head sticky-top">Pending Orders</h6>
-                    @if(pendingOrders is not null)
+                @if (pendingOrders is not null)
+                {
+                    @foreach (var pendingOrder in pendingOrders)
                     {
-                        @foreach(var pendingOrder in pendingOrders)
-                        {
-                <div class="order">
-                    <div class="d-flex justify-content-between mx-3">
-                            <p>@pendingOrder.TimeOrdered.ToShortDateString()</p>
-                            <p>@pendingOrder.TimeOrdered.ToShortTimeString()</p>
+                        <div class="order py-1">
+                            <div class="d-flex justify-content-between mx-3">
+                                <p>@pendingOrder.TimeOrdered.ToShortDateString()</p>
+                                <p>@pendingOrder.TimeOrdered.ToShortTimeString()</p>
+                            </div>
+                            <div class="border rounded shadow m-2 bg-white">
+                                @if(pendingOrder.OrderProducts is not null)
+                                {
+                                    @foreach (var prod in pendingOrder.OrderProducts)
+                                    {
+                                        <div class="border border-0 border-bottom border-dark mx-3">
+                                            <span class="py-0">@prod.Product.Name</span>
+                                            <span class="float-end py-0">@prod.Quantity</span>
+                                        </div>
+                                    }
+                                }
+                            </div>
                         </div>
-                </div>
-                        }
                     }
+                }
 
             </div>
             <div class="accepted-orders" style="background-color:cornflowerblue;">
@@ -28,8 +40,8 @@
                 {
                     @foreach (var acceptedOrder in acceptedOrders)
                     {
-                    <div class="order">
-                        <p>@acceptedOrder.TimeOrdered</p>
+                        <div class="order">
+                            <p>@acceptedOrder.TimeOrdered</p>
                         </div>
 
                     }
@@ -40,7 +52,7 @@
     </Authorized>
 </AuthorizeView>
 
-@code{
+@code {
     List<Order> pendingOrders = new List<Order>();
     List<Order> acceptedOrders = new List<Order>();
 
@@ -52,6 +64,6 @@
             return;
 
         pendingOrders = response.Data.Where(x => x.OrderStatus == OrderStatus.Pending).ToList();
-        acceptedOrders = response.Data.Where(x => x.OrderStatus == OrderStatus.Cooking).ToList();
+        acceptedOrders = response.Data.Where(x => x.OrderStatus == OrderStatus.Baking).ToList();
     }
 }

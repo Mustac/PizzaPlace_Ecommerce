@@ -78,7 +78,7 @@ namespace PizzaPlace.BlazorServer.Services
         public async Task<OperationResponse<IEnumerable<Order>>> GetProcessingOrders()
             => await ProcessRequestAsync<IEnumerable<Order>>(async context =>
             {
-                var orders = await context.Orders.Include(x=>x.OrderProducts).ThenInclude(x=>x.Product).Where(x => x.OrderStatus == OrderStatus.Cooking || x.OrderStatus == OrderStatus.Pending).ToListAsync();
+                var orders = await context.Orders.Include(x=>x.OrderProducts).ThenInclude(x=>x.Product).Where(x => x.OrderStatus == OrderStatus.Baking || x.OrderStatus == OrderStatus.Pending).ToListAsync();
 
                 if (orders is null)
                     return OperationResponse<IEnumerable<Order>>.Fail();

@@ -26,59 +26,8 @@ namespace PizzaPlace.BlazorServer.Helpers
 
             ApplicationUser[] applicationUsers = new[] { new ApplicationUser
             {
-                Addresses = new List<Address>
-                {
-                    new Address
-                    {
-                        City = "Oslo",
-                        Street = "Torggata 18",
-                        Zip = "0181",
-                    }
-                },
                 Email = "chef1@gmail.com",
-                UserName = "chef1@gmail.com"
-            },
-                new ApplicationUser
-            {
-                    Addresses = new List<Address>
-                {
-                    new Address
-                    {
-                        City = "Oslo",
-                        Street = "Karl Johans gate 22",
-                        Zip = "0159",
-                    }
-                },
-                Email = "chef2@gmail.com",
-                UserName = "chef2@gmail.com"
-            },
-                new ApplicationUser
-            {
-                      Addresses = new List<Address>
-                {
-                    new Address
-                    {
-                        City = "Oslo",
-                        Street = "Storgata 32",
-                        Zip = "0184",
-                    }
-                },
-                Email = "chef3@gmail.com",
-                UserName = "chef3@gmail.com"
-            },
-                new ApplicationUser
-            {
-                    Addresses = new List<Address>
-                {
-                    new Address
-                    {
-                        City = "Oslo",
-                        Street = "Prinsens gate 15",
-                        Zip = "0152",
-                    }
-                },
-                Email = "chef4@gmail.com",
-                UserName = "chef4@gmail.com"
+                UserName = "chef@gmail.com"
             }};
 
             foreach (var user in applicationUsers)
@@ -164,7 +113,7 @@ namespace PizzaPlace.BlazorServer.Helpers
                     }
                 },
                 Email = "mustac.marijan@gmail.com",
-                UserName = "mustac.marijan@gmail.com"
+                UserName = "mustac.marijan@gmail.com",
             };
 
             

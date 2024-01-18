@@ -54,11 +54,6 @@ namespace PizzaPlace.BlazorServer.Data
             .IsRequired();
 
             builder.Entity<ApplicationUser>()
-                .HasMany(u => u.ChefOrders)
-                .WithOne(o => o.Chef)
-                .HasForeignKey(o => o.ChefId);
-
-            builder.Entity<ApplicationUser>()
                 .HasMany(u => u.DeliveryOrders)
                 .WithOne(o => o.Delivery)
                 .HasForeignKey(o => o.DeliveryId);

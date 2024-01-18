@@ -3,8 +3,9 @@
     public enum OrderStatus
     {
         Pending,
-        Cooking,
-        Shipped,
+        Preping,
+        Baking,
+        Delivery,
         Delivered
     }
 }

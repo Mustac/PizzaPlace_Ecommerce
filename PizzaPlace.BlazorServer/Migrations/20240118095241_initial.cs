@@ -211,26 +211,19 @@ namespace PizzaPlace.BlazorServer.Migrations
                     TimeDelivered = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     TotalPrice = table.Column<float>(type: "real", nullable: false),
                     DiscountedPrice = table.Column<float>(type: "real", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
+                    OrderStatus = table.Column<int>(type: "integer", nullable: false),
+                    FullAddress = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<string>(type: "text", nullable: false),
-                    ChefId = table.Column<string>(type: "text", nullable: false),
-                    DeliveryId = table.Column<string>(type: "text", nullable: false)
+                    DeliveryId = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Orders_AspNetUsers_ChefId",
-                        column: x => x.ChefId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Orders_AspNetUsers_DeliveryId",
                         column: x => x.DeliveryId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Orders_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -267,7 +260,8 @@ namespace PizzaPlace.BlazorServer.Migrations
                     OrderId = table.Column<int>(type: "integer", nullable: false),
                     ProductId = table.Column<int>(type: "integer", nullable: false),
                     Id = table.Column<int>(type: "integer", nullable: false),
-                    Quantity = table.Column<int>(type: "integer", nullable: false)
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    Price = table.Column<float>(type: "real", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -291,26 +285,26 @@ namespace PizzaPlace.BlazorServer.Migrations
                 columns: new[] { "Id", "DateCreated", "DiscountedPrice", "Ingredients", "IsArchived", "IsDeleted", "Name", "Price" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3369), 0f, "Tomato, Mozzarella, Basil", false, false, "Margherita", 10f },
-                    { 2, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3375), 0f, "Tomato, Mozzarella, Pepperoni", false, false, "Pepperoni", 12f },
-                    { 3, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3377), 0f, "Tomato, Mozzarella, Ham, Pineapple", false, false, "Hawaiian", 13f },
-                    { 4, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3378), 0f, "BBQ Sauce, Mozzarella, Chicken, Red Onion", false, false, "BBQ Chicken", 14f },
-                    { 5, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3379), 0f, "Tomato, Mozzarella, Pepperoni, Ham, Bacon, Sausage", false, false, "Meat Lover", 15f },
-                    { 6, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3382), 0f, "Tomato, Mozzarella, Bell Pepper, Onion, Mushroom, Olives", false, false, "Veggie", 13f },
-                    { 7, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3383), 0f, "Tomato, Mozzarella, Mushroom", false, false, "Mushroom", 12f },
-                    { 8, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3384), 0f, "Tomato, Mozzarella, Cheddar, Feta, Parmesan", false, false, "Four Cheese", 14f },
-                    { 9, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3384), 0f, "Buffalo Sauce, Mozzarella, Chicken, Celery", false, false, "Buffalo Chicken", 14f },
-                    { 10, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3386), 0f, "Tomato, Mozzarella, Pepperoni, Bell Pepper, Onion, Mushroom, Olives, Sausage", false, false, "Supreme", 16f },
-                    { 11, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3387), 0f, "Alfredo Sauce, Mozzarella, Chicken", false, false, "Chicken Alfredo", 14f },
-                    { 12, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3388), 0f, "Olive Oil, Mozzarella, Tomato, Basil", false, false, "White Pizza", 13f },
-                    { 13, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3389), 0f, "Olive Oil, Mozzarella, Shrimp, Garlic", false, false, "Shrimp Scampi", 16f },
-                    { 14, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3390), 0f, "Tomato, Mozzarella, Steak, Bell Pepper, Onion", false, false, "Philly Cheesesteak", 15f },
-                    { 15, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3391), 0f, "Tomato, Mozzarella, Ground Beef, Tomato, Lettuce, Cheddar", false, false, "Taco Pizza", 14f },
-                    { 16, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3391), 0f, "Tomato, Mozzarella, Sausage", false, false, "Sausage", 12f },
-                    { 17, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3392), 0f, "Tomato, Mozzarella, Chicken, Garlic", false, false, "Garlic Chicken", 14f },
-                    { 18, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3394), 0f, "Tomato, Mozzarella, Spinach, Feta", false, false, "Spinach and Feta", 13f },
-                    { 19, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3395), 0f, "Pesto Sauce, Mozzarella, Bell Pepper, Onion, Mushroom, Olives", false, false, "Pesto Veggie", 14f },
-                    { 20, new DateTime(2023, 11, 23, 15, 17, 42, 930, DateTimeKind.Utc).AddTicks(3396), 0f, "Ranch Sauce, Mozzarella, Bacon, Chicken", false, false, "Bacon Ranch", 14f }
+                    { 1, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4730), 0f, "Tomato, Mozzarella, Basil", false, false, "Margherita", 10f },
+                    { 2, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4737), 0f, "Tomato, Mozzarella, Pepperoni", false, false, "Pepperoni", 12f },
+                    { 3, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4739), 0f, "Tomato, Mozzarella, Ham, Pineapple", false, false, "Hawaiian", 13f },
+                    { 4, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4740), 0f, "BBQ Sauce, Mozzarella, Chicken, Red Onion", false, false, "BBQ Chicken", 14f },
+                    { 5, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4741), 0f, "Tomato, Mozzarella, Pepperoni, Ham, Bacon, Sausage", false, false, "Meat Lover", 15f },
+                    { 6, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4743), 0f, "Tomato, Mozzarella, Bell Pepper, Onion, Mushroom, Olives", false, false, "Veggie", 13f },
+                    { 7, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4744), 0f, "Tomato, Mozzarella, Mushroom", false, false, "Mushroom", 12f },
+                    { 8, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4745), 0f, "Tomato, Mozzarella, Cheddar, Feta, Parmesan", false, false, "Four Cheese", 14f },
+                    { 9, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4746), 0f, "Buffalo Sauce, Mozzarella, Chicken, Celery", false, false, "Buffalo Chicken", 14f },
+                    { 10, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4747), 0f, "Tomato, Mozzarella, Pepperoni, Bell Pepper, Onion, Mushroom, Olives, Sausage", false, false, "Supreme", 16f },
+                    { 11, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4748), 0f, "Alfredo Sauce, Mozzarella, Chicken", false, false, "Chicken Alfredo", 14f },
+                    { 12, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4749), 0f, "Olive Oil, Mozzarella, Tomato, Basil", false, false, "White Pizza", 13f },
+                    { 13, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4750), 0f, "Olive Oil, Mozzarella, Shrimp, Garlic", false, false, "Shrimp Scampi", 16f },
+                    { 14, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4751), 0f, "Tomato, Mozzarella, Steak, Bell Pepper, Onion", false, false, "Philly Cheesesteak", 15f },
+                    { 15, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4752), 0f, "Tomato, Mozzarella, Ground Beef, Tomato, Lettuce, Cheddar", false, false, "Taco Pizza", 14f },
+                    { 16, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4752), 0f, "Tomato, Mozzarella, Sausage", false, false, "Sausage", 12f },
+                    { 17, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4753), 0f, "Tomato, Mozzarella, Chicken, Garlic", false, false, "Garlic Chicken", 14f },
+                    { 18, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4755), 0f, "Tomato, Mozzarella, Spinach, Feta", false, false, "Spinach and Feta", 13f },
+                    { 19, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4755), 0f, "Pesto Sauce, Mozzarella, Bell Pepper, Onion, Mushroom, Olives", false, false, "Pesto Veggie", 14f },
+                    { 20, new DateTime(2024, 1, 18, 9, 52, 41, 483, DateTimeKind.Utc).AddTicks(4756), 0f, "Ranch Sauce, Mozzarella, Bacon, Chicken", false, false, "Bacon Ranch", 14f }
                 });
 
             migrationBuilder.CreateIndex(
@@ -364,11 +358,6 @@ namespace PizzaPlace.BlazorServer.Migrations
                 name: "IX_OrderProducts_ProductId",
                 table: "OrderProducts",
                 column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_ChefId",
-                table: "Orders",
-                column: "ChefId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_DeliveryId",
